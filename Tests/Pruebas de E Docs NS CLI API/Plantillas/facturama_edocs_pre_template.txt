@@ -1,0 +1,69 @@
+<#setting locale = "en_US">
+<#-- 
+================================================================================
+PRE-PLANTILLA FACTURAMA API-LITE V3 - CFDI 4.0 INGRESO (PUE)
+================================================================================
+-->
+{
+  <#-- NODO: COMPROBANTE (Cabecera) -->
+  "NameId": 1, <#-- Propiedad Facturama. 1 = Formato PDF estándar de Factura -->
+  "CfdiType": "I", <#-- Campo SAT: TipoDeComprobante. Fijo a "I" (Ingreso)[cite: 11, 13] -->
+  "Serie": "[ASIGNAR_SERIE]", <#-- Campo SAT: Serie. Opcional[cite: 11, 13] -->
+  "Folio": "[ASIGNAR_FOLIO]", <#-- Campo SAT: Folio. Requerido. Control interno (1 a 40 caracteres)[cite: 11, 13] -->
+  "Date": "[ASIGNAR_FECHA_ISO_8601]", <#-- Campo SAT: Fecha. Formato AAAA-MM-DDThh:mm:ss local[cite: 11, 13] -->
+  
+  <#-- REGLA PUE: Nunca enviar "99" en PUE. Debe ser la clave de liquidación (ej. "01", "03") -->
+  "PaymentForm": "[ASIGNAR_FORMA_PAGO]", <#-- Campo SAT: FormaPago. Catálogo c_FormaPago[cite: 11, 13] -->
+  "PaymentMethod": "PUE", <#-- Campo SAT: MetodoPago. Fijo a "PUE"[cite: 11, 13] -->
+  
+  "Currency": "[ASIGNAR_MONEDA]", <#-- Campo SAT: Moneda. Catálogo ISO 4217 (ej. "MXN")[cite: 11, 13] -->
+  "CurrencyExchangeRate": [ASIGNAR_TIPO_CAMBIO], <#-- Campo SAT: TipoCambio. Requerido si Moneda no es MXN[cite: 11, 13] -->
+  
+  "ExpeditionPlace": "[ASIGNAR_CODIGO_POSTAL_EMISION]", <#-- Campo SAT: LugarExpedicion. CP de la sucursal[cite: 11, 13] -->
+  "Exportation": "01", <#-- Campo SAT: Exportacion. Fijo a "01" (No aplica) para ventas nacionales[cite: 11, 13] -->
+  "PaymentConditions": "[ASIGNAR_CONDICIONES_PAGO]", <#-- Campo SAT: CondicionesDePago. Opcional[cite: 11, 13] -->
+  
+  <#-- NODO: EMISOR (Issuer) -->
+  "Issuer": {
+    "FiscalRegime": "[ASIGNAR_REGIMEN_EMISOR]", <#-- Campo SAT: RegimenFiscal. Catálogo c_RegimenFiscal[cite: 11, 13] -->
+    "Rfc": "[ASIGNAR_RFC_EMISOR]", <#-- Campo SAT: Rfc[cite: 11, 13] -->
+    "Name": "[ASIGNAR_NOMBRE_EMISOR]" <#-- Campo SAT: Nombre[cite: 11, 13] -->
+  },
+
+  <#-- NODO: RECEPTOR (Receiver) -->
+  "Receiver": {
+    "Rfc": "[ASIGNAR_RFC_RECEPTOR]", <#-- Campo SAT: Rfc[cite: 11, 13] -->
+    "Name": "[ASIGNAR_NOMBRE_RECEPTOR]", <#-- Campo SAT: Nombre[cite: 11, 13] -->
+    "TaxZipCode": "[ASIGNAR_CP_RECEPTOR]", <#-- Campo SAT: DomicilioFiscalReceptor. Obligatorio v4.0[cite: 11, 13] -->
+    "FiscalRegime": "[ASIGNAR_REGIMEN_RECEPTOR]", <#-- Campo SAT: RegimenFiscalReceptor. Obligatorio v4.0[cite: 11, 13] -->
+    "CfdiUse": "[ASIGNAR_USO_CFDI]" <#-- Campo SAT: UsoCFDI. Catálogo c_UsoCFDI[cite: 11, 13] -->
+  },
+
+  <#-- NODO: CONCEPTOS (Items) -->
+  "Items": [
+    {
+      "ProductCode": "[ASIGNAR_CLAVE_PROD_SERV]", <#-- Campo SAT: ClaveProdServ. Catálogo SAT[cite: 11, 13] -->
+      "IdentificationNumber": "[ASIGNAR_SKU_INTERNO]", <#-- Campo SAT: NoIdentificacion. Opcional[cite: 11, 13] -->
+      "Description": "[ASIGNAR_DESCRIPCION_ARTICULO]", <#-- Campo SAT: Descripcion[cite: 11, 13] -->
+      "Unit": "[ASIGNAR_UNIDAD_MEDIDA_PROPIA]", <#-- Campo SAT: Unidad. Opcional (ej. "Pieza")[cite: 11, 13] -->
+      "UnitCode": "[ASIGNAR_CLAVE_UNIDAD_SAT]", <#-- Campo SAT: ClaveUnidad. Catálogo SAT (ej. "H87")[cite: 11, 13] -->
+      "UnitPrice": [ASIGNAR_PRECIO_UNITARIO], <#-- Campo SAT: ValorUnitario. Sin impuestos[cite: 11, 13] -->
+      "Quantity": [ASIGNAR_CANTIDAD_LINEA], <#-- Campo SAT: Cantidad[cite: 11, 13] -->
+      "Subtotal": [ASIGNAR_SUBTOTAL_LINEA], <#-- Campo SAT: Importe. (Cantidad * Precio Unitario)[cite: 11, 13] -->
+      "Discount": [ASIGNAR_DESCUENTO_LINEA], <#-- Campo SAT: Descuento. Opcional. 0.0 si no hay[cite: 11, 13] -->
+      "TaxObject": "[ASIGNAR_OBJETO_IMP]", <#-- Campo SAT: ObjetoImp. Obligatorio v4.0. Ej. "02" (Sí objeto de impuesto)[cite: 11, 13] -->
+      
+      <#-- Sub-nodo Traslados de la línea (Requerido si TaxObject es "02") -->
+      "Taxes": [
+        {
+          "Name": "[ASIGNAR_NOMBRE_IMPUESTO_FACTURAMA]", <#-- Campo SAT: Impuesto. Facturama requiere texto ej. "IVA", internamente lo pasa a "002"[cite: 11, 13] -->
+          "Base": [ASIGNAR_BASE_IMPUESTO_LINEA], <#-- Campo SAT: Base[cite: 11, 13] -->
+          "Rate": [ASIGNAR_TASA_IMPUESTO], <#-- Campo SAT: TasaOCuota. Ej. 0.16[cite: 11, 13] -->
+          "Total": [ASIGNAR_IMPORTE_IMPUESTO], <#-- Campo SAT: Importe[cite: 11, 13] -->
+          "IsRetention": false, <#-- Propiedad Facturama para separar Traslados de Retenciones[cite: 13] -->
+          "IsQuota": false <#-- Propiedad Facturama vinculada al TipoFactor Cuota vs Tasa[cite: 13] -->
+        }
+      ]
+    }
+  ]
+}

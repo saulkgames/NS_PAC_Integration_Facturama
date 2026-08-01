@@ -1,0 +1,138 @@
+================================================================================
+DICCIONARIO DE DATOS: INTEGRACIÓN NETSUITE -> FACTURAMA API-LITE (CFDI 4.0 PUE)
+================================================================================
+Propósito: Documentación técnica para el mapeo del E-Document Template.
+Fuentes: Guía de Llenado Anexo 20 (SAT) v4.0 y API Facturama Lite v3.
+
+NOTAS ARQUITECTÓNICAS IMPORTANTES:
+1. Cálculos Automáticos: Facturama calcula dinámicamente los nodos globales (Total, SubTotal Global, Descuento Global e Impuestos Globales) sumando el arreglo de "Items". Por lo tanto, NO se envían en la petición a nivel cabecera para evitar errores de redondeo de centavos.
+2. Identificadores: Facturama usa booleanos (IsRetention, IsQuota) en lugar de separar los arreglos de impuestos como lo hace el SAT (Traslados vs Retenciones).
+
+--------------------------------------------------------------------------------
+1. CABECERA (Root Level)
+--------------------------------------------------------------------------------
+* NameId (Facturama)
+  - SAT equivalente: N/A
+  - Descripción: Identificador del diseño PDF en Facturama. 
+  - Mapeo sugerido: Fijo a 1 (Diseño estándar de Factura).
+
+* CfdiType (Facturama)
+  - SAT equivalente: TipoDeComprobante
+  - Descripción: Efecto del comprobante para el emisor.
+  - Mapeo sugerido: Fijo a "I" (Ingreso).
+
+* Serie / Folio (Facturama)
+  - SAT equivalente: Serie / Folio
+  - Descripción: Control interno del contribuyente.
+  - Mapeo sugerido: Serie = campo custom de la transacción (ej. custbody_mx_cfdi_serie). Folio = transaction.tranid.
+
+* Date (Facturama)
+  - SAT equivalente: Fecha
+  - Descripción: Fecha y hora local de emisión.
+  - Mapeo sugerido: transaction.trandate formateado a ISO 8601 (AAAA-MM-DDThh:mm:ss).
+
+* PaymentForm (Facturama)
+  - SAT equivalente: FormaPago
+  - Descripción: Cómo se pagó el comprobante. 
+  - REGLA CRÍTICA: En operaciones PUE está prohibido usar "99".
+  - Mapeo sugerido: transaction.custbody_mx_txn_sat_payment_method extrayendo solo la clave (ej. "03").
+
+* PaymentMethod (Facturama)
+  - SAT equivalente: MetodoPago
+  - Descripción: PUE (Una exhibición) o PPD (Parcialidades).
+  - Mapeo sugerido: Fijo a "PUE" para este E-Document.
+
+* Currency / CurrencyExchangeRate (Facturama)
+  - SAT equivalente: Moneda / TipoCambio
+  - Descripción: Clave ISO de la moneda y su tipo de cambio FIX.
+  - Mapeo sugerido: transaction.currencysymbol y transaction.exchangerate.
+
+* ExpeditionPlace (Facturama)
+  - SAT equivalente: LugarExpedicion
+  - Descripción: Código postal desde donde se emite.
+  - Mapeo sugerido: transaction.location.zip o transaction.subsidiary.zip.
+
+* Exportation (Facturama)
+  - SAT equivalente: Exportacion
+  - Descripción: Obligatorio en CFDI 4.0 para indicar si hay exportación.
+  - Mapeo sugerido: Fijo a "01" (No aplica) para ventas nacionales.
+
+--------------------------------------------------------------------------------
+2. NODO: EMISOR (Issuer)
+--------------------------------------------------------------------------------
+* FiscalRegime (Facturama) -> SAT: RegimenFiscal
+  - Descripción: Clave del régimen de la empresa emisora.
+  - Mapeo sugerido: transaction.subsidiary.custrecord_mx_sat_industry_type.
+
+* Rfc / Name (Facturama) -> SAT: Rfc / Nombre
+  - Descripción: Datos fiscales de la subsidiaria. 
+  - Mapeo sugerido: transaction.subsidiary.taxidnumber y transaction.subsidiary.legalname.
+
+--------------------------------------------------------------------------------
+3. NODO: RECEPTOR (Receiver)
+--------------------------------------------------------------------------------
+* Rfc / Name (Facturama) -> SAT: Rfc / Nombre
+  - Descripción: Datos fiscales del cliente receptor.
+  - Mapeo sugerido: transaction.customer.custentity_mx_rfc y transaction.customer.companyname.
+
+* TaxZipCode (Facturama) -> SAT: DomicilioFiscalReceptor
+  - Descripción: Obligatorio v4.0. CP del domicilio fiscal del cliente.
+  - Mapeo sugerido: transaction.customer.billzip.
+
+* FiscalRegime (Facturama) -> SAT: RegimenFiscalReceptor
+  - Descripción: Obligatorio v4.0. Clave de régimen del cliente.
+  - Mapeo sugerido: transaction.customer.custentity_mx_sat_industry_type.
+
+* CfdiUse (Facturama) -> SAT: UsoCFDI
+  - Descripción: Uso que el receptor dará a la factura.
+  - Mapeo sugerido: transaction.custbody_mx_cfdi_usage.
+
+--------------------------------------------------------------------------------
+4. NODO: CONCEPTOS (Items) - Sublista de Artículos
+--------------------------------------------------------------------------------
+* ProductCode (Facturama) -> SAT: ClaveProdServ
+  - Descripción: Clave de 8 dígitos del catálogo SAT.
+  - Mapeo sugerido: item.custcol_mx_txn_line_sat_item_code.
+
+* IdentificationNumber (Facturama) -> SAT: NoIdentificacion
+  - Descripción: SKU o número de parte interno.
+  - Mapeo sugerido: item.itemid.
+
+* Description (Facturama) -> SAT: Descripcion
+  - Descripción: Descripción comercial. Escapar caracteres siempre.
+  - Mapeo sugerido: item.description?json_string.
+
+* UnitCode / Unit (Facturama) -> SAT: ClaveUnidad / Unidad
+  - Descripción: Clave SAT (ej. "H87") y unidad propia (ej. "Pieza").
+  - Mapeo sugerido: item.custcol_mx_txn_line_sat_cust_req_num y item.units.
+
+* UnitPrice / Quantity / Subtotal (Facturama) -> SAT: ValorUnitario / Cantidad / Importe
+  - Descripción: Matemática base de la línea. Subtotal = UnitPrice * Quantity.
+  - Mapeo sugerido: item.rate, item.quantity, item.amount.
+
+* TaxObject (Facturama) -> SAT: ObjetoImp
+  - Descripción: Obligatorio v4.0. Indica si la línea grava impuestos ("02" Sí objeto).
+  - Mapeo sugerido: Evaluar lógica o fijo a "02" si todos sus productos gravan IVA.
+
+--------------------------------------------------------------------------------
+5. NODO: IMPUESTOS DE LÍNEA (Items.Taxes)
+--------------------------------------------------------------------------------
+* Name (Facturama) -> SAT: Impuesto (Implícito)
+  - Descripción: Facturama pide el nombre descriptivo ("IVA", "IEPS", "ISR"). Su motor lo traduce a la clave del SAT "002", "003", etc.
+  - Mapeo sugerido: Fijo a "IVA" si es el único impuesto que manejan.
+
+* Base (Facturama) -> SAT: Base
+  - Descripción: Monto sobre el cual se calcula el impuesto.
+  - Mapeo sugerido: Generalmente igual al item.amount (si no hay descuento previo a la base).
+
+* Rate (Facturama) -> SAT: TasaOCuota
+  - Descripción: Tasa en formato decimal (ej. 0.16).
+  - Mapeo sugerido: Extraer del código de impuesto de la línea (taxcode).
+
+* Total (Facturama) -> SAT: Importe
+  - Descripción: Monto del impuesto calculado.
+  - Mapeo sugerido: item.tax1amt.
+
+* IsRetention / IsQuota (Facturama) -> SAT: TipoFactor
+  - Descripción: Banderas lógicas de Facturama. Para IVA trasladado normal, ambas son "false".
+================================================================================

@@ -1,0 +1,128 @@
+{
+  "NameId": 1,
+  "CfdiType": "I",
+  "Folio": "CASHSALE37359",
+  "Date": "2026-07-28T00:00:00",
+  
+  "PaymentForm": "01",
+  "PaymentMethod": "PUE",
+  
+  "Currency": "MXN",
+  "CurrencyExchangeRate": 1,
+  
+  "ExpeditionPlace": "81460",
+  "Exportation": "01",
+
+  "Issuer": {
+    "FiscalRegime": "601",
+    "Rfc": "PFP810520JX0",
+    "Name": "PROVEEDORA DE FIERRO Y PERFILES"
+  },
+  
+  "Receiver": {
+    "Rfc": "AUVS981218849",
+    "Name": "SAUL IVAN ANGULO VARELA",
+    "TaxZipCode": "81490",
+    "FiscalRegime": "626",
+    "CfdiUse": "G03"
+  },
+ 
+  "Items": [
+    {
+      "ProductCode": "46181601",
+      "IdentificationNumber": "TC144",
+      "Description": "Tornillo Cochi 1/4\"x4\"",
+      "Unit": "Pza",
+      "UnitCode": "H87",
+      "UnitPrice": 1.5015,
+      "Quantity": 1,
+      "Subtotal": 1.5,
+      "Discount": 0,
+      "Total": 1.74,
+      "TaxObject": "02",
+       "Taxes": [
+                
+                {
+                  "Name": "IVA",
+                  "Base": 1.5,
+                  "Rate": 0.16,
+                  "Total": 0.24,
+                  "IsRetention": false,
+                  "IsQuota": false
+                }
+        ]
+    },
+    {
+      "ProductCode": "40181800",
+      "IdentificationNumber": "PTGC100C14",
+      "Description": "PTR Galvanizado 1\" x 1\" Cal.14 a 6.00m",
+      "Unit": "PZA",
+      "UnitCode": "H87",
+      "UnitPrice": 243.8205,
+      "Quantity": 2,
+      "Subtotal": 487.64,
+      "Discount": 0,
+      "Total": 565.66,
+      "TaxObject": "02",
+       "Taxes": [
+                
+                {
+                  "Name": "IVA",
+                  "Base": 487.64,
+                  "Rate": 0.16,
+                  "Total": 78.02,
+                  "IsRetention": false,
+                  "IsQuota": false
+                }
+        ]
+    },
+    {
+      "ProductCode": "40181800",
+      "IdentificationNumber": "PTRC100C12",
+      "Description": "PTR 1\" x 1\" Cal.12 a 6.00m",
+      "Unit": "PZA",
+      "UnitCode": "H87",
+      "UnitPrice": 258.363,
+      "Quantity": 5,
+      "Subtotal": 1291.82,
+      "Discount": 0,
+      "Total": 1498.51,
+      "TaxObject": "02",
+       "Taxes": [
+                
+                {
+                  "Name": "IVA",
+                  "Base": 1291.82,
+                  "Rate": 0.16,
+                  "Total": 206.69,
+                  "IsRetention": false,
+                  "IsQuota": false
+                }
+        ]
+    },
+    {
+      "ProductCode": "30263600",
+      "IdentificationNumber": "SOL075125",
+      "Description": "Solera 3/4'' x 1 1/4''",
+      "Unit": "Mt",
+      "UnitCode": "MTR",
+      "UnitPrice": 106.92759,
+      "Quantity": 3,
+      "Subtotal": 320.78,
+      "Discount": 0,
+      "Total": 372.10,
+      "TaxObject": "02",
+       "Taxes": [
+                
+                {
+                  "Name": "IVA",
+                  "Base": 320.78,
+                  "Rate": 0.16,
+                  "Total": 51.32,
+                  "IsRetention": false,
+                  "IsQuota": false
+                }
+        ]
+    }
+  ]
+}

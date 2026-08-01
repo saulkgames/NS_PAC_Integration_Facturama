@@ -1,0 +1,141 @@
+{
+  "custom": {
+    "loggedUserName": "John Doe",
+    "companyInfo": { 
+      "rfc": "AAA010101AAA" 
+    },
+    "satcodes": {
+      "paymentMethod": "03",
+      "paymentStringTypeCode": "Transferencia"
+    },
+    "appliedTxns": [
+      {
+        "id": "12345",
+        "line": 0,
+        "amount": 116.00,
+        "custbody_mx_cfdi_folio": "F-100",
+        "custbody_mx_cfdi_serie": "A",
+        "custbody_mx_cfdi_uuid": "12345678-1234-1234-1234-123456789012",
+        "paymentTerm": "PPD",
+        "currencysymbol": "$",
+        "sublistId": "apply",
+        "order": 1, 
+        "amountdue": 116.00,
+        "taxSummary": {
+          "totalBaseTransfer": 100.00,
+          "totalBaseWithHold": 0.0,
+          "transfersTaxExemptedAmount": 0.0,
+          "transferTaxes": [
+            {
+              "taxAmount": 16.00,
+              "totalTaxBaseAmount": 100.00,
+              "taxRate": 0.16,
+              "satTaxCode": "002",
+              "taxFactorType": "Tasa"
+            }
+          ],
+          "whTaxes": [],
+          "exemptTaxes": []
+        }
+      }
+    ],
+    "accumTransferTaxes": [
+      { 
+        "satTaxCode": "002", 
+        "taxRate": 0.16, 
+        "taxFactorType": "Tasa", 
+        "taxAmount": 16.00, 
+        "taxSummary": 100.00 
+      }
+    ],
+    "accumWhTaxes": [],
+    "accumExemptTaxes": [],
+    
+    "totalTrasladosBaseIVA16": 100.00,
+    "totalTrasladosImpuestoIVA16": 16.00,
+    "totalTrasladosBaseIVA8": 0.00,
+    "totalRetencionesISR": 0.00,
+    "totalRetencionesIVA": 0.00,
+    "totalRetencionesIEPS": 0.00
+  }
+},
+{
+  "custom": {
+    // ID: Obtenido de la sesión de NetSuite (nsRuntime.getCurrentUser().name)
+    "loggedUserName": "John Doe",
+    "companyInfo": { 
+      // ID: 'federalidnumber' o 'employerid' de la Subsidiaria/Compañía
+      "rfc": "AAA010101AAA" 
+    },
+    "satcodes": {
+      // ID: 'custbody_mx_txn_sat_payment_method' de la cabecera del pago
+      "paymentMethod": "03",
+      // ID: 'custbody_mx_cfdi_payment_string_type' de la cabecera del pago
+      "paymentStringTypeCode": "Transferencia"
+    },
+    "appliedTxns": [ // Sublista: 'apply' procesada por appliedTransactions.js
+      {
+        // ID: 'internalid' de la factura original que se está pagando
+        "id": "12345",
+        // Índice de la línea en la sublista 'apply' del pago
+        "line": 0,
+        // ID: 'amount' de la sublista 'apply' (Monto que se está pagando en este recibo)
+        "amount": 116.00,
+        // ID: 'custbody_mx_cfdi_folio' (Folio SAT extraído de la factura original)
+        "custbody_mx_cfdi_folio": "F-100",
+        // ID: 'custbody_mx_cfdi_serie' (Serie SAT extraída de la factura original)
+        "custbody_mx_cfdi_serie": "A",
+        // ID: 'custbody_mx_cfdi_uuid' (UUID extraído de la factura original)
+        "custbody_mx_cfdi_uuid": "12345678-1234-1234-1234-123456789012",
+        // ID: 'custbody_mx_txn_sat_payment_term' extraído de la factura original
+        "paymentTerm": "PPD",
+        // ID: 'symbol' (Símbolo de la moneda extraído vía SuiteQL del registro de Currency)
+        "currencysymbol": "$",
+        "sublistId": "apply",
+        // Calculado vía SQL: 'times_paid_invoice + 1' (Número de parcialidad)
+        "order": 1, 
+        // ID: 'foreignamountunpaid' de la factura original (Importe Saldo Anterior)
+        "amountdue": 116.00,
+        "taxSummary": { // Calculado: Prorrateo usando (Monto Pagado / Total de Factura original)
+          // Base gravable prorrateada a este pago
+          "totalBaseTransfer": 100.00,
+          "totalBaseWithHold": 0.0,
+          "transfersTaxExemptedAmount": 0.0,
+          "transferTaxes": [
+            {
+              // Impuesto exacto pagado en esta parcialidad
+              "taxAmount": 16.00,
+              // Base exacta pagada en esta parcialidad
+              "totalTaxBaseAmount": 100.00,
+              "taxRate": 0.16,
+              "satTaxCode": "002",
+              "taxFactorType": "Tasa"
+            }
+          ],
+          "whTaxes": [],
+          "exemptTaxes": []
+        }
+      }
+    ],
+    // Resúmenes Globales del Pago (Calculados en customerPayment.js agrupando todos los taxSummary)
+    "accumTransferTaxes": [
+      { 
+        "satTaxCode": "002", 
+        "taxRate": 0.16, 
+        "taxFactorType": "Tasa", 
+        "taxAmount": 16.00, 
+        "taxSummary": 100.00 
+      }
+    ],
+    "accumWhTaxes": [],
+    "accumExemptTaxes": [],
+    
+    // Filtros directos sobre accumTransferTaxes para fácil impresión en FreeMarker
+    "totalTrasladosBaseIVA16": 100.00,
+    "totalTrasladosImpuestoIVA16": 16.00,
+    "totalTrasladosBaseIVA8": 0.00,
+    "totalRetencionesISR": 0.00,
+    "totalRetencionesIVA": 0.00,
+    "totalRetencionesIEPS": 0.00
+  }
+}

@@ -1,0 +1,311 @@
+Crea un cfdi de emision
+Parámetros URI
+No se tienen parÃ¡metros
+
+Atributos de la petición
+NameId ( integer )
+
+Gets or sets atributo para especificar el nombre que se establecera en el pdf (default 1 = factura) [ Vea la documentación de "Nombres del CFDI" ]
+
+
+Data type: Text
+
+LogoUrl ( string )
+
+Gets or sets url del logo, ej. https://dominio.com/mi-logo.png
+
+
+Matching regular expression pattern: (http(s?):)([/|.|\w|\s|-])*\.(?:jpg|jpeg|png)
+
+Date ( string )
+
+Gets or sets fecha de Emision (Opcional) del comprobante conforme a la norma ISO 8601
+
+
+Data type: DateTime
+
+Matching regular expression pattern: ^([\+-]?\d{4}(?!\d{2}\b))((-?)((0[1-9]|1[0-2])(\3([12]\d|0[1-9]|3[01]))?|W([0-4]\d|5[0-2])(-?[1-7])?|(00[1-9]|0[1-9]\d|[12]\d{2}|3([0-5]\d|6[1-6])))([T\s]((([01]\d|2[0-3])((:?)[0-5]\d)?|24\:?00)([\.,]\d+(?!:))?)?(\17[0-5]\d([\.,]\d+)?)?([zZ]|([\+-])([01]\d|2[0-3]):?([0-5]\d)?)?)?)?$
+
+Serie ( string )
+
+Gets or sets referencia (Opcional) de la Serie existente en la Sucursal
+
+
+Matching regular expression pattern: [a-zA-Z0-9]{1,25}
+
+String length: inclusive between 0 and 25
+
+PaymentAccountNumber ( string )
+
+Gets or sets atributo opcional para incorporar al menos los cuatro últimos digitos del número de cuenta con la que se realizó el pago.
+
+
+Data type: Text
+
+Matching regular expression pattern: ^\d{1,4}?$
+
+String length: inclusive between 4 and 4
+
+CurrencyExchangeRate ( decimal number )
+
+Gets or sets tipo de cambio de la moneda en caso de ser diferente de MXN
+
+
+Data type: Text
+
+Currency ( string )
+
+Gets or sets atributo para expresar la moneda utilizada para expresar los montos en 3 caracteres según la especificación del estándar internacional ISO 4217
+
+
+Data type: Text
+
+String length: inclusive between 3 and 3
+
+ExpeditionPlace ( string )
+
+Gets or sets lugar de Expedición (Codigo Postal desde donde se expide el comprobante)
+
+
+Required
+
+Matching regular expression pattern: [0-9]{5}
+
+Exportation ( string )
+
+Gets or sets atributo requerido para expresar si el comprobante ampara una operación de exportación. Se elige del catálogo del SAT 01|02|03|04
+
+
+Data type: Text
+
+Matching regular expression pattern: 0[1234]
+
+PaymentConditions ( string )
+
+Gets or sets (Opcional).
+
+
+Data type: Text
+
+Matching regular expression pattern: [^|]{1,100}
+
+GlobalInformation ( GlobalInformationV4Model )
+
+Gets or sets nodo Información Global
+
+
+Relations ( Cfdiv4Relations )
+
+Gets or sets cfdis Relacionados empleado para las notas de credito, etc.
+
+
+Folio ( string )
+
+Gets or sets folio: Atributo para control interno del contribuyente que expresa el folio del comprobante, acepta una cadena de 1 a 40 caracteres.
+
+
+Required
+
+Matching regular expression pattern: [^|]{1,40}
+
+String length: inclusive between 1 and 40
+
+CfdiType ( string )
+
+Gets or sets atributo requerido para expresar el efecto del comprobante fiscal para el contribuyente emisor: ingreso, egreso ó traslado
+
+
+Required
+
+Data type: Text
+
+Matching regular expression pattern: I|E|T|N|P
+
+PaymentForm ( string )
+
+Gets or sets atributo obligatorio y de catálogo, para expresar la forma de pago de los bienes o servicios amparados por el comprobante. Se entiende como método de pago leyendas tales como: 01, 02, 03, 99
+
+
+Data type: Text
+
+Matching regular expression pattern: 01|02|03|04|05|06|08|12|13|14|15|17|23|24|25|26|27|28|29|30|31|99
+
+PaymentMethod ( string )
+
+Gets or sets atributo obligatorio y de catálogo, para expresar el método de pago de los bienes o servicios amparados por el comprobante. Se entiende como método de pago leyendas tales como: PPD, PUE
+
+
+Matching regular expression pattern: PUE|PPD
+
+Issuer ( IssuerV4BindingModel )
+
+Gets or sets entidad Fiscal que emite el CFDI.
+
+
+Required
+
+Receiver ( ReceiverV4BindingModel )
+
+Gets or sets cliente a quien se emitirá el CFDi, Atributo Requerido
+
+
+Required
+
+Items ( Atributos de ItemFullBindingModel )
+
+Gets or sets nodo requerido para enlistar los conceptos cubiertos por el comprobante.
+
+
+Complemento ( Complementv4 )
+
+Gets or sets complementos aplicables al cfdi 4.0.
+
+
+Observations ( string )
+
+Gets or sets descripcion no fiscal del pdf
+
+
+OrderNumber ( string )
+
+Gets or sets numero de Orden, propiedad no fiscal (opcional)
+
+
+Max length: 100
+
+PaymentBankName ( string )
+
+Gets or sets nombre del banco, propiedad no fiscal (opcional)
+
+
+Max length: 50
+
+Argumentos de respuesta
+detalle del CFDi
+
+CfdiInfoModel
+Id ( string )
+
+Identifiacador unico del cfdi.
+
+
+CfdiType ( string )
+
+Tipo del efecto del comprobante fiscal para el contribuyente emisor: ingreso, egreso ó traslado.
+
+
+Type ( string )
+
+Tipo de comprobante segun catalogo del SAT.
+
+
+Serie ( string )
+
+Numero de la serie en el control interno del contribuyente.
+
+
+Folio ( string )
+
+Numero de la folio en el control interno del contribuyente.
+
+
+Date ( string )
+
+Fecha y hora de expedición del comprobante fiscal.
+
+
+CertNumber ( string )
+
+No del Certificado.
+
+
+PaymentTerms ( string )
+
+Forma de pago.
+
+
+PaymentConditions ( string )
+
+Condiciones comerciales aplicables para el pago del comprobante fiscal digital a través de Internet.
+
+
+PaymentMethod ( string )
+
+Método de pago de los bienes o servicios amparados por el comprobante. Se entiende como método de pago leyendas tales como: cheque, tarjeta de crédito o debito, depósito en cuenta, etc.
+
+
+PaymentAccountNumber ( string )
+
+Incorpora al menos los cuatro últimos digitos del número de cuenta con la que se realizó el pago.
+
+
+PaymentBankName ( string )
+
+Nombre del banco donde se realizo el pago.
+
+
+ExpeditionPlace ( string )
+
+Lugar de expedición del comprobante.
+
+
+ExchangeRate ( decimal number )
+
+Tipo de cambio conforme a la moneda usada.
+
+
+Currency ( string )
+
+Moneda utilizada para expresar los montos.
+
+
+Subtotal ( decimal number )
+
+Representa la suma de los importes antes de descuentos e impuestos.
+
+
+Discount ( decimal number )
+
+Representa el importe total de los descuentos aplicables antes de impuestos.
+
+
+Total ( decimal number )
+
+Representar la suma del subtotal, menos los descuentos aplicables, más los impuestos trasladados, menos los impuestos retenidos.
+
+
+Observations ( string )
+
+Observaciones no fiscales de la factura.
+
+
+OrderNumber ( string )
+
+Observaciones no fiscales de la factura.
+
+
+Issuer ( TaxEntityInfoViewModel )
+
+Nodo que contiene el detalle del emisor.
+
+
+Receiver ( ReceiverViewModel )
+
+Nodo que contiene el detalle del receptor.
+
+
+Items ( Atributos de ItemInfoModel )
+
+Nodo que contiene el detalle de los conceptos.
+
+
+Taxes ( Atributos de TaxInfoModel )
+
+Nodo que contiene el detalle de los impuestos.
+
+
+Complement ( )
+
+Nodo que contiene complementos de extensión definidos por el SAT.
+
+

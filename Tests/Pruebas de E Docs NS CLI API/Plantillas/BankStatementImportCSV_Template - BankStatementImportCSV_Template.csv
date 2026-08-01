@@ -1,0 +1,7 @@
+Date (MM/DD/YYYY),Payer/Payee Name,Transaction Id,Transaction Type,Amount,Memo,NS Internal Customer Id,NS Customer Name,Invoice Number(s)
+6/5/2026,,111,CREDIT,657,Deposito de cliente,,,
+6/6/2026,,112,DEBIT,-3000,Asiento,,,
+6/7/2026,,113,CREDIT,1289.98,Deposito de cliente,,,
+6/8/2026,,114,CREDIT,349.02,Deposito de cliente,,,
+6/9/2026,,115,CREDIT,400,Deposito de cliente,,,
+6/11/2026,,117,CREDIT,800,Deposito de cliente,,,

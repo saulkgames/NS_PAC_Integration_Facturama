@@ -1,0 +1,105 @@
+<#setting locale = "en_US">
+<#-- 
+================================================================================
+PRE-PLANTILLA CFDI 4.0 - INGRESO (PUE)
+Basada estrictamente en la Guía de Llenado del SAT (Anexo 20 v4.0).
+================================================================================
+-->
+{
+  <#-- NODO: COMPROBANTE -->
+  "Version": "4.0", <#-- Fijo a 4.0[cite: 10] -->
+  "Serie": "[ASIGNAR_SERIE]", <#-- Opcional. Control interno del contribuyente (1 a 25 caracteres)[cite: 10] -->
+  "Folio": "[ASIGNAR_FOLIO]", <#-- Opcional. Control interno del contribuyente (1 a 40 caracteres)[cite: 10] -->
+  "Fecha": "[ASIGNAR_FECHA]", <#-- Requerido. Formato AAAA-MM-DDThh:mm:ss. Debe corresponder a la hora local de expedición[cite: 10] -->
+  
+  <#-- 
+    REGLA PUE: Al ser un comprobante pagado en el momento (PUE), la Forma de Pago DEBE 
+    ser la clave de cómo se liquidó (ej. "01" Efectivo, "03" Transferencia). 
+    ESTRICTAMENTE PROHIBIDO usar la clave "99" (Por definir)[cite: 10].
+  -->
+  "FormaPago": "[ASIGNAR_FORMA_PAGO]", <#-- Requerido. Catálogo c_FormaPago[cite: 10] -->
+  "MetodoPago": "PUE", <#-- Requerido. Fijo a "PUE" (Pago en una sola exhibición) para este contexto[cite: 10] -->
+  
+  "CondicionesDePago": "[ASIGNAR_CONDICIONES_PAGO]", <#-- Opcional. Texto libre hasta 1000 caracteres[cite: 10] -->
+  
+  "SubTotal": [ASIGNAR_SUBTOTAL], <#-- Requerido. Suma de los importes antes de descuentos e impuestos. No permite valores negativos[cite: 10] -->
+  "Descuento": [ASIGNAR_DESCUENTO], <#-- Condicional. Requerido si algún concepto tiene descuento. Debe ser menor o igual al SubTotal[cite: 10] -->
+  
+  "Moneda": "[ASIGNAR_MONEDA]", <#-- Requerido. Clave del catálogo c_Moneda (ej. "MXN", "USD")[cite: 10] -->
+  "TipoCambio": [ASIGNAR_TIPO_CAMBIO], <#-- Condicional. Requerido si la moneda es distinta a "MXN". Usar tipo de cambio FIX[cite: 10] -->
+  
+  "Total": [ASIGNAR_TOTAL], <#-- Requerido. SubTotal - Descuento + Impuestos Trasladados - Impuestos Retenidos. No permite valores negativos[cite: 10] -->
+  
+  "TipoDeComprobante": "I", <#-- Requerido. Fijo a "I" (Ingreso)[cite: 10] -->
+  
+  "Exportacion": "[ASIGNAR_EXPORTACION]", <#-- Requerido en v4.0. Catálogo c_Exportacion. Usar "01" si no aplica[cite: 10] -->
+  "LugarExpedicion": "[ASIGNAR_LUGAR_EXPEDICION]", <#-- Requerido. Código postal de expedición del catálogo c_CodigoPostal[cite: 10] -->
+
+  <#-- NODO: EMISOR -->
+  "Emisor": {
+    "Rfc": "[ASIGNAR_RFC_EMISOR]", <#-- Requerido. 12 (Moral) o 13 (Física) posiciones[cite: 10] -->
+    "Nombre": "[ASIGNAR_NOMBRE_EMISOR]", <#-- Requerido en v4.0. Nombre o Razón Social tal cual está en el RFC[cite: 10] -->
+    "RegimenFiscal": "[ASIGNAR_REGIMEN_EMISOR]" <#-- Requerido. Catálogo c_RegimenFiscal (ej. "601")[cite: 10] -->
+  },
+
+  <#-- NODO: RECEPTOR -->
+  "Receptor": {
+    "Rfc": "[ASIGNAR_RFC_RECEPTOR]", <#-- Requerido. RFC válido o genérico (XAXX010101000 / XEXX010101000)[cite: 10] -->
+    "Nombre": "[ASIGNAR_NOMBRE_RECEPTOR]", <#-- Requerido en v4.0. Nombre o Razón Social tal cual está en el RFC[cite: 10] -->
+    "DomicilioFiscalReceptor": "[ASIGNAR_CP_RECEPTOR]", <#-- Requerido en v4.0. Código postal del domicilio fiscal del receptor[cite: 10] -->
+    "RegimenFiscalReceptor": "[ASIGNAR_REGIMEN_RECEPTOR]", <#-- Requerido en v4.0. Catálogo c_RegimenFiscal del receptor[cite: 10] -->
+    "UsoCFDI": "[ASIGNAR_USO_CFDI]" <#-- Requerido. Catálogo c_UsoCFDI (ej. "G03"). Debe ser compatible con el régimen del receptor[cite: 10] -->
+  },
+
+  <#-- NODO: CONCEPTOS (Arreglo) -->
+  "Conceptos": [
+    {
+      "ClaveProdServ": "[ASIGNAR_CLAVE_PROD_SERV]", <#-- Requerido. Catálogo c_ClaveProdServ. Si no existe, usar "01010101"[cite: 10] -->
+      "NoIdentificacion": "[ASIGNAR_NO_IDENTIFICACION]", <#-- Opcional. SKU o número de parte interno (hasta 100 caracteres)[cite: 10] -->
+      "Cantidad": [ASIGNAR_CANTIDAD], <#-- Requerido. Hasta 6 decimales[cite: 10] -->
+      "ClaveUnidad": "[ASIGNAR_CLAVE_UNIDAD]", <#-- Requerido. Catálogo c_ClaveUnidad (ej. "H87" para pieza)[cite: 10] -->
+      "Unidad": "[ASIGNAR_UNIDAD]", <#-- Opcional. Unidad de medida propia de la operación (ej. "Pieza")[cite: 10] -->
+      "Descripcion": "[ASIGNAR_DESCRIPCION]", <#-- Requerido. Descripción del bien o servicio[cite: 10] -->
+      "ValorUnitario": [ASIGNAR_VALOR_UNITARIO], <#-- Requerido. Mayor a cero para Ingresos[cite: 10] -->
+      "Importe": [ASIGNAR_IMPORTE_CONCEPTO], <#-- Requerido. Cantidad * ValorUnitario[cite: 10] -->
+      "Descuento": [ASIGNAR_DESCUENTO_CONCEPTO], <#-- Condicional. Si aplica, debe ser <= Importe[cite: 10] -->
+      
+      <#-- 
+        REGLA OBJETO IMPUESTO: En v4.0 es obligatorio declarar si la línea es objeto de impuesto.
+        Catálogo c_ObjetoImp: "01" (No objeto), "02" (Sí objeto), "03" (Sí objeto no obligado al desglose).
+        Si es "02", el nodo "Impuestos" a nivel concepto es OBLIGATORIO[cite: 10].
+      -->
+      "ObjetoImp": "[ASIGNAR_OBJETO_IMP]",
+      
+      "Impuestos": {
+        "Traslados": [
+          {
+            "Base": [ASIGNAR_BASE_TRASLADO], <#-- Requerido. Mayor a cero[cite: 10] -->
+            "Impuesto": "[ASIGNAR_IMPUESTO_TRASLADO]", <#-- Requerido. Catálogo c_Impuesto (ej. "002" para IVA)[cite: 10] -->
+            "TipoFactor": "[ASIGNAR_TIPO_FACTOR_TRASLADO]", <#-- Requerido. Catálogo c_TipoFactor (Tasa, Cuota, Exento)[cite: 10] -->
+            "TasaOCuota": [ASIGNAR_TASA_CUOTA_TRASLADO], <#-- Condicional. Requerido si TipoFactor es Tasa o Cuota (ej. 0.160000)[cite: 10] -->
+            "Importe": [ASIGNAR_IMPORTE_TRASLADO] <#-- Condicional. Requerido si TipoFactor es Tasa o Cuota[cite: 10] -->
+          }
+        ]
+        <#-- Nota: Si hay retenciones a nivel concepto, se agregarían en un arreglo "Retenciones" paralelo a "Traslados" -->
+      }
+    }
+  ],
+
+  <#-- NODO: IMPUESTOS (Global) -->
+  <#-- Requerido únicamente si en los conceptos existen impuestos trasladados o retenidos[cite: 10] -->
+  "Impuestos": {
+    "TotalImpuestosTrasladados": [ASIGNAR_TOTAL_TRASLADADOS], <#-- Condicional. Suma de los importes de traslados[cite: 10] -->
+    
+    "Traslados": [
+      {
+        <#-- Los traslados globales se agrupan por Impuesto, TipoFactor y TasaOCuota[cite: 10] -->
+        "Base": [ASIGNAR_BASE_GLOBAL], <#-- Requerido en v4.0[cite: 10] -->
+        "Impuesto": "[ASIGNAR_IMPUESTO_GLOBAL]", <#-- Requerido (ej. "002")[cite: 10] -->
+        "TipoFactor": "[ASIGNAR_TIPO_FACTOR_GLOBAL]", <#-- Requerido (ej. "Tasa")[cite: 10] -->
+        "TasaOCuota": [ASIGNAR_TASA_CUOTA_GLOBAL], <#-- Condicional (ej. 0.160000)[cite: 10] -->
+        "Importe": [ASIGNAR_IMPORTE_GLOBAL] <#-- Condicional[cite: 10] -->
+      }
+    ]
+  }
+}

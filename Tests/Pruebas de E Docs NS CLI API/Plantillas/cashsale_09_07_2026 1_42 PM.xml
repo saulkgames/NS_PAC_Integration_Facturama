@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<fx:FactDocMX
+        xmlns:fx="http://www.fact.com.mx/schema/fx"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.fact.com.mx/schema/fx http://www.mysuitemex.com/fact/schema/fx_2010_g.xsd">
+    <fx:Version>8</fx:Version>
+    <fx:Identificacion>
+        <fx:CdgPaisEmisor>MX</fx:CdgPaisEmisor>
+        <fx:TipoDeComprobante>FACTURA</fx:TipoDeComprobante>
+        <fx:RFCEmisor>PFP810520JX0</fx:RFCEmisor>
+        <fx:RazonSocialEmisor>PROVEEDORA DE FIERRO Y PERFILES</fx:RazonSocialEmisor>
+        <fx:Usuario>SISTEMAS ALMETAL</fx:Usuario>
+        <fx:AsignacionSolicitada>
+                <fx:Folio>CASHSALE37357</fx:Folio>
+            <fx:TiempoDeEmision>2026-07-08T00:00:00</fx:TiempoDeEmision>
+        </fx:AsignacionSolicitada>
+        <fx:Exportacion>01</fx:Exportacion>
+        <fx:LugarExpedicion>81460</fx:LugarExpedicion>
+    </fx:Identificacion>
+    <fx:Emisor>
+        <fx:RegimenFiscal>
+            <fx:Regimen>601</fx:Regimen>
+        </fx:RegimenFiscal>
+    </fx:Emisor>
+    <fx:Receptor>
+        <fx:CdgPaisReceptor>MX</fx:CdgPaisReceptor>
+        <fx:RFCReceptor>AUVS981218849</fx:RFCReceptor>
+        <fx:NombreReceptor>SAUL IVAN ANGULO VARELA</fx:NombreReceptor>
+        <fx:DomicilioFiscalReceptor>81490</fx:DomicilioFiscalReceptor>
+        <fx:RegimenFiscalReceptor>626</fx:RegimenFiscalReceptor>
+        <fx:UsoCFDI>CN01</fx:UsoCFDI>
+    </fx:Receptor>
+    <fx:Conceptos>
+            <fx:Concepto>
+                <fx:Cantidad>1.000000</fx:Cantidad>
+                <fx:ClaveUnidad>H87</fx:ClaveUnidad>
+                    <fx:UnidadDeMedida>Pz</fx:UnidadDeMedida>
+                <fx:ClaveProdServ>30263600</fx:ClaveProdServ>
+                <fx:Codigo>Solera 1/8'' x 2''</fx:Codigo>
+                <fx:Descripcion>""</fx:Descripcion>
+                <fx:ValorUnitario>166.03</fx:ValorUnitario>
+                <fx:Importe>166.03</fx:Importe>
+                <fx:Descuento>0.00</fx:Descuento>
+                <fx:ObjetoImp>02</fx:ObjetoImp>
+                    <fx:ImpuestosSAT>
+                            <fx:Traslados>
+                                        <fx:Traslado Base="166.03" Importe="26.56" Impuesto="002" TasaOCuota="0.160000" TipoFactor="Tasa" />
+                            </fx:Traslados>
+                    </fx:ImpuestosSAT>
+                <fx:Opciones>
+                </fx:Opciones>
+            </fx:Concepto>
+            <fx:Concepto>
+                <fx:Cantidad>1.000000</fx:Cantidad>
+                <fx:ClaveUnidad>H87</fx:ClaveUnidad>
+                    <fx:UnidadDeMedida>PZA</fx:UnidadDeMedida>
+                <fx:ClaveProdServ>40181800</fx:ClaveProdServ>
+                <fx:Codigo>PTR 1" x 1" Cal.11 a 6.00m</fx:Codigo>
+                <fx:Descripcion>""</fx:Descripcion>
+                <fx:ValorUnitario>263.80</fx:ValorUnitario>
+                <fx:Importe>263.80</fx:Importe>
+                <fx:Descuento>0.00</fx:Descuento>
+                <fx:ObjetoImp>02</fx:ObjetoImp>
+                    <fx:ImpuestosSAT>
+                            <fx:Traslados>
+                                        <fx:Traslado Base="263.80" Importe="42.21" Impuesto="002" TasaOCuota="0.160000" TipoFactor="Tasa" />
+                            </fx:Traslados>
+                    </fx:ImpuestosSAT>
+                <fx:Opciones>
+                </fx:Opciones>
+            </fx:Concepto>
+    </fx:Conceptos>
+            <fx:ImpuestosSAT TotalImpuestosTrasladados="68.77">
+            <fx:Traslados>
+                        <fx:Traslado Base="429.83" Importe="68.77" Impuesto="002" TasaOCuota="0.160000" TipoFactor="Tasa" />
+            </fx:Traslados>
+            </fx:ImpuestosSAT>
+    <fx:Totales>
+        <fx:Moneda>MXN</fx:Moneda>
+        <fx:TipoDeCambioVenta>1</fx:TipoDeCambioVenta>
+        <fx:SubTotalBruto>429.83</fx:SubTotalBruto>
+        <fx:SubTotal>429.83</fx:SubTotal>
+        <fx:Descuento>0.00</fx:Descuento>
+        <fx:Total>498.60</fx:Total>
+        <fx:TotalEnLetra>-</fx:TotalEnLetra>
+                <fx:FormaDePago>99</fx:FormaDePago>
+    </fx:Totales>
+    <fx:ComprobanteEx>
+        <fx:TerminosDePago>
+                <fx:MetodoDePago>PUE</fx:MetodoDePago>
+        </fx:TerminosDePago>
+    </fx:ComprobanteEx>
+</fx:FactDocMX>

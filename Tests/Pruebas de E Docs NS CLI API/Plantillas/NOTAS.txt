@@ -1,0 +1,31 @@
+PROMPT:
+Ayudame a programar la siguiente logica para resolver el problema que tengo al generar el TOTAL de cada item que necesita mi JSON resultado.
+
+Aqui esta la logica para el flujo inicial
+
+//Este FLUJO debe estar dentro de el LIST items.
+// las validaciones se deberan hacer contra las variables 
+// has_taxes y has_whTaxes para crear los objetos de impuestos correspondientes.
+var Subtotal = 0
+var Descuentos = 0 
+var Impuestos_Trasladados = 0
+var Impuestos_Retenidos = 0
+
+FLUJO INICIAL PARA CALCULO DE "Total"
+IF (itemSatCodes.taxObject == "02"){
+    IF(taxes.taxItems?has_content){
+        var has_taxes = true
+        LIST(item.taxes.taxItems as taxItems){
+            Impuestos_Trasladados += taxItems.taxAmount
+        } 
+    }
+    IF(taxes.whTaxItems?has_content){
+        var has_whTaxes = true
+        LIST(item.taxes.whTaxItems as whTaxItems){
+            Impuestos_Retenidos += whTaxItems.taxAmount
+        }
+    }
+    Total = Subtotal - Descuentos + Impuestos_Trasladados - Impuestos_Retenidos
+} ELSE {
+    Total = Subtotal - Descuentos
+}

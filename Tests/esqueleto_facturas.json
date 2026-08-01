@@ -1,0 +1,154 @@
+{
+  "custom": {
+    "loggedUserName": "John Doe",
+    "billaddr": { 
+      "customerdefaultzipcode": "11000", 
+      "countrycode": "MX" 
+    },
+    "companyInfo": { 
+      "rfc": "AAA010101AAA" 
+    },
+    "satcodes": {
+      "paymentTerm": "PPD",
+      "paymentMethod": "99",
+      "cfdiUsage": "G03",
+      "proofType": "I"
+    },
+    "items": [
+      {
+        "line": 0,
+        "itemId": "123",
+        "type": "InvtPart",
+        "quantity": 2,
+        "rate": 150.00,
+        "amount": 300.00,
+        "discount": 0.0,
+        "satUnitCode": "H87",
+        "taxes": {
+          "taxItems": [
+            { 
+              "taxCode": "IVA", 
+              "taxRate": 0.16, 
+              "taxBaseAmount": 300.00, 
+              "taxAmount": 48.00, 
+              "satTaxCode":2
+            }
+          ],
+          "whTaxItems": []
+        }
+      }
+    ],
+    "summary": {
+      "subtotal": 300.00,
+      "bodyDiscount": 0.0,
+      "totalDiscount": 0.0,
+      "totalTaxSum": 48.00,
+      "totalAmount": 348.00,
+      "transferTaxes": [
+         {
+           "taxAmount": 48.00,
+           "totalTaxBaseAmount": 300.00,
+           "taxRate": 0.16,
+           "satTaxCode": "002"
+         }
+      ],
+      "whTaxes": []
+    },
+    "relatedCfdis": {
+      "types": ["04"],
+      "cfdis": { "k0": [{"index": 0}] }
+    }
+  }
+},
+{
+  "custom": {
+    // ID: Obtenido de la sesión de NetSuite (nsRuntime.getCurrentUser().name)
+    "loggedUserName": "John Doe", 
+    "billaddr": { 
+      // ID: 'zip' de la dirección de facturación por defecto del cliente (Vía SuiteQL)
+      "customerdefaultzipcode": "11000", 
+      // ID: 'country' de la dirección de facturación por defecto del cliente
+      "countrycode": "MX" 
+    },
+    "companyInfo": { 
+      // ID: 'federalidnumber' o 'employerid' de la Subsidiaria/Compañía, o sublista 'taxregistration' si usas SuiteTax
+      "rfc": "AAA010101AAA" 
+    },
+    "satcodes": {
+      // ID: 'custbody_mx_txn_sat_payment_term' (Traducido al código del SAT)
+      "paymentTerm": "PPD",
+      // ID: 'custbody_mx_payment_method' (Traducido al código del SAT)
+      "paymentMethod": "99",
+      // ID: 'custbody_mx_cfdi_usage' (Traducido al código del SAT)
+      "cfdiUsage": "G03",
+      // Calculado: 'I' para Invoice/CashSale, 'E' para CreditMemo, 'T' para ItemFulfillment
+      "proofType": "I"
+    },
+    "items": [ // Sublista: 'item'
+      {
+        // Índice de la línea en la sublista
+        "line": 0,
+        // ID: 'item' (Internal ID del artículo)
+        "itemId": "123",
+        // ID: 'itemtype'
+        "type": "InvtPart",
+        // ID: 'quantity'
+        "quantity": 2,
+        // ID: 'rate'
+        "rate": 150.00,
+        // ID: 'amount' (Monto de la línea sin impuestos)
+        "amount": 300.00,
+        // ID: 'amount' de la línea tipo 'Discount' subsecuente (si aplica)
+        "discount": 0.0,
+        // Calculado: Mapeo SAT cruzando 'units' (Unidad) y 'unitstype' (Tipo de unidad)
+        "satUnitCode": "H87",
+        "taxes": {
+          "taxItems": [ // Sublista 'taxitem' (Legacy) o 'taxdetails' (SuiteTax)
+            { 
+              // ID: 'taxcode'
+              "taxCode": "IVA", 
+              // ID: 'taxrate' (SuiteTax) o 'rate' (Legacy)
+              "taxRate": 0.16, 
+              // ID: 'taxbasis' (SuiteTax) o calculado: amount * taxbasis/100 (Legacy)
+              "taxBaseAmount": 300.00, 
+              // ID: 'taxamount' (SuiteTax) o 'tax1amt' (Legacy)
+              "taxAmount": 48.00, 
+              // Calculado: Mapeado a través del tipo de impuesto
+              "satTaxCode": "002" 
+            }
+          ],
+          // Sublista 'item' columnas de Retención (custcol_4601_witax...) o tipos SuiteTax retenidos
+          "whTaxItems": []
+        }
+      }
+    ],
+    "summary": { // Calculados en summary.js
+      // Calculado: Suma de todos los custom.items[i].amount
+      "subtotal": 300.00,
+      // ID: Valor absoluto de 'discounttotal' (Cabecera)
+      "bodyDiscount": 0.0,
+      // Calculado: Descuentos de línea + prorrateo de bodyDiscount
+      "totalDiscount": 0.0,
+      // Calculado: Suma global de traslados menos retenciones
+      "totalTaxSum": 48.00,
+      // Calculado: subtotal + totalTaxSum - totalDiscount
+      "totalAmount": 348.00,
+      "transferTaxes": [
+         // Agrupación de todos los impuestos de línea por satTaxCode y taxRate
+         {
+           "taxAmount": 48.00,
+           "totalTaxBaseAmount": 300.00,
+           "taxRate": 0.16,
+           "satTaxCode": "002"
+         }
+      ],
+      "whTaxes": []
+    },
+    "relatedCfdis": { // Sublista: 'recmachcustrecord_mx_rcs_orig_trans'
+      // ID: 'custrecord_mx_rcs_rel_type' (Tipo de Relación)
+      "types": ["04"],
+      // Agrupación interna por índice de relación
+      "cfdis": { "k0": [{"index": 0}] }
+    }
+  }
+}

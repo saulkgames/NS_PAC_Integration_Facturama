@@ -1,0 +1,13 @@
+<pluginimplementation scriptid="customscript_drt_pi_mx_pac_certify">
+  <customplugintype>[scriptid=customscript_ei_pl_sending_plugin]</customplugintype>
+  <description></description>
+  <isinactive>F</isinactive>
+  <loglevel>AUDIT</loglevel>
+  <name>DRT - MX PI PAC Certify</name>
+  <notifyadmins>F</notifyadmins>
+  <notifyemails></notifyemails>
+  <notifyowner>T</notifyowner>
+  <notifyuser>F</notifyuser>
+  <scriptfile>[/SuiteBundles/Bundle 373485/com.netsuite.mexicocompliance/src/electronicInvoicing/pluginimpl/drt_mc_pl_pac_certify_impl.js]</scriptfile>
+  <status>RELEASED</status>
+</pluginimplementation>
