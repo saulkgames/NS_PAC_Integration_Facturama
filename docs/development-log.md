@@ -2,7 +2,7 @@
 
 Registro cronológico de avances técnicos del proyecto **NS PAC Integration Facturama**.
 
-### 2026-08-07 — Resumen inicial de la integración NetSuite–Facturama
+### 2026-08-01 — Resumen inicial de la integración NetSuite–Facturama
 
 - **Estado:** pendiente de validación
 - **Objetivo o problema:** Implementar un método de envío de E-Documents que conecte NetSuite con Facturama API-Lite para timbrar CFDI 4.0, recuperar el XML certificado y actualizar la transacción de origen.
