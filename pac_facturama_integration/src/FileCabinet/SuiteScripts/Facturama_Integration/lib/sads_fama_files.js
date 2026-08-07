@@ -2,60 +2,38 @@
  * @NApiVersion 2.0
  * @NModuleScope Public
  * 
- * Módulos 4 y 5: Gestor de Archivos (XML Download & PDF Builder)
+ * Módulo: Gestor de Archivos
  */
-define(['N/https', 'N/file', 'N/render', 'N/record', 'N/log'], function(https, file, render, record, log) {
+define(['N/file', 'N/encode'], function(file, encode) {
     'use strict';
 
-    var TARGET_FOLDER_ID = -10; // TODO: Configurar tu Folder ID
+    var TARGET_FOLDER_ID = -15; // Carpeta Attachments to Send
 
-    function downloadXml(cfdiId, baseGetUrl, headers, txnRecord) {
-        var downloadUrl = baseGetUrl
-            .replace('{id}', cfdiId);
-
-        var response = https.get({ url: downloadUrl, headers: headers });
+    function saveXml(fileName, base64Content) {
         
-        if (response.code !== 200) {
-            throw new Error('Fallo al descargar XML de Facturama. HTTP ' + response.code);
+        // 1. Decodificar el Base64 que nos envía Facturama a texto plano UTF-8
+        var decodedXml = '';
+        try {
+            decodedXml = encode.convert({
+                string: base64Content,
+                inputEncoding: encode.Encoding.BASE_64,
+                outputEncoding: encode.Encoding.UTF_8
+            });
+        } catch (e) {
+            // Fallback por si en el futuro Facturama lo manda en texto plano
+            decodedXml = base64Content; 
         }
 
-        var responseJson = JSON.parse(response.body);
-        
+        // 2. Crear el archivo con el texto XML real
         var xmlFile = file.create({
-            name: txnRecord.getValue('tranid') + '_' + cfdiId + '.xml',
+            name: fileName,
             fileType: file.Type.XMLDOC,
-            contents: responseJson.Content,
-            folder: TARGET_FOLDER_ID
+            contents: decodedXml,
+            folder: TARGET_FOLDER_ID 
         });
-
+        
         return xmlFile.save();
     }
 
-    function generatePdf(txnId, txnType, xmlFileId) {
-        var pdfFile = render.transaction({
-            entityId: parseInt(txnId, 10),
-            printMode: render.PrintMode.PDF
-        });
-
-        pdfFile.folder = TARGET_FOLDER_ID;
-        pdfFile.isOnline = true;
-        var pdfFileId = pdfFile.save();
-
-        record.attach({ record: { type: 'file', id: xmlFileId }, to: { type: txnType, id: txnId } });
-        record.attach({ record: { type: 'file', id: pdfFileId }, to: { type: txnType, id: txnId } });
-
-        record.submitFields({
-            type: txnType,
-            id: txnId,
-            values: { 'custbody_edoc_generated_pdf': pdfFileId },
-            options: { ignoreMandatoryFields: true }
-        });
-
-        return pdfFileId;
-    }
-
-    return {
-        downloadXml: downloadXml,
-        generatePdf: generatePdf
-    };
+    return { saveXml: saveXml };
 });

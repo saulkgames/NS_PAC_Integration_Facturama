@@ -28,24 +28,36 @@ define(['N/https', 'N/log'], function(https, log) {
         };
     }
 
-    function postTimbrado(url, headers, payload) {
-        var response = https.post({
-            url: url,
-            headers: headers,
-            body: JSON.stringify(payload)
-        });
-
-        if (response.code !== 200 && response.code !== 201) {
-            return _handleError(response.code, response.body);
-        }
-
-        return {
-            success: true,
-            data: JSON.parse(response.body)
-        };
+    function safeParse(jsonString) {
+        try { return JSON.parse(jsonString); } 
+        catch (e) { return jsonString; }
     }
 
-    return {
-        postTimbrado: postTimbrado
+    function postTimbrado(url, headers, payload) {
+        var resp = https.post({ url: url, headers: headers, body: payload });
+        var parsedBody = safeParse(resp.body);
+
+        if (resp.code !== 200 && resp.code !== 201) {
+            var errorMsg = typeof parsedBody === 'object' ? JSON.stringify(parsedBody) : parsedBody;
+            throw new Error('Fallo de Timbrado (HTTP ' + resp.code + '): ' + errorMsg);
+        }
+        return parsedBody;
+    }
+
+    function getXml(baseUrl, headers, cfdiId) {
+        var finalUrl = baseUrl.replace('{id}', cfdiId);
+        var resp = https.get({ url: finalUrl, headers: headers });
+        
+        if (resp.code !== 200) {
+            var getErrorBody = safeParse(resp.body);
+            throw new Error('Falló descarga XML (HTTP ' + resp.code + '): ' + JSON.stringify(getErrorBody));
+        }
+        return safeParse(resp.body);
+    }
+
+    return { 
+        safeParse: safeParse,
+        postTimbrado: postTimbrado, 
+        getXml: getXml 
     };
 });

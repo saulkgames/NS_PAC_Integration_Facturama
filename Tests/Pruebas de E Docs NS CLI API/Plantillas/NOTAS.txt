@@ -29,3 +29,23 @@ IF (itemSatCodes.taxObject == "02"){
 } ELSE {
     Total = Subtotal - Descuentos
 }
+
+NOTAS DE DESARROLLO DEL 01/08/2026 02 26 PM
+-FALTARON CAMPOS QUE MAPEAR PARA QUE LA INTERFAZ Y BOTONES FUNCIONEN CORRECTAMENTE
+-ANALzAR COMO USAR LOS METODOS Y MODULOS PARA USAR EL LOGGER NATIVO DE LA SUITEAPP de Mexico
+
+Falta Mapear:
+    Cambiar Estado del Documento Electronico Correctamente
+    Numero de serie de CSD
+    Validar en El administrador de Instalaciones cuales son los campos de cuerpo de transaccion que correspondan a 
+        la localizacion de mexico o _mx_cfdi para revisar que se debe Mapear en esos campos.
+
+Falta validar el resto de scripts que funcionan dentro de las transacciones como CS´s, SL´s o UE´s
+    
+
+Falta Crear Solucion para El envio de Documento electronico (email)
+
+    
+PRUEBAS DE VENTA DE CONTADO TIMBRADA:
+    Seguramente encontrare alguna timbrara  con anticipo de clientes.
+    Revisar: Como queda el timbre Actualmente solo se imprime el QR.

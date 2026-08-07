@@ -1,0 +1,426 @@
+<nsResponse>
+<record recordType="invoice" id="2011418" perm="4" fields="_eml_nkey_,_multibtnstate_,selectedtab,nsapiPI,nsapiSR,nsapiVF,nsapiFC,nsapiPS,nsapiVI,nsapiVD,nsapiPD,nsapiVL,nsapiRC,nsapiLI,nsapiLC,nsapiCT,nsbrowserenv,wfPI,wfSR,wfVF,wfFC,wfPS,type,id,externalid,whence,customwhence,entryformquerystring,_csrf,wfinstances,dbstrantype,bulk,createddate,lastmodifieddate,periodclosed,allownonglchanges,taxperiod,version,voided,linked,linkedrevrecje,linkedclosedperioddiscounts,entityname,trantypepermcheck,ntype,deletionreason,deletionreasonmemo,nluser,nlrole,nldept,nlloc,nlsub,baserecordtype,nlapiCC,nexus,warnnexuschange,nexus_country,entitynexus,extraurlparams,taxamountoverride,taxamount2override,isonlinetransaction,companyid,partnerid,source,sourcesystem,synceventfield,originator,website,oldrevenuecommitment,iseitf81on,entityfieldname,currencyname,currencysymbol,currencyprecision,isbasecurrency,origexchangerate,origcurrency,edition,tobeprinted,tobeemailed,email,tobefaxed,fax,message,billattention,billaddressee,billphone,billaddr1,billaddr2,billaddr3,billcity,billstate,billzip,billcountry,billoverride,billingaddress_key,billingaddress,billisresidential,shipisresidential,shipattention,shipaddressee,shipphone,shipaddr1,shipaddr2,shipaddr3,shipcity,shipstate,shipzip,shipcountry,shipoverride,shippingaddress_key,shippingaddress,recordcreatedby,recordcreateddate,prevdate,ppsetbyuser,ppsetbyuservalue,pp_s,pp_e,overallbalance,primarycurrency,primarycurrencyfxrate,overallunbilledorders,credlim,credholdoverride,manualcredithold,credholdentity,checkcreditlimit,weekendpreference,persistedterms,terms,unbilledorders,balance,oncredithold,billaddress,userestimatedpaymentdate,userestimatesource,isinstallment,duedays,mindays,datedriven,discdays,discpct,installmentcount,errornotificationsfield,warningnotificationsfield,noticenotificationsfield,doshippingrecalc,fedexservicename,hasfedexfreightservice,itemshippingcostfxrate,account,exchangerate,currency,vatregnum,totalcostestimate,estgrossprofit,estgrossprofitpercent,previousopportunity,prevrep,custcurrep,discountitem,discountrate,discounttotal,discountastotal,discountistaxable,disctax1,disctax1amt,checkcommitted,paymentcustomdata,custbody_establishment_code,custbody_wmsse_printpickticket,custbody_wmsse_ordertype,custbody_radi_oyster_ap_memo,custbody_radi_oyster_ap_reference,custbody_radi_oyster_ap_project,custbody_10184_customer_entity_bank,custbody_doc_num_summ_invoice,custbody_sii_spcl_scheme_code_sales,custbody_sii_property_location,custbody_sii_land_register,custbody_sii_exempt_details,custbody_sii_intra_txn_type,custbody_sii_orig_invoice,custbody_sii_external_reference,custbody_sii_correction_type,custbody_sii_operation_date,custbody_sii_is_third_party,custbody_sii_article_72_73,custbody_sii_not_reported_in_time,custbody_sii_article_61d,custbody_sii_registration_status,custbody_sii_registration_code,custbody_sii_registration_msg,custbody_sii_issued_inv_type,custbody_country_of_origin,custbody_report_timestamp,custbody_regime_code,custbody_transaction_region,custbody_nexus_notc,custbody_delivery_terms,custbody_notc,custbody_4110_customregnum,custbody_mode_of_transport,custbody_regime_code_of_supply,custbody_date_of_taxable_supply,custbody_refno_originvoice,custbody_counterparty_vat,custbody_ei_ds_txn_identifier,custbody_psg_ei_trans_edoc_standard,custbody_psg_ei_qr_string,custbody_psg_ei_template,custbody_psg_ei_status,custbody_psg_ei_template_inlinehelp,custbody_psg_ei_sending_method,custbody_psg_ei_inbound_edocument,custbody_edoc_gen_trans_pdf,custbody_edoc_generated_pdf,custbody_psg_ei_generated_edoc,custbody_psg_ei_certified_edoc,custbody_psg_ei_digitalsignature_label,custbody_crt_sol_cancel,custbody_drt_crt_verificacion_cancel,custbody_drt_tipo_cambio_uuid,custbody_drt_motivo_cancelacion,custbody_drt_transaccion_relacionada,custbody_drt_folio_sustitucion,custbody_psg_ei_qr_code,custbody_ei_network_id,custbody_ei_network_name,custbody_ei_network_status,custbody_ei_network_updated_date_time,custbody_mx_cfdi_cadena_original,custbody_mx_cfdi_signature,custbody_mx_cfdi_sat_signature,custbody_mx_cfdi_sat_serial,custbody_mx_cfdi_qr_code,custbody_mx_cfdi_issue_datetime,custbody_mx_cfdi_issuer_serial,custbody_mx_cfdi_certify_timestamp,custbody_mx_cfdi_usage,custbody_mx_cfdi_uuid,custbody_mx_txn_sat_payment_method,custbody_mx_txn_sat_payment_term,custbody_mx_cfdi_folio,custbody_mx_cfdi_sat_addendum,custbody_mx_cfdi_serie,custbody_mx_cfdi_sat_export_type,custbody_drt_custbody_mx_cfdi_qr_code,custbody_drt_custbody_mx_cfdi_sat_sign,custbody_drt_custbody_mx_cfdi_signatur,custbody_drt_mx_cfdi_cadena_original,custbody_mcf_sat_months,custbody_mcf_sat_recurrence,custbody_mcf_sat_year,custbody_drt_uuid_relacionado,custbody_drt_uuid_relacionado_2,custbody_alm_tarjeta_numero,custbody_alm_tarjeta_autorizacion,custbody_alm_pago_numdeposito,custbody_packship_account_number,custbody_validated_addresses_data,custbody_packship_zip_code,custbody_packship_country,custbody_packship_billing_type,fob,shipdate,shipcarrier,shipmethod,trackingnumbers,linkedtrackingnumbers,returntrackingnumbers,shipaddress,custbody_wmsse_codflag,custbody_packship_process_on_if,custbody_wmsse_freightterms,custbody_wmsse_signiturerequired,custbody_wmsse_thirdpartyaccountnumber,custbody_wmsse_saturdaydelivery,custbody_shipcentral_sat_del,custbody_estimated_tax_amount,custbody_shipcentral_returnservice,custbody_shipcentral_rma_tobeemail,custbody_sii_code_issued_inv,custbody_4601_appliesto,custbody_psg_ei_content,custbody_ph4185_bstyle,custbody_ph4014_wtax_wamt,custbody_ph4014_wtax_rate,custbody_ph4014_wtax_code,custbody_ph4014_wtax_bamt,custbody_curr_user_discount_limit,trandate,tranid,entity,custbody_mx_customer_rfc,subsidiary,custbody_drt_rfc_subsidiaria,custbody_alm_date_time,postingperiod,otherrefnum,memo,salesrep,location,custbody_pfp_condiciondepago_,custbody_amount_words,createdfrom,duedate,startdate,enddate,amountremaining,discountdate,discountamount,amountpaid,transactionnumber,partner,contribpct,saleseffectivedate,leadsource,custbody_drt_fecha_hora_entrega,intercotransaction,intercostatus,custbody_pfp_chofer_,department,class,excludefromglnumbering,custbody_curr_cust_discount_limit,custbody_document_date,custbody_mcp_sat_c_carta_porte,custbody_wms_atlas_reason_for_return,custbody_estado_orden_venta,custbody_serie_aph,custbody_15699_exclude_from_ep_process,custbody_freigth_service_terms,custbody_4601_doc_ref_id,custbody_sang_hidden_surcharge_config,custbody_packship_ship_groups_data,custbody_itr_nexus,custbody_4601_pymnt_ref_id,custbody_4601_entitytype,custbody_4601_entitydefaultwitaxcode,custbody_mx_journalentry_createdby,custbody_drt_nc_identificador_novacaja,custbody_drt_nc_requiere_factura,custbody_drt_nc_conexion,custbody_drt_nc_tipo_venta,custbody_drt_nc_entrega_mercancia,custbody_drt_nc_informacion_envio,custbody_drt_nc_total_efectivo,custbody_drt_nc_total_credito,custbody_drt_nc_total_debito,custbody_drt_cs_xml,custbody_drtpesototal,custbody_drtvolumentotal,custbody_drtvolumentotalpies,custbody_drtcantidad,custbodydrt,custbody_packship_so_packinstructions,custbody_drt_serie_lote_obj,custbodyalm_consignatario_name,custbody_alm_consignation_adress,custbody_drt_cp_peso_bruto_vehicular,custbody_drt_hasinvoice,custbody_drt_hasfulfillment,custbody9,custbody_drt_tran_cuadre_caja,custbody_numtotalmercs_alm,opportunity,custbody_shipcentral_rma_returnreason,custbody_whoutlet_related_filenames,custbody_cust_serv_lvl,custbody_customer_level_service_rec,origtotal2,subtotal,taxtotal,total,amountremainingtotalbox,origtotal,balreadyrefunded,emailaddr,locationusesbins,inventorydetailuitype,partnerstotal,canhavestackable,semail,storeorder,status,statusRef,finchrg,tranline0_department,tranline0_class,tranline0_location,sendorderfulfillmentemail,customerpayment,custpage_taf_subsidiarycache,custpage_itr_nexus,custpage_cs_msgs,custpage_lrcfm_datacarrier_text,custpage_4601_enablelookuptrans,custpage_4601_resobj,custpage_cs_msgs_wht,custpage_4601_witaxcodesasjson,custpage_4601_witaxgroupsasjson,custpage_4601_witaxsetupsasjson,custpage_4601_witaxtype,custpage_4601_appliesto,custpage_4601_witaxcode,custpage_4601_witaxrate,custpage_4601_witaxbaseamount,custpage_4601_witaxamount,syncpartnerteams">
+<_csrf>bADL6OOVpZrCGc4P9Uq9FzhYqKPavvZfIASoC7xHVEpDbgrqyQ51igvvv2LqG2SYaioiNk8BLVBL-xY_o-4OS1CVTj92VaHnu_qW4nFlxkUtnGHc_GePxHFKC_8sofCFXAo2Q6dUrzIkb1THBATh1FleLRQjuHZOR5CBgj9fb-4=</_csrf>
+<_eml_nkey_>5490848~9672~3~N</_eml_nkey_>
+<account>122</account>
+<amountpaid>749.91</amountpaid>
+<amountremaining>0.00</amountremaining>
+<amountremainingtotalbox>0.00</amountremainingtotalbox>
+<balance>0.00</balance>
+<balreadyrefunded>F</balreadyrefunded>
+<baserecordtype>invoice</baserecordtype>
+<billaddress>GLADIS ALEIDA LIMON HIGUERA<br>CONOCIDO S/N <br>0 HIGUERA DE LOS MONZON, SIN<br>México</billaddress>
+<billaddressee>GLADIS ALEIDA LIMON HIGUERA</billaddressee>
+<billcity>HIGUERA DE LOS MONZON</billcity>
+<billcountry>MX</billcountry>
+<billingaddress>176904</billingaddress>
+<billingaddress_key>176904</billingaddress_key>
+<billisresidential>F</billisresidential>
+<billoverride>F</billoverride>
+<billstate>SIN</billstate>
+<billzip>0</billzip>
+<canhavestackable>F</canhavestackable>
+<checkcommitted>F</checkcommitted>
+<companyid>10653</companyid>
+<createddate>09/02/2026 5:54 PM</createddate>
+<createdfrom>2011417</createdfrom>
+<credholdentity>10653</credholdentity>
+<credholdoverride>F</credholdoverride>
+<currency>1</currency>
+<currencyname>MXN</currencyname>
+<currencyprecision>2</currencyprecision>
+<currencysymbol>MXN</currencysymbol>
+<custbody9>F</custbody9>
+<custbody_15699_exclude_from_ep_process>F</custbody_15699_exclude_from_ep_process>
+<custbody_4601_entitytype>2</custbody_4601_entitytype>
+<custbody_alm_consignation_adress>GLADIS ALEIDA LIMON HIGUERA<br>CONOCIDO S/N <br>0 HIGUERA DE LOS MONZON, SIN<br>México</custbody_alm_consignation_adress>
+<custbody_alm_date_time>09/02/2026 5:49:27 PM</custbody_alm_date_time>
+<custbody_amount_words>Setecientos Cuarenta Y Nueve Pesos 91/100</custbody_amount_words>
+<custbody_crt_sol_cancel>F</custbody_crt_sol_cancel>
+<custbody_drt_hasfulfillment>F</custbody_drt_hasfulfillment>
+<custbody_drt_hasinvoice>F</custbody_drt_hasinvoice>
+<custbody_drt_nc_requiere_factura>F</custbody_drt_nc_requiere_factura>
+<custbody_drt_rfc_subsidiaria>PFP810520JX0</custbody_drt_rfc_subsidiaria>
+<custbody_drt_serie_lote_obj>{}</custbody_drt_serie_lote_obj>
+<custbody_edoc_gen_trans_pdf>T</custbody_edoc_gen_trans_pdf>
+<custbody_edoc_generated_pdf>3110543</custbody_edoc_generated_pdf>
+<custbody_ei_ds_txn_identifier>F</custbody_ei_ds_txn_identifier>
+<custbody_mcp_sat_c_carta_porte>F</custbody_mcp_sat_c_carta_porte>
+<custbody_mx_cfdi_cadena_original>||1.1|bcaa552e-f1d3-44d3-8c77-ecbd84e21d8a|2026-02-11T18:33:02|MSE090205D9A|V3rvkoeptDNY/hHvjqks0JAA10GZMOGpZ/ql09b1oRJv8v5pcQrPh+k3c8qd7KL05GNfq0TfjS1WwrWT2hIeW7y81dOE77J7KfMsZ4jc82OecYGJfx/v6A9HaEh57GO+//zxmGWl/RYgw7TezwZMBy0KEOOHJALZW766oSeuiQbbn/tUxM59xkp/Xq4bEpLBtgdajMyDwkX71lEFV/zeX+mJvDfWJnCp7LcCbMBQpE7V0OLKN+TQ6b8sh4QC0KVJldphevbfOEWntyHIuyX+qS9faDiA1B//WYgN/hT4LJPE7oSQOaTT1q4zSCjhMhNCsd6uE/vbHD5AGQVPop4gRw==|00001000000711327115||</custbody_mx_cfdi_cadena_original>
+<custbody_mx_cfdi_certify_timestamp>2026-02-11T18:33:02</custbody_mx_cfdi_certify_timestamp>
+<custbody_mx_cfdi_folio>B1650919</custbody_mx_cfdi_folio>
+<custbody_mx_cfdi_issue_datetime>11/02/2026 6:33:01 PM</custbody_mx_cfdi_issue_datetime>
+<custbody_mx_cfdi_issuer_serial>00001000000711517176</custbody_mx_cfdi_issuer_serial>
+<custbody_mx_cfdi_qr_code>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</custbody_mx_cfdi_qr_code>
+<custbody_mx_cfdi_sat_export_type>1</custbody_mx_cfdi_sat_export_type>
+<custbody_mx_cfdi_sat_serial>00001000000711327115</custbody_mx_cfdi_sat_serial>
+<custbody_mx_cfdi_sat_signature>XT3UghNcrSrcrWCnbEVoK2fXKJRkL9/wqz0iQVp4Jsti/o1sDuV+D1fWrWOnhvUWhqu11X1fd2QNGgYxZyzCz96TwIoZEULDDx1ZsqnI/DByhnOYji+9pMj3jt1TG0qZLIogT4Fd9AbN7tDQl1A2dKO2s0UibwnsLL10IgSTZ4/LbHkeWP/jRSIBMxiUrr7HDlDvxe0+ICn8eqtJwbZTU65KskggVaaGAdN0vS3PY0zeCFa4bSJDkZvc4HL72SAZmJ3EesXiOHw49OdyMtfD6/zFzlrN3nzKK9wzcNRwaVOjWUscP83BHlQbxt+tIKriHQ1IYZ/GoAPVSzo3oADwJg==</custbody_mx_cfdi_sat_signature>
+<custbody_mx_cfdi_signature>V3rvkoeptDNY/hHvjqks0JAA10GZMOGpZ/ql09b1oRJv8v5pcQrPh+k3c8qd7KL05GNfq0TfjS1WwrWT2hIeW7y81dOE77J7KfMsZ4jc82OecYGJfx/v6A9HaEh57GO+//zxmGWl/RYgw7TezwZMBy0KEOOHJALZW766oSeuiQbbn/tUxM59xkp/Xq4bEpLBtgdajMyDwkX71lEFV/zeX+mJvDfWJnCp7LcCbMBQpE7V0OLKN+TQ6b8sh4QC0KVJldphevbfOEWntyHIuyX+qS9faDiA1B//WYgN/hT4LJPE7oSQOaTT1q4zSCjhMhNCsd6uE/vbHD5AGQVPop4gRw==</custbody_mx_cfdi_signature>
+<custbody_mx_cfdi_usage>23</custbody_mx_cfdi_usage>
+<custbody_mx_cfdi_uuid>bcaa552e-f1d3-44d3-8c77-ecbd84e21d8a</custbody_mx_cfdi_uuid>
+<custbody_mx_customer_rfc>XAXX010101000</custbody_mx_customer_rfc>
+<custbody_mx_journalentry_createdby>11841</custbody_mx_journalentry_createdby>
+<custbody_mx_txn_sat_payment_method>1</custbody_mx_txn_sat_payment_method>
+<custbody_mx_txn_sat_payment_term>3</custbody_mx_txn_sat_payment_term>
+<custbody_packship_process_on_if>F</custbody_packship_process_on_if>
+<custbody_pfp_condiciondepago_>2</custbody_pfp_condiciondepago_>
+<custbody_psg_ei_certified_edoc>3110541</custbody_psg_ei_certified_edoc>
+<custbody_psg_ei_content><?xml version="1.0" encoding="UTF-8"?> <fx:FactDocMX xmlns:fx="http://www.fact.com.mx/schema/fx" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.fact.com.mx/schema/fx http://www.mysuitemex.com/fact/schema/fx_2010_g.xsd"> <fx:Version>8</fx:Version> <fx:Identificacion> <fx:CdgPaisEmisor>MX</fx:CdgPaisEmisor> <fx:TipoDeComprobante>FACTURA</fx:TipoDeComprobante> <fx:RFCEmisor>PFP810520JX0</fx:RFCEmisor> <fx:RazonSocialEmisor>PROVEEDORA DE FIERRO Y PERFILES</fx:RazonSocialEmisor> <fx:Usuario>Kenia Janeth Quintero Sepulveda</fx:Usuario> <fx:AsignacionSolicitada> <fx:Serie>B</fx:Serie> <fx:Folio>1650919</fx:Folio> <fx:TiempoDeEmision>2026-02-09T17:49:27</fx:TiempoDeEmision> </fx:AsignacionSolicitada> <fx:Exportacion>01</fx:Exportacion> <fx:LugarExpedicion>81460</fx:LugarExpedicion> </fx:Identificacion> <fx:Emisor> <fx:RegimenFiscal> <fx:Regimen>601</fx:Regimen> </fx:RegimenFiscal> </fx:Emisor> <fx:Receptor> <fx:CdgPaisReceptor>MX</fx:CdgPaisReceptor> <fx:RFCReceptor>XAXX010101000</fx:RFCReceptor> <fx:NombreReceptor>GLADIS ALEIDA LIMON HIGUERA</fx:NombreReceptor> <fx:DomicilioFiscalReceptor>81460</fx:DomicilioFiscalReceptor> <fx:RegimenFiscalReceptor>616</fx:RegimenFiscalReceptor> <fx:UsoCFDI>S01</fx:UsoCFDI> </fx:Receptor> <fx:Conceptos> <fx:Concepto> <fx:Cantidad>5.000000</fx:Cantidad> <fx:ClaveUnidad>H87</fx:ClaveUnidad> <fx:UnidadDeMedida>PZA</fx:UnidadDeMedida> <fx:ClaveProdServ>30102304</fx:ClaveProdServ> <fx:Codigo>Perfil Negro Cercha Camionera 20'Cal.18</fx:Codigo> <fx:Descripcion>"Perfil Negro Cercha Camionera 20&apos;Cal.18"</fx:Descripcion> <fx:ValorUnitario>99.29</fx:ValorUnitario> <fx:Importe>496.47</fx:Importe> <fx:Descuento>0.00</fx:Descuento> <fx:ObjetoImp>02</fx:ObjetoImp> <fx:ImpuestosSAT> <fx:Traslados> <fx:Traslado Base="496.47" Importe="79.44" Impuesto="002" TasaOCuota="0.160000" TipoFactor="Tasa" /> </fx:Traslados> </fx:ImpuestosSAT> <fx:Opciones> </fx:Opciones> </fx:Concepto> <fx:Concepto> <fx:Cantidad>100.000000</fx:Cantidad> <fx:ClaveUnidad>H87</fx:ClaveUnidad> <fx:UnidadDeMedida>Pza</fx:UnidadDeMedida> <fx:ClaveProdServ>31161500</fx:ClaveProdServ> <fx:Codigo>Tornillo Cochi 1/4"x1 1/2"</fx:Codigo> <fx:Descripcion>"Tornillo Cochi 1/4&quot;x1 1/2&quot;"</fx:Descripcion> <fx:ValorUnitario>1.02</fx:ValorUnitario> <fx:Importe>102.00</fx:Importe> <fx:Descuento>0.00</fx:Descuento> <fx:ObjetoImp>02</fx:ObjetoImp> <fx:ImpuestosSAT> <fx:Traslados> <fx:Traslado Base="102.00" Importe="16.32" Impuesto="002" TasaOCuota="0.160000" TipoFactor="Tasa" /> </fx:Traslados> </fx:ImpuestosSAT> <fx:Opciones> </fx:Opciones> </fx:Concepto> <fx:Concepto> <fx:Cantidad>100.000000</fx:Cantidad> <fx:ClaveUnidad>H87</fx:ClaveUnidad> <fx:UnidadDeMedida>Pza</fx:UnidadDeMedida> <fx:ClaveProdServ>31161700</fx:ClaveProdServ> <fx:Codigo>Tuerca Hexagonal Forjada 1/4"</fx:Codigo> <fx:Descripcion>"Tuerca Hexagonal Forjada 1/4 &quot;"</fx:Descripcion> <fx:ValorUnitario>0.48</fx:ValorUnitario> <fx:Importe>48.00</fx:Importe> <fx:Descuento>0.00</fx:Descuento> <fx:ObjetoImp>02</fx:ObjetoImp> <fx:ImpuestosSAT> <fx:Traslados> <fx:Traslado Base="48.00" Importe="7.68" Impuesto="002" TasaOCuota="0.160000" TipoFactor="Tasa" /> </fx:Traslados> </fx:ImpuestosSAT> <fx:Opciones> </fx:Opciones> </fx:Concepto> </fx:Conceptos> <fx:ImpuestosSAT TotalImpuestosTrasladados="103.44"> <fx:Traslados> <fx:Traslado Base="646.47" Importe="103.44" Impuesto="002" TasaOCuota="0.160000" TipoFactor="Tasa" /> </fx:Traslados> </fx:ImpuestosSAT> <fx:Totales> <fx:Moneda>MXN</fx:Moneda> <fx:TipoDeCambioVenta>1</fx:TipoDeCambioVenta> <fx:SubTotalBruto>646.47</fx:SubTotalBruto> <fx:SubTotal>646.47</fx:SubTotal> <fx:Descuento>0.00</fx:Descuento> <fx:Total>749.91</fx:Total> <fx:TotalEnLetra>-</fx:TotalEnLetra> <fx:FormaDePago>01</fx:FormaDePago> </fx:Totales> <fx:ComprobanteEx> <fx:TerminosDePago> <fx:MetodoDePago>PUE</fx:MetodoDePago> <fx:CondicionesDePago>Contado</fx:CondicionesDePago> </fx:TerminosDePago> </fx:ComprobanteEx> </fx:FactDocMX></custbody_psg_ei_content>
+<custbody_psg_ei_generated_edoc><a href="/app/site/hosting/scriptlet.nl?script=90&deploy=1&compid=5490848&edocId=2011418&fileFormat=xml&doctype=outbound&type=invoice&command=preview">preview invoice_11/02/2026 6:31 PM.xml</a>&nbsp;&nbsp;<a href="/app/site/hosting/scriptlet.nl?script=90&deploy=1&compid=5490848&edocId=2011418&fileFormat=xml&doctype=outbound&type=invoice&genDate=11%2F02%2F2026+6%3A31+PM&command=download">download</a></custbody_psg_ei_generated_edoc>
+<custbody_psg_ei_sending_method>5</custbody_psg_ei_sending_method>
+<custbody_psg_ei_status>3</custbody_psg_ei_status>
+<custbody_psg_ei_template>109</custbody_psg_ei_template>
+<custbody_psg_ei_trans_edoc_standard>3</custbody_psg_ei_trans_edoc_standard>
+<custbody_report_timestamp>9/2/2026 15:53:56</custbody_report_timestamp>
+<custbody_shipcentral_rma_tobeemail>F</custbody_shipcentral_rma_tobeemail>
+<custbody_shipcentral_sat_del>F</custbody_shipcentral_sat_del>
+<custbody_sii_article_61d>F</custbody_sii_article_61d>
+<custbody_sii_article_72_73>F</custbody_sii_article_72_73>
+<custbody_sii_is_third_party>F</custbody_sii_is_third_party>
+<custbody_sii_not_reported_in_time>F</custbody_sii_not_reported_in_time>
+<custbody_wmsse_codflag>F</custbody_wmsse_codflag>
+<custbody_wmsse_printpickticket>F</custbody_wmsse_printpickticket>
+<custbody_wmsse_saturdaydelivery>F</custbody_wmsse_saturdaydelivery>
+<custbody_wmsse_signiturerequired>F</custbody_wmsse_signiturerequired>
+<custcurrep>5726</custcurrep>
+<custpage_4601_appliesto>T</custpage_4601_appliesto>
+<custpage_4601_enablelookuptrans>true</custpage_4601_enablelookuptrans>
+<custpage_4601_resobj>{"GLOBAL_TRY_CATCH":{"id":"GLOBAL_TRY_CATCH","title":"Try Catch Global Error","error_msg":{"TRIGGERED_BY_USER":{"id":"TRIGGERED_BY_USER","message":"Error provocado por el usuario: "}}},"GLOBAL_VALUES":{"id":"GLOBAL_VALUES","title":"Valores Globales","error_msg":{"WARNING":{"id":"WARNING","message":"Advertencia"}}},"WTAX_SETUP":{"id":"WTAX_SETUP","title":"Configuración de impuestos de retención","fields":{"APPLIES_TO":{"id":"APPLIES_TO","label":"Se aplica a","select":{"INDIVIDUAL_LINES":{"id":"INDIVIDUAL_LINES","label":"Artículos de línea individuales"},"TOTAL_AMT":{"id":"TOTAL_AMT","label":"Importe total"}},"help":"Seleccione la base para procesar la retención de impuestos."},"AUTO_APPLY":{"id":"AUTO_APPLY","label":"Aplicar impuesto de retención automáticamente","help":"Marque esta casilla para aplicar automáticamente la retención de impuestos en las operaciones."},"AVAILABLE_PURC":{"id":"AVAILABLE_PURC","label":"Disponible para compras","help":"Marque esta casilla para que la retención de impuestos esté disponible en las operaciones de compra."},"NOT_ON_POS":{"id":"NOT_ON_POS","label":"Deshabilitar WTax en el pedido de compra","help":"Marque esta casilla para desactivar la retención en las órdenes de compra."},"NOT_ON_SOS":{"id":"NOT_ON_SOS","label":"Deshabilitar WTax en la orden de venta","help":"Marque esta casilla para desactivar la retención en las órdenes de venta."},"AVAILABLE_SALES":{"id":"AVAILABLE_SALES","label":"Disponible en ventas","help":"Marque esta casilla para que la retención de impuestos esté disponible en las operaciones de venta."},"ENABLE_LOOKUP":{"id":"ENABLE_LOOKUP","label":"Habilitar la búsqueda fiscal en las transacciones","help":"Marque esta casilla para buscar automáticamente el código de impuesto seleccionado por defecto en la entidad o en el registro del artículo en una operación."},"NEXUS":{"id":"NEXUS","label":"Nexo","error_msg":{"ERRMSG1":{"id":"ERRMSG1","message":"Se creó un registro de configuración de retención de impuestos para el nexo seleccionado."}},"help":"Seleccione el nexo fiscal que corresponda a este registro."},"TAX_POINT":{"id":"TAX_POINT","label":"Fecha de facturación","select":{"ACCRUAL":{"id":"ACCRUAL","label":"Devengado"},"PAYMENT":{"id":"PAYMENT","label":"Pagado"}},"help":"El momento en que se reconoce una obligación, crédito o gasto de retención de impuestos."}}},"WTAX_TYPE":{"id":"WTAX_TYPE","title":"Tipo de impuesto de retención","title_plural":"Tipos de retenciones de impuestos","fields":{"DESCRIPTION":{"id":"DESCRIPTION","label":"Descripción","help":"Introduzca una descripción para este tipo, código o grupo de retención de impuestos."},"NAME":{"id":"NAME","label":"Nombre","help":"Introduzca un nombre para este tipo o grupo de retención de impuestos."},"NEXUS":{"id":"NEXUS","label":"Nexo","help":"Seleccione el nexo fiscal que corresponda a este registro.","error_msg":{"ERRMSG1":{"id":"ERRMSG1","message":"Ya existe un tipo de retención de impuestos con el mismo nombre en el nexo seleccionado."}}},"PURC_ACCOUNT":{"id":"PURC_ACCOUNT","label":"Cuenta de impuestos de compra y pasivos","help":"Seleccione la cuenta de control de retención de impuestos para las operaciones de compra.","error_msg":{"ERRMSG1":{"id":"ERRMSG1","message":"Cuenta de impuestos sobre la compra/pasivo y Cuenta de impuestos sobre la venta/activo se deben contabilizar en diferentes cuentas."}}},"SALES_ACCOUNT":{"id":"SALES_ACCOUNT","label":"Cuenta de impuestos sobre ventas/activos","help":"Seleccione la cuenta de control de retención de impuestos para las operaciones de venta."},"TAX_BASE":{"id":"TAX_BASE","label":"Base del impuesto de retención","select":{"GROSS_AMT":{"id":"GROSS_AMT","label":"Importe bruto"},"NET_AMT":{"id":"NET_AMT","label":"Importe neto"},"TAX_AMT":{"id":"TAX_AMT","label":"Importe de impuestos"}},"help":"Seleccione la base para procesar la retención de impuestos.","error_msg":{"TAX_BASE_LOCK":{"id":"TAX_BASE_LOCK","message":"Edición de la base de retención no está permitido, ya que hay transacciones asociadas a este tipo de retención a cuenta."}}}}},"WTAX_CODE":{"id":"WTAX_CODE","title":"Código de impuestos de retención","title_plural":"Códigos de retención de impuestos","fields":{"AVAILABLE_ON":{"id":"AVAILABLE_ON","label":"Disponible en","select":{"BOTH":{"id":"BOTH","label":"Ambos"},"PURCHASES":{"id":"PURCHASES","label":"Compras"},"SALES":{"id":"SALES","label":"Ventas"}},"help":"Seleccione el tipo de operaciones a las que puede aplicarse este código o grupo de retención de impuestos."},"DESCRIPTION":{"id":"DESCRIPTION","label":"Descripción","help":"Introduzca una descripción para este tipo, código o grupo de retención de impuestos."},"EFFECTIVE_FROM":{"id":"EFFECTIVE_FROM","label":"Válido desde","help":"Introduzca la fecha a partir de la cual entra en vigencia este código de retención de impuestos."},"INACTIVE":{"id":"INACTIVE","label":"Inactivo","help":"Marque esta casilla para desactivar este código de retención de impuestos."},"INC_CHILDREN":{"id":"INC_CHILDREN","label":"Incluir secundarios (subsidiarias)","help":"Incluir subsidiarias de nivel inferior."},"NAME":{"id":"NAME","label":"Código de impuesto","help":"Introduzca un nombre para este código de impuesto.","error_msg":{"ERRMSG1":{"id":"ERRMSG1","message":"Ya existe un &1 con el mismo nombre en el nexo del tipo de retención de impuestos seleccionado."}}},"PERCENTAGE_BASE":{"id":"PERCENTAGE_BASE","label":"Porcentaje de la base","help":"Introduzca el porcentaje de importe base que se utilizará para procesar la retención de impuestos.<br><br>Esto se fija por defecto en: 100%"},"RATE":{"id":"RATE","label":"Tipo","help":"Introduzca el tipo de retención de impuestos correspondiente como porcentaje.<br><br>Por ejemplo: 8%<br><br>Este porcentaje se calculará cuando seleccione este código de retención de impuestos en las operaciones."},"SUBSIDIARIES":{"id":"SUBSIDIARIES","label":"Subsidiarias","help":"Esto determina qué subsidiarias tendrán este código o grupo de retención de impuestos disponible. Si utiliza OneWorld, NetSuite muestra este campo. La lista desplegable muestra la lista de subsidiarias disponibles. En el campo Subsidiarias, los dos puntos separan las subsidiarias de nivel superior (a la izquierda) de las de nivel inferior (a la derecha)."},"TAX_AGENCY":{"id":"TAX_AGENCY","label":"Agencia tributaria","help":"Agencia Tributaria"},"VALID_UNTIL":{"id":"VALID_UNTIL","label":"Válido hasta","help":"Introduzca la fecha de vencimiento de este código de retención de impuestos.","error_msg":{"ERRMSG1":{"id":"ERRMSG1","message":"La fecha Válido hasta debe ser posterior a la fecha Válido desde."}}},"WTAX_SETUP":{"id":"WTAX_SETUP","label":"Configuración de retención de impuestos","help":""},"WTAX_TYPE":{"id":"WTAX_TYPE","label":"Tipo de impuesto de retención","help":"Seleccione el tipo de código o grupo de retención de impuestos que va a crear.<br><br>La cuenta de control de impuestos para este tipo de retención de impuestos está selecciona por defecto.<br><br>Puede crear un nuevo tipo de retención de impuestos en Configuración > Impuestos retenidos > Tipos de impuestos."},"WTAX_BASE":{"id":"WTAX_BASE","label":"Base de retención de impuestos","help":"Seleccione la base para procesar la retención de impuestos."},"STATE":{"id":"STATE","label":"Estado"},"COUNTRY":{"id":"COUNTRY","label":"País"},"NEW":{"id":"NEW","label":"Nuevo &1"},"NEXUS":{"id":"NEXUS","label":"Nexo"}},"notif_msg":{"NOTIFMSG1":{"id":"NOTIFMSG1","message":"La edición de este registro actualizará los siguientes grupos de retención de impuestos, que forman parte de"}}},"WTAX_GROUP":{"id":"WTAX_GROUP","title":"Grupo de retención de impuestos","title_plural":"Grupos de retención de impuestos","fields":{"AVAILABLE_ON":{"id":"AVAILABLE_ON","label":"Disponible en","select":{"PURCHASES":{"id":"PURCHASES","label":"Compras"},"SALES":{"id":"SALES","label":"Ventas"}},"help":"Seleccione el tipo de operaciones a las que puede aplicarse este código o grupo de retención de impuestos."},"DESCRIPTION":{"id":"DESCRIPTION","label":"Descripción","help":"Introduzca una descripción para este tipo, código o grupo de retención de impuestos."},"INACTIVE":{"id":"INACTIVE","label":"Inactivo","help":"Marque esta casilla para desactivar este código de retención de impuestos."},"INC_CHILDREN":{"id":"INC_CHILDREN","label":"Incluir secundarios (subsidiarias)","help":"Incluir subsidiarias de nivel inferior."},"NAME":{"id":"NAME","label":"Nombre","help":"Introduzca un nombre para este tipo o grupo de retención de impuestos."},"RATE":{"id":"RATE","label":"Tipo","help":"Introduzca el tipo de retención de impuestos correspondiente como porcentaje.<br><br>Por ejemplo: 8%<br><br>Este porcentaje se calculará cuando seleccione este código de retención de impuestos en las operaciones."},"SUBSIDIARIES":{"id":"SUBSIDIARIES","label":"Subsidiarias","help":"Esto determina qué subsidiarias tendrán este código o grupo de retención de impuestos disponible. Si utiliza OneWorld, NetSuite muestra este campo. La lista desplegable muestra la lista de subsidiarias disponibles. En el campo Subsidiarias, los dos puntos separan las subsidiarias de nivel superior (a la izquierda) de las de nivel inferior (a la derecha)."},"WTAX_SETUP":{"id":"WTAX_SETUP","label":"Configuración de retención de impuestos","help":""},"WTAX_TYPE":{"id":"WTAX_TYPE","label":"Tipo de impuesto de retención","help":"Seleccione el tipo de código o grupo de retención de impuestos que va a crear.<br><br>La cuenta de control de impuestos para este tipo de retención de impuestos está selecciona por defecto.<br><br>Puede crear un nuevo tipo de retención de impuestos en Configuración > Impuestos retenidos > Tipos de impuestos."},"WTAX_BASE":{"id":"WTAX_BASE","label":"Base de retención de impuestos","help":"Muestra la base imponible del tipo de retención de impuestos seleccionado."},"NEW":{"id":"NEW","label":"Nuevo &1"},"NEXUS":{"id":"NEXUS","label":"Nexo"}},"subtab":{"WTAX_CODES":{"id":"WTAX_CODES","label":"Código de impuestos de retención","fields":{"BASIS":{"id":"BASIS","label":"Base"},"TYPE":{"id":"TYPE","label":"Tipo de retención de impuestos"},"TAX_BASE":{"id":"TAX_BASE","label":"Base de retención de impuestos"},"WTAX_CODE":{"id":"WTAX_CODE","label":"Código de impuestos de retención"},"RATE":{"id":"RATE","label":"Tipo"}}}},"error_msg":{"ERRMSG1":{"id":"ERRMSG1","message":"Ya existe un &1 con el mismo nombre en el nexo del tipo de retención de impuestos seleccionado."},"ERRMSG2":{"id":"ERRMSG2","message":"Los códigos de retención de impuestos deben tener la misma base de retención de impuestos. Compruebe la configuración de tipo de retención de impuestos."}}},"RECORD":{"id":"RECORD","field":{"NEW":{"id":"NEW","label":"Nuevo &1"},"YES":{"id":"YES","label":"Sí"},"NO":{"id":"NO","label":"No"}},"button":{"NEW":{"id":"NEW","label":"Nuevo"},"CANCEL":{"id":"CANCEL","label":"Cancelar"},"DELETE":{"id":"DELETE","label":"Eliminar"},"SAVE":{"id":"SAVE","label":"Guardar"}},"validation_msg":{"DELETE_RECORD":{"id":"DELETE_RECORD","message":"¿Está seguro de que quiere eliminar este registro?"}},"error_msg":{"PROB_FOUND":{"id":"PROB_FOUND","message":"Se detectaron problemas."}}},"TRANS_CS":{"id":"TRANS_CS","form_reload":{"RELOADMSG1":{"id":"RELOADMSG1","message":"Es necesario cargar el formulario nuevamente para poder aplicar la retención de impuestos. Los cambios realizados no se guardarán."},"RELOADMSG2":{"id":"RELOADMSG2","message":"Se debe volver a cargar el formulario. Los cambios realizados no se guardarán."}},"form_details":{"WTAX_CODE":{"id":"WTAX_CODE","message":"Seleccione un Código de retención de impuestos."},"WTAX_AMOUNT_FIELD_INV_WARNING":{"id":"WTAX_AMOUNT_FIELD_INV_WARNING","message":"Para mostrar el importe neto del pago de retención en la fuente, en la subpestaña Aplicar volver a marcar la casilla 'Aplicar' junto a la factura que desea pagar."},"WTAX_AMOUNT_FIELD_BILL_WARNING":{"id":"WTAX_AMOUNT_FIELD_BILL_WARNING","message":"Para mostrar el importe neto del pago de retención en la fuente, en la subpestaña Aplicar volver a marcar la casilla 'Aplicar' junto a la factura que desea pagar."}},"form_save":{"WTAX_TOTAL_VALIDATION":{"id":"WTAX_TOTAL_VALIDATION","message":"El importe de la retención fiscal total para todos los tipos de retención de impuestos no puede ser cero o menos. Esto incluye el desglose de los importes de todos los grupos fiscales las retenciones aplicadas sobre la transacción."}},"validate_field":{"HEADER_DISCOUNT_VALIDATION":{"id":"HEADER_DISCOUNT_VALIDATION","message":"La aplicación de un descuento operación no se admite cuando el punto de retención de impuestos está ajustada a \"Devengado\"."}},"validate_line":{"HEADER_DISCOUNT_VALIDATION":{"id":"HEADER_DISCOUNT_VALIDATION","message":"La aplicación de un descuento operación no se admite cuando el punto de retención de impuestos está ajustada a \"Devengado\"."}}},"TRANS_UE":{"id":"TRANS_UE","field":{"AMOUNT":{"id":"AMOUNT","label":"Importe"},"APPLIES_TO":{"id":"APPLIES_TO","label":"Se aplica a","select":{"INDIVIDUAL_LINES":{"id":"INDIVIDUAL_LINES","label":"Artículos de línea individuales"},"TOTAL_AMT":{"id":"TOTAL_AMT","label":"Importe total"}},"help":"Seleccione la base para procesar la retención de impuestos."},"APPLY_WH_TAX":{"id":"APPLY_WH_TAX","label":"¿Aplicar retención de impuestos?"},"BASE_AMT":{"id":"BASE_AMT","label":"Importe base","help":"La base para procesar la retención de impuestos."},"DATE":{"id":"DATE","label":"Fecha"},"REF_NO":{"id":"REF_NO","label":"N.º de referencia"},"TAX_AMOUNT":{"id":"TAX_AMOUNT","label":"Importe de impuestos","help":"El importe de retención de impuestos."},"TAX_CODE":{"id":"TAX_CODE","label":"Código de impuesto","help":"El código o grupo de retención de impuestos aplicable."},"TAX_RATE":{"id":"TAX_RATE","label":"Tipo impositivo","help":"El tipo de retención de impuestos correspondiente."},"TOTAL":{"id":"TOTAL","label":"Total"},"TYPE":{"id":"TYPE","label":"Tipo"},"WITHHELD":{"id":"WITHHELD","label":"Retenido"},"WTAX_AMT":{"id":"WTAX_AMT","label":"Importe de retención de impuestos"},"WTAX_BASE_AMT":{"id":"WTAX_BASE_AMT","label":"Importe base de retención de impuestos"},"WTAX_CODE":{"id":"WTAX_CODE","label":"Código de impuestos de retención"},"WTAX_RATE":{"id":"WTAX_RATE","label":"Tipo de retención de impuestos"},"BILL_PAYMENT":{"id":"BILL_PAYMENT","label":"Pago de facturas"},"INVOICE_PAYMENT":{"id":"INVOICE_PAYMENT","label":"Pago de facturas"},"BILL_CREDIT":{"id":"BILL_CREDIT","label":"Crédito de factura"},"CREDIT_MEMO":{"id":"CREDIT_MEMO","label":"Nota de crédito"}},"subtab":{"WTAX":{"id":"WTAX","label":"Retención de Impuestos"}},"button":{"GO_BACK":{"id":"GO_BACK","label":"Volver"}},"field_msg":{"CANCEL_WTAX_BILL_CREDIT":{"id":"CANCEL_WTAX_BILL_CREDIT","message":"Crédito de factura de retención de impuestos cancelado del pago de factura invalidado &1"},"CANCEL_WTAX_CREDIT_MEMO":{"id":"CANCEL_WTAX_CREDIT_MEMO","message":"Nota de crédito de retención de impuestos cancelada del pago de factura invalidado &1"},"AMOUNT":{"id":"AMOUNT","message":"Importe"},"WTAX_AMT":{"id":"WTAX_AMT","message":"Withholding Tax Amount for &1"},"REF_NO":{"id":"REF_NO","message":"N.º de referencia"}},"error_msg":{"TRAN_LOCK_BILL_CREDIT":{"id":"TRAN_LOCK_BILL_CREDIT","message":"El crédito de la factura muestra el importe de retención de impuestos para la factura asociada."},"TRAN_LOCK_BILL_PAYMENT":{"id":"TRAN_LOCK_BILL_PAYMENT","message":"Esta factura ya tiene un pago aplicado; neto para la retención de impuestos correspondiente."},"TRAN_LOCK_CREDIT_MEMO":{"id":"TRAN_LOCK_CREDIT_MEMO","message":"La nota de crédito muestra el importe de retención de impuestos para la factura asociada."},"TRAN_LOCK_INVOICE_PAYMENT":{"id":"TRAN_LOCK_INVOICE_PAYMENT","message":"Esta factura ya tiene un pago aplicado; neto para la retención de impuestos correspondiente."},"TRAN_LOCK":{"id":"TRAN_LOCK","message":"No se permite la edición en esta operación. Para obtener más información, póngase en contacto con su administrador de NetSuite."},"TRAN_LOCK_NS_INFO":{"id":"TRAN_LOCK_NS_INFO","message":"Información de NetSuite"},"TRAN_LOCK_WARNING":{"id":"TRAN_LOCK_WARNING","message":"Advertencia"},"SO_MULT_INVENTORY":{"id":"SO_MULT_INVENTORY","message":"El orden de venta cuando varios Inventario Localización está activada, un valor en Ubicación se requiere."},"INVOICE_MULT_INVENTORY":{"id":"INVOICE_MULT_INVENTORY","message":"En la factura cuando varios Inventario Localización está activada, un valor en Ubicación se requiere."},"ERROR":{"id":"ERROR","message":"Error"},"VAT_CODE_CHECK_US":{"id":"VAT_CODE_CHECK_US","message":"Por favor, asegúrese de que haya al menos un código de impuestos con los siguientes valores para el país actual / subsidiara:<br>Tasa = 0,00%<br>Nombre del impuesto = -No Imponible-<br>Inactivo = falso (casilla no debe estar marcado)"},"VAT_CODE_CHECK_CA":{"id":"VAT_CODE_CHECK_CA","message":"Asegúrese de que hay al menos un grupo de impuestos con GST / PST o códigos fiscales HST con los siguientes valores para el país / filial actual:<br><br>Velocidad = 0,00%<br>Excluir de Informes de IVA = verdadero (casilla debe estar marcada)<br>Inactiva = falso (casilla de verificación no debe ser marcado)"},"VAT_CODE_CHECK_OTHER_COUNTRIES":{"id":"VAT_CODE_CHECK_OTHER_COUNTRIES","message":"Por favor, asegúrese de que haya al menos un código de impuestos con los siguientes valores para el país actual / subsidiara:<br>Tasa = 0,00%<br>Excluir de los reportes de IVA = verdadero (casilla debe estar marcada)<br>Inactivo = falso (casilla no debe estar marcado)<br><br>Insinuación: Generalmente los ajustes anteriores se pueden encontrar en un código tributario con el nombre / código que contiene \"UNDEF_\""},"WTAX_ON_PAYMENT_LOCK":{"id":"WTAX_ON_PAYMENT_LOCK","message":"Payment processing is still in progess."},"VOIDING_JOURNALS_NOT_SUPPORTED_FOR_WTAX":{"id":"VOIDING_JOURNALS_NOT_SUPPORTED_FOR_WTAX","message":"Voiding Bill Payments with Withholding Tax using reversing journals is not supported."}},"email":{"WTAX_ON_PAYMENT_FAILED_SUBJECT":{"id":"WTAX_ON_PAYMENT_FAILED_SUBJECT","message":"Failed Withholding Tax processing for Payment&1"},"WTAX_ON_PAYMENT_FAILED_BODY":{"id":"WTAX_ON_PAYMENT_FAILED_BODY","message":"Posting of Withholding Tax for the following transaction/s was not successful:\n&1\n\nError encountered:\n&2\nFor more information, see \"Withholding Tax Troubleshooting Guide\" in the Help Center.\n\nOnce you have resolved the error, please click the link below to reprocess the posting of withholding tax:\n&3"}}},"REPORT":{"id":"REPORT","report":{"WTAX_VENDOR_DETAIL_REPORT":{"id":"WTAX_VENDOR_DETAIL_REPORT","title":"Impuestos Retenidos para Proveedores (Detalle)"},"WTAX_VENDOR_QUARTERLY_LIST":{"id":"WTAX_VENDOR_QUARTERLY_LIST","title":"Impuesto Retenido Trimestral para Proveedores - Período"},"WTAX_VENDOR_MONTHLY_LIST":{"id":"WTAX_VENDOR_MONTHLY_LIST","title":"Mensual de Impuesto Retenido para Proveedor - Período"},"WTAX_VENDOR_PDF":{"id":"WTAX_VENDOR_PDF","title":"Lista de proveedores a los que se les retienen los impuestos"},"WTAX_CUSTOMER_DETAIL_REPORT":{"id":"WTAX_CUSTOMER_DETAIL_REPORT","title":"Impuestos Retenidos por Clientes (Detalle)"},"WTAX_CUSTOMER_DETAIL_LIST":{"id":"WTAX_CUSTOMER_DETAIL_LIST","title":"Impuestos Retenidos por Clientes"},"FROM":{"id":"FROM","title":"De"},"TO":{"id":"TO","title":"A"},"WTAX_CUSTOMER_PDF":{"id":"WTAX_CUSTOMER_PDF","title":"Lista de clientes a los que se les retienen los impuestos"},"WTAX_VENDOR_SUMMARY_REPORT":{"id":"WTAX_VENDOR_SUMMARY_REPORT","title":"Contribución Retenida para Proveedores (Resumen)"},"WTAX_CUSTOMER_SUMMARY_REPORT":{"id":"WTAX_CUSTOMER_SUMMARY_REPORT","title":"Contribución Retenida por los Clientes (Resumen)"},"WTAX_VENDOR_PURC_DETAIL_REPORT":{"id":"WTAX_VENDOR_PURC_DETAIL_REPORT","title":"Compra por código de retención de impuestos (Detalle)"},"WTAX_VENDOR_PURC_DETAIL_PDF":{"id":"WTAX_VENDOR_PURC_DETAIL_PDF","title":"Lista de compras por la cual los impuestos fueron retenidos (Detalle)"},"WTAX_VENDOR_PURC_SUMMARY_REPORT":{"id":"WTAX_VENDOR_PURC_SUMMARY_REPORT","title":"Compra por código de retención de impuestos (Resumen)"},"WTAX_VENDOR_PURC_SUMMARY_PDF":{"id":"WTAX_VENDOR_PURC_SUMMARY_PDF","title":"Lista de compras por la cual los impuestos fueron retenidos (Resumen)"},"WTAX_CUSTOMER_SALES_DETAIL_REPORT":{"id":"WTAX_CUSTOMER_SALES_DETAIL_REPORT","title":"Ventas por código de retención de impuestos (Detalle)"},"WTAX_CUSTOMER_SALES_DETAIL_PDF":{"id":"WTAX_CUSTOMER_SALES_DETAIL_PDF","title":"Lista de ventas por el cual los impuestos fueron retenidos (Detalle)"},"WTAX_CUSTOMER_SALES_SUMMARY_REPORT":{"id":"WTAX_CUSTOMER_SALES_SUMMARY_REPORT","title":"Ventas por código de retención de impuestos (Resumen)"},"WTAX_CUSTOMER_SALES_SUMMARY_PDF":{"id":"WTAX_CUSTOMER_SALES_SUMMARY_PDF","title":"Lista de ventas por el cual los impuestos fueron retenidos (Resumen)"}},"common_field":{"AGENT_NAME":{"id":"AGENT_NAME","label":"Nombre del agente de retención"},"AMT_INCOME_PMNT":{"id":"AMT_INCOME_PMNT","label":"Importe de pago de impuestos"},"AMT_TAX_WHELD":{"id":"AMT_TAX_WHELD","label":"Importe de retención de impuestos"},"CLASSIFICATION":{"id":"CLASSIFICATION","label":"Clasificación"},"COMPANY":{"id":"COMPANY","label":"Empresa"},"CORPORATION":{"id":"CORPORATION","label":"Sociedad (nombre registrado)"},"DESCRIPTION":{"id":"DESCRIPTION","label":"Descripción"},"END_OF_REPORT":{"id":"END_OF_REPORT","label":"Fin del informe"},"FIRST_NAME":{"id":"FIRST_NAME","label":"Nombre"},"GRAND_TOTAL":{"id":"GRAND_TOTAL","label":"Total"},"INDIVIDUAL":{"id":"INDIVIDUAL","label":"Individual","long_label":"Individuo (Apellido, Nombre, Segundo nombre)"},"LAST_NAME":{"id":"LAST_NAME","label":"Apellido"},"MEMO":{"id":"MEMO","label":"Nota"},"MIDDLE_NAME":{"id":"MIDDLE_NAME","label":"Segundo nombre"},"NEXUS":{"id":"NEXUS","label":"Nexo"},"PAYEE_NAME":{"id":"PAYEE_NAME","label":"Agente de Retención Nombre"},"PERIOD_FROM":{"id":"PERIOD_FROM","label":"para el período"},"PERIOD_TO":{"id":"PERIOD_TO","label":"a"},"REFERENCE_NO":{"id":"REFERENCE_NO","label":"Número de transacción"},"SEQ_NO":{"id":"SEQ_NO","label":"N.º de secuencia"},"SUBSIDIARY":{"id":"SUBSIDIARY","label":"Subsidiaria"},"TAX_CODE":{"id":"TAX_CODE","label":"Código de impuesto"},"TAX_PERIOD":{"id":"TAX_PERIOD","label":"Período del impuesto"},"TAX_RATE":{"id":"TAX_RATE","label":"Tipo de retención de impuestos"},"TAX_REG_NO":{"id":"TAX_REG_NO","label":"Número de identificación fiscal"},"TAX_TYPE":{"id":"TAX_TYPE","label":"Tipo de impuesto"},"TIN":{"id":"TIN","label":"Tax ID"},"TRANSACTION_TYPE":{"id":"TRANSACTION_TYPE","label":"Tipo de transacción"},"WTAX_RATE":{"id":"WTAX_RATE","label":"Tipo de retención de impuestos"},"NUM_ONE":{"id":"NUM_ONE","label":"1"},"NUM_TWO":{"id":"NUM_TWO","label":"2"},"NUM_THREE":{"id":"NUM_THREE","label":"3"},"NUM_FOUR":{"id":"NUM_FOUR","label":"4"},"NUM_FIVE":{"id":"NUM_FIVE","label":"5"},"NUM_SIX":{"id":"NUM_SIX","label":"6"},"NUM_SEVEN":{"id":"NUM_SEVEN","label":"7"},"NUM_EIGHT":{"id":"NUM_EIGHT","label":"8"},"NUM_NINE":{"id":"NUM_NINE","label":"9"},"NUM_TEN":{"id":"NUM_TEN","label":"10"},"NUM_ELEVEN":{"id":"NUM_ELEVEN","label":"11"},"NUM_TWELVE":{"id":"NUM_TWELVE","label":"12"}},"common_field_value":{"NONE":{"id":"NONE","value":"Ninguno"}},"button":{"SUBMIT":{"id":"SUBMIT","label":"Enviar"},"PRINT_PDF":{"id":"PRINT_PDF","label":"Imprimir PDF"},"SAVE_CSV":{"id":"SAVE_CSV","label":"Exportar - CSV"},"EXPORT_DAT":{"id":"EXPORT_DAT","label":"Exportar - DAT"},"RETURN_TO_CRITERIA":{"id":"RETURN_TO_CRITERIA","label":"Volver a criterios"}}}}</custpage_4601_resobj>
+<custpage_4601_witaxamount>0.0</custpage_4601_witaxamount>
+<custpage_4601_witaxbaseamount>0.0</custpage_4601_witaxbaseamount>
+<custpage_4601_witaxcodesasjson>[{"id":"21","name":"ISR Por Intereses","rate":20,"percentageofbase":100,"witaxtype":"12","witaxtype_text":"12","witaxtypename":"ISR Por Intereses","witaxbase":"amount","istaxgroup":false,"subsidiaries":["4","10"],"subsidiaries_text":"21","includechildsubs":false},{"id":"20","name":"FLETES","rate":4,"percentageofbase":100,"witaxtype":"3","witaxtype_text":"3","witaxtypename":"IVA Fletes","witaxbase":"amount","istaxgroup":false,"subsidiaries":["4","10"],"subsidiaries_text":"20","includechildsubs":false},{"id":"18","name":"IVA Servicio Fletes","rate":4,"percentageofbase":100,"witaxtype":"3","witaxtype_text":"3","witaxtypename":"IVA Fletes","witaxbase":"amount","istaxgroup":false,"subsidiaries":["1"],"subsidiaries_text":"18","includechildsubs":true}]</custpage_4601_witaxcodesasjson>
+<custpage_4601_witaxgroupsasjson>[{"id":"17","witaxcodes":[{"TaxGroupId":"17","TaxCode":"16","TaxRate":0.0125,"TaxBasis":100,"TaxType":"11"},{"TaxGroupId":"17","TaxCode":"2","TaxRate":0.10666700000000001,"TaxBasis":100,"TaxType":"5"}]},{"id":"6","witaxcodes":[{"TaxGroupId":"6","TaxCode":"1","TaxRate":0.1,"TaxBasis":100,"TaxType":"1"},{"TaxGroupId":"6","TaxCode":"2","TaxRate":0.10666700000000001,"TaxBasis":100,"TaxType":"5"}]},{"id":"7","witaxcodes":[{"TaxGroupId":"7","TaxCode":"3","TaxRate":0.1,"TaxBasis":100,"TaxType":"2"},{"TaxGroupId":"7","TaxCode":"4","TaxRate":0.10666700000000001,"TaxBasis":100,"TaxType":"6"}]},{"id":"13","witaxcodes":[{"TaxGroupId":"13","TaxCode":"11","TaxRate":0.1067,"TaxBasis":100,"TaxType":"8"},{"TaxGroupId":"13","TaxCode":"10","TaxRate":0.1,"TaxBasis":100,"TaxType":"9"}]},{"id":"14","witaxcodes":[{"TaxGroupId":"14","TaxCode":"10","TaxRate":0.1,"TaxBasis":100,"TaxType":"9"},{"TaxGroupId":"14","TaxCode":"9","TaxRate":0.1067,"TaxBasis":100,"TaxType":"10"}]}]</custpage_4601_witaxgroupsasjson>
+<custpage_4601_witaxsetupsasjson>{"id":"1","saletaxpoint":"onaccrual","purctaxpoint":"onaccrual","autoapply":false}</custpage_4601_witaxsetupsasjson>
+<custpage_4601_witaxtype>sale</custpage_4601_witaxtype>
+<custpage_cs_msgs>{"ERR_FIELD_TAXREPORTING_COUNTERPARTYVAT_VALUE":"Enter a valid VAT number in the Partner ID field on the Tax Reporting subtab.","ERR_FIELD_COUNTERPARTYVAT_VALUE":"Enter a valid VAT number in the Partner ID field."}</custpage_cs_msgs>
+<custpage_cs_msgs_wht>{"ERR_INVALID_DISCOUNT_ON_ACCRUAL":"La aplicación de descuentos en la transacción no se admite cuando el punto de impuesto de retención está configurado como En acumulación.","INFO_ADDRESS_CHANGE_ERROR_MESSAGE":"{INFO_ADDRESS_CHANGE_ERROR_MESSAGE}"}</custpage_cs_msgs_wht>
+<custpage_itr_nexus>MX</custpage_itr_nexus>
+<custpage_lrcfm_datacarrier_text>{"MX":[{"country":"MX","fields":[{"id":"custitem_mx_txn_item_sat_item_code","type":"SELECT"},{"id":"custitem_mx_txn_item_sat_item_type","type":"SELECT"},{"id":"custbody_mx_customer_rfc","type":"TEXT","keepHiddenIn":["cashrefund","customerdeposit","customerrefund","estimate","returnauthorization"]},{"id":"custbody_mx_inbound_bill_uuid","type":"TEXT","keepHiddenIn":["blanketpurchaseorder","check","creditcardcharge","inventorystatuschange","purchasecontract","purchaserequisition","vendorreturnauthorization","purchaseorder"]},{"id":"custbody_mx_operation_type","type":"SELECT","keepHiddenIn":["blanketpurchaseorder","creditcardcharge","inventorystatuschange","purchasecontract","purchaserequisition","vendorreturnauthorization"]},{"id":"custbody_mx_tax_effect_vendor_cfdi","type":"CHECKBOX","keepHiddenIn":["blanketpurchaseorder","creditcardcharge","inventorystatuschange","purchasecontract","purchaserequisition","vendorreturnauthorization"]},{"id":"custbody_mx_payment_method","type":"SELECT"},{"id":"custbody_mx_bank_information","type":"SELECT"},{"id":"custpage_mx_bank_information","type":"SELECT"},{"id":"custbody_mx_bank_name","type":"TEXT"},{"id":"custbody_mx_bank_acct_num","type":"TEXT"},{"id":"custentity_mx_rfc","type":"TEXT"},{"id":"custentity_mx_sat_industry_type","type":"SELECT"},{"id":"custbody_mx_cfdi_sat_addendum","type":"TEXT","keepHiddenIn":["cashrefund","customerdeposit","customerrefund","estimate","returnauthorization","salesorder"]},{"id":"custbody_mx_cfdi_certify_timestamp","type":"TEXT","keepHiddenIn":["cashrefund","customerdeposit","customerrefund","estimate","returnauthorization","salesorder"]},{"id":"custbody_mx_cfdi_uuid","type":"TEXT","keepHiddenIn":["cashrefund","customerdeposit","customerrefund","estimate","returnauthorization","salesorder"]},{"id":"custbody_mx_cfdi_serie","type":"TEXT","keepHiddenIn":["salesorder","estimate"]},{"id":"custbody_mx_cfdi_folio","type":"TEXT","keepHiddenIn":["salesorder","estimate"]},{"id":"custbody_mx_cfdi_sat_export_type","type":"SELECT","keepHiddenIn":["salesorder","estimate"]},{"id":"custbody_mx_cfdi_usage","type":"SELECT","keepHiddenIn":["cashrefund","estimate","returnauthorization","salesorder"]},{"id":"custbody_mx_txn_sat_payment_term","type":"SELECT","keepHiddenIn":["cashrefund","estimate","returnauthorization","salesorder"]},{"id":"custbody_mx_txn_sat_payment_method","type":"SELECT","keepHiddenIn":["cashrefund","customerdeposit","customerrefund","estimate","opportunity","returnauthorization","vendorreturnauthorization"]},{"id":"custrecord_mx_rcs_rel_type","type":"SELECT"},{"id":"custbody_mx_journalentry_authorizedby","type":"SELECT","keepHiddenIn":["journalentry"]},{"id":"custbody_mx_journalentry_createdby","type":"SELECT","keepHiddenIn":["journalentry"]},{"id":"custentity_mx_sat_registered_name","type":"TEXT"},{"id":"custbody_mcf_sat_months","type":"SELECT","keepHiddenIn":["cashrefund","customerdeposit","customerrefund","estimate","returnauthorization","creditmemo","salesorder"]},{"id":"custbody_mcf_sat_recurrence","type":"SELECT","keepHiddenIn":["cashrefund","customerdeposit","customerrefund","estimate","returnauthorization","creditmemo","salesorder"]},{"id":"custbody_mcf_sat_year","type":"TEXT","keepHiddenIn":["cashrefund","customerdeposit","customerrefund","estimate","returnauthorization","creditmemo","salesorder"]}],"sublists":["recmachcustrecord_psg_mx_bank_info_entity","recmachcustrecord_mx_rcs_orig_trans"],"sublistColumns":[]}]}</custpage_lrcfm_datacarrier_text>
+<custpage_taf_subsidiarycache>{"1":"MX","3":"MX","6":"MX","5":"MX","12":"MX","7":"MX","8":"MX","9":"MX","2":"MX","11":"MX","4":"MX","10":"MX"}</custpage_taf_subsidiarycache>
+<datedriven>F</datedriven>
+<dbstrantype>CustInvc</dbstrantype>
+<duedate>09/02/2026</duedate>
+<duedays>0</duedays>
+<edition>XX</edition>
+<email>facturacion@almetal.mx</email>
+<emailaddr>facturacion@almetal.mx</emailaddr>
+<entity>10653</entity>
+<entityfieldname>entity</entityfieldname>
+<entityname>8669 GLADIS ALEIDA LIMON HIGUERA</entityname>
+<entitynexus>1</entitynexus>
+<entryformquerystring>id=2011418&siaT=1785871899152&siaWhc=/app/center/card.nl&siaNv=rr&xml=T</entryformquerystring>
+<estgrossprofit>211.35</estgrossprofit>
+<estgrossprofitpercent>32.6929%</estgrossprofitpercent>
+<exchangerate>1.00</exchangerate>
+<excludefromglnumbering>F</excludefromglnumbering>
+<finchrg>F</finchrg>
+<hasfedexfreightservice>F</hasfedexfreightservice>
+<id>2011418</id>
+<installmentcount>0</installmentcount>
+<inventorydetailuitype>LOH_STRICT_VALIDATION</inventorydetailuitype>
+<isbasecurrency>T</isbasecurrency>
+<iseitf81on>F</iseitf81on>
+<isinstallment>F</isinstallment>
+<isonlinetransaction>F</isonlinetransaction>
+<itemshippingcostfxrate>1</itemshippingcostfxrate>
+<lastmodifieddate>11/02/2026 6:33 PM</lastmodifieddate>
+<linked>T</linked>
+<linkedclosedperioddiscounts>F</linkedclosedperioddiscounts>
+<linkedrevrecje>F</linkedrevrecje>
+<location>3</location>
+<locationusesbins>T</locationusesbins>
+<manualcredithold>F</manualcredithold>
+<mindays>0</mindays>
+<nexus>1</nexus>
+<nexus_country>MX</nexus_country>
+<nlapiCC>F</nlapiCC>
+<nldept>5</nldept>
+<nlloc>0</nlloc>
+<nlrole>3</nlrole>
+<nlsub>4</nlsub>
+<nluser>9672</nluser>
+<nsapiCT>1785872213906</nsapiCT>
+<nsapiFC>dispatchFieldChanged</nsapiFC>
+<ntype>7</ntype>
+<oldrevenuecommitment>F</oldrevenuecommitment>
+<origcurrency>1</origcurrency>
+<origexchangerate>1.00</origexchangerate>
+<origtotal>749.91</origtotal>
+<origtotal2>749.91</origtotal2>
+<overallbalance>0.00</overallbalance>
+<overallunbilledorders>0.00</overallunbilledorders>
+<persistedterms>4</persistedterms>
+<postingperiod>670</postingperiod>
+<pp_e>28/02/2026</pp_e>
+<pp_s>01/02/2026</pp_s>
+<ppsetbyuser>F</ppsetbyuser>
+<prevdate>09/02/2026</prevdate>
+<prevrep>5726</prevrep>
+<primarycurrency>1.00</primarycurrency>
+<primarycurrencyfxrate>1.00</primarycurrencyfxrate>
+<recordcreatedby>11841</recordcreatedby>
+<recordcreateddate>02/09/2026 15:53:50</recordcreateddate>
+<saleseffectivedate>09/02/2026</saleseffectivedate>
+<salesrep>5726</salesrep>
+<semail>facturacion@almetal.mx</semail>
+<sendorderfulfillmentemail>T</sendorderfulfillmentemail>
+<shipaddress>GLADIS ALEIDA LIMON HIGUERA<br>CONOCIDO S/N <br>0 HIGUERA DE LOS MONZON, SIN<br>México</shipaddress>
+<shipaddressee>GLADIS ALEIDA LIMON HIGUERA</shipaddressee>
+<shipcarrier>nonups</shipcarrier>
+<shipcity>HIGUERA DE LOS MONZON</shipcity>
+<shipcountry>MX</shipcountry>
+<shipdate>09/02/2026</shipdate>
+<shipisresidential>F</shipisresidential>
+<shipoverride>F</shipoverride>
+<shippingaddress>176904</shippingaddress>
+<shippingaddress_key>176904</shippingaddress_key>
+<shipstate>SIN</shipstate>
+<shipzip>0</shipzip>
+<status>Pagado por completo</status>
+<statusRef>paidInFull</statusRef>
+<storeorder>F</storeorder>
+<subsidiary>4</subsidiary>
+<subtotal>646.47</subtotal>
+<syncpartnerteams>F</syncpartnerteams>
+<taxperiod>652</taxperiod>
+<taxtotal>103.44</taxtotal>
+<terms>4</terms>
+<tobeemailed>F</tobeemailed>
+<tobefaxed>F</tobefaxed>
+<tobeprinted>F</tobeprinted>
+<total>749.91</total>
+<totalcostestimate>435.12</totalcostestimate>
+<trandate>09/02/2026</trandate>
+<tranid>B1650919</tranid>
+<tranline0_location>3</tranline0_location>
+<transactionnumber>B1650919</transactionnumber>
+<type>custinvc</type>
+<unbilledorders>0.00</unbilledorders>
+<version>12</version>
+<voided>F</voided>
+<warnnexuschange>F</warnnexuschange>
+<weekendpreference>ASIS</weekendpreference>
+<wfFC>workflow_fieldchanged</wfFC>
+<wfPI>workflow_pageinit</wfPI>
+<wfPS>workflow_postsourcing</wfPS>
+<wfSR>workflow_saverecord</wfSR>
+<wfVF>workflow_validatefield</wfVF>
+<machine name="item" type="edit" fields="item,olditemid,displayname,description,quantityremaining,quantityavailable,quantity,inventorydetail,inventorydetailavail,inventorydetailreq,binitem,isserial,isnumbered,locationusesbins,itemlocationbinlist,fulfillmentbin,fulfillmentstatus,fulfillmentstatusquantity,generatedinvdetail,isinvdetaildirty,inventorydetailset,units,unitslist,unitconversionrate,price,custcol_drt_rate_backup,custcol_drt_rate_block,rate,rateschedule,marginal,oqpbucket,custcol_pfpdescuento_,amount,amounthasbeenset,netamount,taxcode,custcol_mx_txn_line_sat_tax_object,taxrate1,tax1amt,grossamt,options,costestimate,custcol_mx_txn_line_sat_item_code,custcol_drt_sobre_cargo,custcol_4601_witaxapplies,custcol_4601_witaxbamt_exp,custcol_4601_witaxamt_exp,custcol_4601_witaxline_exp,custcol_4601_witaxcode_exp,custcol_4601_witaxrate_exp,custcol_drt_tipo_unidad,custcol_alm_mat_peligro_sat,custcoldrt_cant,custcol_desglose_detalle,custcol_nota_xlinea,custcol_margen_aplicado,custcol_margen_estandar,custcol_mergn_desc_solicitado,custcol_precio_sin_margen,custcol_margen_minimo_item,custcol_maxdiscount_margin_percent,custcol_sang_monto_sobrecargo_apli,custcol_sang_item_solicitar_corte,custcolalm_margen_de_venta,custcol_alm_precio_final,custcol_alm_precio_integrado,custcol_country_of_origin_code,custcol_country_of_origin_name,cseg2,cseg3,cseg4,custcol_nature_of_transaction_codes,custcol_pfp_codigoarticulo_,custcol_sang_hidden_item_largo,custcol_statistical_value_base_curr,custcol_2663_companyname,custcol_2663_firstname,custcol_2663_isperson,custcol_2663_lastname,custcol_4601_itemdefaultwitaxcode,custcol_4601_witaxamount,custcol_4601_witaxbaseamount,custcol_4601_witaxcode,custcol_4601_witaxline,custcol_4601_witaxrate,custcol_9572_cr_entitybank_format,custcol_9572_cr_entitybank_sub,custcol_9572_custref_file_format,account,line,lineuniquekey,discline,printitems,ingroup,includegroupwrapper,groupsetup,itemtype,itemsubtype,isnoninventory,fulfillable,mandatorytaxcode,id,isposting,minqty,matrixtype,linenumber,historyurl,history,custpage_4601_witaxcode,custpage_4601_witaxrate,custpage_4601_witaxbaseamount,custpage_4601_witaxamount">
+<line>
+<account>54</account>
+<amount>496.47</amount>
+<amounthasbeenset>F</amounthasbeenset>
+<binitem>T</binitem>
+<costestimate>367.15</costestimate>
+<custcol_alm_mat_peligro_sat>F</custcol_alm_mat_peligro_sat>
+<custcol_drt_rate_backup>104.52</custcol_drt_rate_backup>
+<custcol_drt_rate_block>99.294</custcol_drt_rate_block>
+<custcol_drt_sobre_cargo>T</custcol_drt_sobre_cargo>
+<custcol_drt_tipo_unidad>3803</custcol_drt_tipo_unidad>
+<custcol_mx_txn_line_sat_item_code>1848</custcol_mx_txn_line_sat_item_code>
+<custcol_mx_txn_line_sat_tax_object>2</custcol_mx_txn_line_sat_tax_object>
+<custcol_pfp_codigoarticulo_>PR00CC20C18</custcol_pfp_codigoarticulo_>
+<custcol_pfpdescuento_>5.0%</custcol_pfpdescuento_>
+<custcol_statistical_value_base_curr>0.00</custcol_statistical_value_base_curr>
+<custcolalm_margen_de_venta>25</custcolalm_margen_de_venta>
+<description>Perfil Negro Cercha Camionera 20'Cal.18</description>
+<displayname>PR00CC20C18</displayname>
+<fulfillable>T</fulfillable>
+<fulfillmentstatusquantity>0</fulfillmentstatusquantity>
+<generatedinvdetail>F</generatedinvdetail>
+<grossamt>575.91</grossamt>
+<history>Historial</history>
+<historyurl>/app/accounting/transactions/history.nl?id=2011418</historyurl>
+<id>2011418_1</id>
+<includegroupwrapper>F</includegroupwrapper>
+<inventorydetail>841162</inventorydetail>
+<inventorydetailavail>T</inventorydetailavail>
+<inventorydetailreq>T</inventorydetailreq>
+<inventorydetailset>T</inventorydetailset>
+<isinvdetaildirty>F</isinvdetaildirty>
+<isnoninventory>F</isnoninventory>
+<isnumbered>F</isnumbered>
+<isposting>T</isposting>
+<isserial>F</isserial>
+<item>11547</item>
+<item_display>Perfil Negro Cercha Camionera 20'Cal.18</item_display>
+<itemtype>InvtPart</itemtype>
+<line>1</line>
+<lineuniquekey>12525445</lineuniquekey>
+<locationusesbins>T</locationusesbins>
+<mandatorytaxcode>T</mandatorytaxcode>
+<marginal>F</marginal>
+<olditemid>11547</olditemid>
+<price>1</price>
+<price_display>Precio base</price_display>
+<printitems>F</printitems>
+<quantity>5</quantity>
+<quantityavailable>54</quantityavailable>
+<rate>99.294</rate>
+<rateschedule>0</rateschedule>
+<rateschedule>114.17</rateschedule>
+<sys_id>9625854802070464</sys_id>
+<tax1amt>79.44</tax1amt>
+<taxcode>6</taxcode>
+<taxcode_display>IVA_MX MERCANCIAS:IVA 16% Mercancias</taxcode_display>
+<taxrate1>16.0%</taxrate1>
+<unitconversionrate>1</unitconversionrate>
+<units>8195</units>
+<units_display>PZA</units_display>
+<unitslist>8195</unitslist>
+</line>
+<line>
+<account>54</account>
+<amount>102.00</amount>
+<amounthasbeenset>F</amounthasbeenset>
+<binitem>T</binitem>
+<costestimate>46.97</costestimate>
+<custcol_alm_mat_peligro_sat>F</custcol_alm_mat_peligro_sat>
+<custcol_drt_rate_backup>1.02</custcol_drt_rate_backup>
+<custcol_drt_rate_block>1.02</custcol_drt_rate_block>
+<custcol_drt_sobre_cargo>T</custcol_drt_sobre_cargo>
+<custcol_drt_tipo_unidad>1</custcol_drt_tipo_unidad>
+<custcol_mx_txn_line_sat_item_code>2015</custcol_mx_txn_line_sat_item_code>
+<custcol_mx_txn_line_sat_tax_object>2</custcol_mx_txn_line_sat_tax_object>
+<custcol_pfp_codigoarticulo_>TC14112</custcol_pfp_codigoarticulo_>
+<custcol_pfpdescuento_>0.0%</custcol_pfpdescuento_>
+<custcol_statistical_value_base_curr>0.00</custcol_statistical_value_base_curr>
+<custcolalm_margen_de_venta>50</custcolalm_margen_de_venta>
+<description>Tornillo Cochi 1/4"x1 1/2"</description>
+<displayname>TC14112</displayname>
+<fulfillable>T</fulfillable>
+<fulfillmentstatusquantity>0</fulfillmentstatusquantity>
+<generatedinvdetail>F</generatedinvdetail>
+<grossamt>118.32</grossamt>
+<history>Historial</history>
+<historyurl>/app/accounting/transactions/history.nl?id=2011418</historyurl>
+<id>2011418_4</id>
+<includegroupwrapper>F</includegroupwrapper>
+<inventorydetail>841163</inventorydetail>
+<inventorydetailavail>T</inventorydetailavail>
+<inventorydetailreq>T</inventorydetailreq>
+<inventorydetailset>T</inventorydetailset>
+<isinvdetaildirty>F</isinvdetaildirty>
+<isnoninventory>F</isnoninventory>
+<isnumbered>F</isnumbered>
+<isposting>T</isposting>
+<isserial>F</isserial>
+<item>4725</item>
+<item_display>Tornillo Cochi 1/4"x1 1/2"</item_display>
+<itemtype>InvtPart</itemtype>
+<line>4</line>
+<lineuniquekey>12525448</lineuniquekey>
+<locationusesbins>T</locationusesbins>
+<mandatorytaxcode>T</mandatorytaxcode>
+<marginal>F</marginal>
+<minqty>1</minqty>
+<olditemid>4725</olditemid>
+<price>1</price>
+<price_display>Precio base</price_display>
+<printitems>F</printitems>
+<quantity>100</quantity>
+<quantityavailable>755</quantityavailable>
+<rate>1.02</rate>
+<rateschedule>0</rateschedule>
+<rateschedule>1.02</rateschedule>
+<sys_id>9625854802070465</sys_id>
+<tax1amt>16.32</tax1amt>
+<taxcode>6</taxcode>
+<taxcode_display>IVA_MX MERCANCIAS:IVA 16% Mercancias</taxcode_display>
+<taxrate1>16.0%</taxrate1>
+<unitconversionrate>1</unitconversionrate>
+<units>1</units>
+<units_display>Pza</units_display>
+<unitslist>1</unitslist>
+<unitslist>8644</unitslist>
+</line>
+<line>
+<account>54</account>
+<amount>48.00</amount>
+<amounthasbeenset>F</amounthasbeenset>
+<binitem>T</binitem>
+<costestimate>21.00</costestimate>
+<custcol_alm_mat_peligro_sat>F</custcol_alm_mat_peligro_sat>
+<custcol_drt_rate_backup>.48</custcol_drt_rate_backup>
+<custcol_drt_rate_block>.48</custcol_drt_rate_block>
+<custcol_drt_sobre_cargo>T</custcol_drt_sobre_cargo>
+<custcol_drt_tipo_unidad>1</custcol_drt_tipo_unidad>
+<custcol_mx_txn_line_sat_item_code>2027</custcol_mx_txn_line_sat_item_code>
+<custcol_mx_txn_line_sat_tax_object>2</custcol_mx_txn_line_sat_tax_object>
+<custcol_pfp_codigoarticulo_>TUHF14</custcol_pfp_codigoarticulo_>
+<custcol_pfpdescuento_>0.0%</custcol_pfpdescuento_>
+<custcol_statistical_value_base_curr>0.00</custcol_statistical_value_base_curr>
+<custcolalm_margen_de_venta>50</custcolalm_margen_de_venta>
+<description>Tuerca Hexagonal Forjada 1/4 "</description>
+<displayname>TUHF14</displayname>
+<fulfillable>T</fulfillable>
+<fulfillmentstatusquantity>0</fulfillmentstatusquantity>
+<generatedinvdetail>F</generatedinvdetail>
+<grossamt>55.68</grossamt>
+<history>Historial</history>
+<historyurl>/app/accounting/transactions/history.nl?id=2011418</historyurl>
+<id>2011418_7</id>
+<includegroupwrapper>F</includegroupwrapper>
+<inventorydetail>841164</inventorydetail>
+<inventorydetailavail>T</inventorydetailavail>
+<inventorydetailreq>T</inventorydetailreq>
+<inventorydetailset>T</inventorydetailset>
+<isinvdetaildirty>F</isinvdetaildirty>
+<isnoninventory>F</isnoninventory>
+<isnumbered>F</isnumbered>
+<isposting>T</isposting>
+<isserial>F</isserial>
+<item>5289</item>
+<item_display>Tuerca Hexagonal Forjada 1/4"</item_display>
+<itemtype>InvtPart</itemtype>
+<line>7</line>
+<lineuniquekey>12525451</lineuniquekey>
+<locationusesbins>T</locationusesbins>
+<mandatorytaxcode>T</mandatorytaxcode>
+<marginal>F</marginal>
+<minqty>1</minqty>
+<olditemid>5289</olditemid>
+<price>1</price>
+<price_display>Precio base</price_display>
+<printitems>F</printitems>
+<quantity>100</quantity>
+<quantityavailable>1721</quantityavailable>
+<rate>0.48</rate>
+<rateschedule>0</rateschedule>
+<rateschedule>0.48</rateschedule>
+<sys_id>9625854802070466</sys_id>
+<tax1amt>7.68</tax1amt>
+<taxcode>6</taxcode>
+<taxcode_display>IVA_MX MERCANCIAS:IVA 16% Mercancias</taxcode_display>
+<taxrate1>16.0%</taxrate1>
+<unitconversionrate>1</unitconversionrate>
+<units>1</units>
+<units_display>Pza</units_display>
+<unitslist>1</unitslist>
+<unitslist>8644</unitslist>
+</line>
+</machine>
+<machine name="partners" type="edit" fields="partner,id,transaction,partnerrole,isprimary,contribution,iscontributionuserdefined"/>
+<machine name="transformations" type="list" fields="id,trandate,linkurl,type,tranid,amountDoc"/>
+<machine name="appliedrules" type="list" fields="creationdate,ruletypetranslation,details,transactionversion,ruletype,id,parenttransaction,externallogid,detailsurl"/>
+<machine name="links" type="list" fields="id,trandate,linkurl,type,tranid,status,total">
+<line>
+<id>2011511</id>
+<linkurl>/app/accounting/transactions/custpymt.nl?whence=</linkurl>
+<status>Depositado</status>
+<sys_id>9625854802184960</sys_id>
+<total>749.91</total>
+<trandate>09/02/2026</trandate>
+<tranid>188183</tranid>
+<type>Pago</type>
+</line>
+<line>
+<id>2011511</id>
+<sys_id>9625854802184961</sys_id>
+<total>749.91</total>
+<type>Total</type>
+</line>
+</machine>
+<machine name="glimpactchanges" type="list" fields="creationdate,transactiondate,transactiontype,transactionkey,transactionnumber,transactionurl,changedby"/>
+</record>
+</nsResponse>
