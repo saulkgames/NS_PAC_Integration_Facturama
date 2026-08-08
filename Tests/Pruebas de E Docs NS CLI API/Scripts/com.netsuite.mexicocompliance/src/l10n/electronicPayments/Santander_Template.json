@@ -1,0 +1,15 @@
+{
+    "contentsDirUUID": "d5b32943-8705-46cf-8696-e40fcb6653df",
+    "name": "Banco Santander Mexico",
+    "format_country": [157],
+    "payment_file_type": "EFT",
+    "include_all_currencies": false,
+    "ref_fields" : "Santander Reference Fields.xml",
+    "entity_ref_fields" : "Santander Entity Reference Fields.xml",
+    "field_validator": "Santander Validator.xml",
+    "free_marker_body": "Santander FreeMarker.txt",
+	"free_marker_body_st": "Santander FreeMarker ST.txt",
+    "output_file_extension": "out",
+    "output_file_encoding": "UTF-8",
+    "max_lines": 1024
+}

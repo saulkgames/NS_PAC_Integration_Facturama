@@ -1,0 +1,124 @@
+/**
+ * Copyright (c) 2017, Oracle and/or its affiliates. All rights reserved.
+ *
+ * @NApiVersion 2.1
+ */
+
+define([], function () {
+
+	var translation = {};
+
+	translation['WITHHOLDING'] = 'Удержание';
+	translation['EDIT_BUTTON'] = 'Изменить';
+	translation['CANCEL_BUTTON'] = 'Отмена';
+	translation['TAX_TYPE'] = 'Тип налога';
+	translation['EXAMPLE_PLAIN_TEXT'] = 'Английский текст';
+	translation['EXAMPLE_TEXT_WITH_INSERTED_VALUE'] = 'История ставки налога ({tax_code_name})';
+	translation['LABEL_BANK_INFO'] = 'Банковские данные';
+	translation['LABEL_PAYMENT_METHOD'] = 'Метод платежа';
+	translation['HELP_BANK_INFO'] = 'Выберите запись банковских данных получателя для этой операции. Это поле используется для Mexico Localization.';
+	translation['ERROR_DATE_RANGE'] = 'Дата «Действует до» должна быть позже даты «Действует с».';
+	translation['ERROR_GENERAL_TITLE'] = 'Ошибка проверки';
+	translation['ERROR_MISSING_MAPPING'] = 'Отсутствует сопоставление для типа записи {record_type}.';
+	translation['ERROR_SUBSIDIARY_COUNTRY_MISSING'] = 'Не найдена страна для филиала с ИД';
+	translation['ERROR_SUBSIDIARY_MISSING'] = 'Не найден филиал для записи или пользователя';
+	translation['ERROR_UNEXPECTED_SAT_ITEM_CODE_1'] = 'Код товара SAT с кодом';
+	translation['ERROR_UNEXPECTED_SAT_ITEM_CODE_2'] = 'не найдено';
+	translation['ERROR_RFC_COMPANY'] = 'Номер RFC должен быть в формате, обязательном для Мексики (XXX000000XXX). Также можно использовать стандартный номер RFC для зарубежных объектов: XEXX010101000.';
+	translation['ERROR_RFC_PERSON'] = 'Номер RFC должен быть в формате, обязательном для Мексики (XXXX000000XXX).';
+	translation['ERROR_SAT_CODE_DUPLICATED'] = 'Невозможно ввести этот код, поскольку он уже используется в другой записи.';
+	translation['EI_AUDIT_TRAIL_CERTIFY_SUCCESS'] = 'Электронный документ успешно сертифицирован';
+	translation['ERROR_EI_AUDIT_TRAIL_NO_PAC'] = 'Нет действующих подключений к PAC.';
+	translation['ERROR_EI_AUDIT_TRAIL_NO_PAC_RESPONSE'] = 'Сделана попытка подключения к PAC, но PAC не отвечает';
+	translation['ERROR_EI_AUDIT_NO_PLUGIN_IMPLEMENTATION_FOUND'] = 'Не удалось установить подключение к PAC: не найден допустимый подключаемый модуль';
+	translation['ERROR_EI_SUBSIDIARY_ALREADY_IN_USE'] = 'At least one of the selected subsidiaries is already configured on another enabled PAC. Make sure that you assign a subsidiary to one enabled PAC only.';
+	translation['ERROR_EI_ONLY_ONE_ENABLED_PAC_IS_ALLOWED'] = 'This PAC cannot be enabled because there is already an enabled PAC in your account. To enable this PAC, disable the currently enabled one and try again.';
+	translation['ERROR_UNIQUE_PAC_VIOLATE_BANNER_TITLE'] = 'Существует действующее подключение к PAC.';
+	translation['ERROR_NO_ACCEPT_DIALOG_MSG'] = 'Перед сохранением необходимо прочесть и принять важное уведомление.';
+	translation['PAC_LICENSE_AGREEMENT'] = 'Выбирая поставщика услуг сертификации в этом приложении, вы тем самым даете разрешение Oracle + NetSuite передать информацию непосредственно этому поставщику услуг сертификации PAC. Перед включением передачи информации убедитесь, что вы получили все необходимые разрешения и заключили все необходимые соглашения непосредственно с поставщиком услуг сертификации PAC.';
+	translation['WARNING_GENERAL_TITLE'] = 'Предупреждение проверки';
+	translation['ERROR_INVALID_OPERATION_TYPE'] = 'Нельзя использовать тип операции «Аренда недвижимости», если выбран зарубежный поставщик. Продолжить с этим выбором?';
+	translation['ERROR_INVALID_TAX_CODES_FOREIGN'] = 'Мексика — зарубежные поставщики не должны использовать коды налогов без импорта ({tax_codes}).Продолжить сохранение?';
+	translation['ERROR_INVALID_TAX_CODES_LOCAL'] = 'Мексика — местные поставщики не должны использовать коды налогов на импорт ({tax_codes}).Продолжить сохранение?';
+    translation['UUID_PDF'] = 'UUID';
+    translation['RFC_PDF'] = 'RFC';
+	translation['CFDI_USAGE_PDF'] = 'Использование CFDI';
+	translation['INDUSTRY_TYPE_PDF'] = 'ТИП ОТРАСЛИ';
+	translation['CSD_SERIAL_NUMBER_PDF'] = 'Серийный номер CSD';
+	translation['PAYMENT_METHOD_PDF'] = 'Метод платежа SAT';
+	translation['PAYMENT_TERMS_PDF'] = 'Срок платежа SAT';
+	translation['TAX_PDF'] = 'Налог';
+	translation['FACTOR_PDF'] = 'Коэффициент';
+	translation['ORIGINAL_STRING_PDF'] = 'Исходная строка';
+	translation['CFDI_SIGNATURE_PDF'] = 'Подпись CFDI';
+	translation['SAT_SIGNATURE_PDF'] = 'Подпись SAT';
+	translation['CERTIFICATION_TIMESTAMP_PDF'] = 'Отметка времени сертификации';
+	translation['SAT_SERIAL_NUMBER_PDF'] = 'Серийный номер SAT';
+	translation['AMOUNT_PDF'] = 'Сумма';
+	translation['AMOUNT_DUE_PDF'] = 'Сумма к получению';
+	translation['PAID_AMOUNT_PDF'] = 'Оплаченная сумма';
+	translation['ISSUANCE_PDF'] = 'ВЫПУСК';
+	translation['CUSTOMER_INFO_PDF'] = 'Информация о клиенте';
+	translation['RECEIVER_INFO_PDF'] = 'Информация о получателе';
+	translation['ISSUER_INFO_PDF'] = 'Информация об эмитенте';
+	translation['TRANSFERS_PDF'] = 'ПЕРЕВОДЫ';
+	translation['WITHHOLDING_PDF'] = 'УДЕРЖАНИЕ';
+	translation['TOTAL_WITHHODLING_TAXES_PDF'] = 'Итого налог на источник дохода';
+	translation['TOTAL_TRANSFER_TAXES_PDF'] = 'Итого налог на перевод';
+	translation['PAC_RFC_PDF'] = 'Номер RFC PAC';
+	translation['RELATED_CFDIS_PDF'] = 'Связанные CFDI';
+	translation['INVOICE_PDF'] = 'Исходящий счет';
+	translation['SALES_ORDER_PDF'] = 'Заказ на продажу';
+	translation['SHIP_TO_PDF'] = 'Адрес доставки';
+	translation['BILL_TO_PDF'] = 'Адрес выставления счета';
+	translation['SHIP_VIA_PDF'] = 'Способ доставки';
+	translation['SALES_REP_PDF'] = 'Продавец';
+	translation['PARTNER_PDF'] = 'Партнер';
+	translation['DUE_DATE_PDF'] = 'Установленный срок';
+	translation['TERMS_PDF'] = 'Условия';
+	translation['CURRENCY_PDF'] = 'Валюта';
+	translation['QUANTITY_PDF'] = 'Количество';
+	translation['UNIT_PDF'] = 'Единицы';
+	translation['ITEM_DESCRIPTION_PDF'] = 'Описание товара';
+	translation['DESCRIPTION_PDF'] = 'Описание';
+	translation['UNIT_RATE_PDF'] = 'Цена за единицу';
+	translation['DISCOUNT_PDF'] = 'Скидка';
+	translation['SALES_INFO_PDF'] = 'Информация о продажах';
+	translation['SUBTOTAL_PDF'] = 'Промежуточный итог';
+	translation['TAX_TOTAL_PDF'] = 'Итог по налогу';
+	translation['TOTAL_PDF'] = 'Итого';
+	translation['PREVIOUS_AMOUNT_PDF'] = 'Предыдущая сумма';
+	translation['PARTS_PDF'] = 'Части';
+	translation['BASE_PDF'] = 'Основа';
+	translation['RATE_PDF'] = 'Ставка';
+	translation['SERIE_PDF'] = 'SERIE';
+	translation['FOLIO_PDF'] = 'FOLIO';
+	translation['TRANSACTION_TYPE_CASH_SALE_PDF'] = 'I - Ingreso';
+	translation['TRANSACTION_TYPE_INVOICE_PDF'] = 'I - Ingreso';
+	translation['TRANSACTION_TYPE_CREDIT_MEMO_PDF'] = 'E - Egreso';
+	translation['TRANSACTION_TYPE_PAYMENT_PDF'] = 'P - Pago';
+	translation['TRANSACTION_TYPE_ITEM_FULFILMENT_PDF'] = 'T - Traslado';
+	translation['FOOTER_PDF'] = 'Этот документ является печатной копией CFDI';
+	translation['RECOVERABILITY_PAGE_NAME'] = 'Mexico Localization Компоненты';
+	translation['RECOVERABILITY_FIELD_COMPONENT'] = 'Название компонента';
+	translation['RECOVERABILITY_FIELD_STATUS'] = 'Статус';
+	translation['RECOVERABILITY_FIELD_UPDATED_DATE'] = 'Дата последнего обновления';
+	translation['RECOVERABILITY_FIELD_UPDATED_BY'] = 'Кем обновлено';
+	translation['RECOVERABILITY_ACTION'] = 'Действие';
+	translation['RECOVERABILITY_REINSTALL'] = 'Переустановить';
+	translation['RECOVERABILITY_DETAILS'] = 'Сведения';
+	translation['RECOVERABILITY_CONFIRM'] = 'Подтвердить';
+	translation['RECOVERABILITY_CONFIRM_REINSTALL'] = 'Действительно переустановить {COMPONENTNAME}?';
+	translation['RECOVERABILITY_INSTALLED'] = 'Компонент успешно установлен.';
+	translation['RECOVERABILITY_REQUEST_FAILED'] = 'Сбой запроса';
+	translation['RECOVERABILITY_REINSTALL_REQUEST_FAILED'] = 'Сбой запроса на переустановку.';
+	translation['RECOVERABILITY_NOT_SUPPORTED'] = 'Сбой запроса на переустановку. Целевое приложение SuiteApp {SUITEAPPNAME} не поддерживается.';
+	translation['RECOVERABILITY_NO_SHAREDMODULE'] = 'Не удалось найти общий модуль.';
+	translation['OPERATION_TYPE_PROFESSIONAL_SERVICES'] = 'Профессиональные услуги';
+	translation['OPERATION_TYPE_REAL_ESTATE_LEASING'] = 'Аренда недвижимости';
+	translation['OPERATION_TYPE_OTHERS'] = 'Другие';
+	translation['OPERATION_TYPE_DEPRECATED'] = 'Тип операции (исключено)';
+
+	return translation;
+});
+

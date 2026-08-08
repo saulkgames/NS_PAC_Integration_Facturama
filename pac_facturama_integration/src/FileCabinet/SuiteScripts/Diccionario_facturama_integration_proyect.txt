@@ -1,0 +1,467 @@
+===================
+File: sads_fama_api.js
+===================
+/**
+ * @NApiVersion 2.0
+ * @NModuleScope Public
+ * 
+ * Módulo 3: Error Handler y Comunicación API
+ */
+define(['N/https', 'N/log'], function(https, log) {
+    'use strict';
+
+    function _handleError(statusCode, responseBody) {
+        var errorMap = {
+            400: '400 Bad Request: Los parámetros que enviaste están incompletos o son inválidos.',
+            401: '401 Unauthorized: Olvidaste poner tu usuario y contraseña, está caducada, o es incorrecta.',
+            403: '403 Forbidden: Entendimos la petición y sabemos quién eres, pero no se supone que estés haciendo esto.',
+            404: '404 Not Found: No pudimos encontrar lo que sea que estás solicitando.',
+            500: '500 Internal Server Error: Ocurrió un error en nuestro servidor que no vimos venir. Intenta más tarde.',
+            503: '503 Service Unavailable: Estamos actualizando el servicio o dando mantenimiento al servidor.'
+        };
+
+        var userMessage = errorMap[statusCode] || ('Error HTTP no mapeado: ' + statusCode);
+        var detailedError = responseBody ? (' | Detalles Facturama: ' + responseBody) : '';
+
+        log.error('Facturama Error [' + statusCode + ']', userMessage + detailedError);
+
+        return { 
+            success: false, 
+            message: userMessage + detailedError 
+        };
+    }
+
+    function safeParse(jsonString) {
+        try { return JSON.parse(jsonString); } 
+        catch (e) { return jsonString; }
+    }
+
+    function postTimbrado(url, headers, payload) {
+        var resp = https.post({ url: url, headers: headers, body: payload });
+        var parsedBody = safeParse(resp.body);
+
+        if (resp.code !== 200 && resp.code !== 201) {
+            var errorMsg = typeof parsedBody === 'object' ? JSON.stringify(parsedBody) : parsedBody;
+            throw new Error('Fallo de Timbrado (HTTP ' + resp.code + '): ' + errorMsg);
+        }
+        return parsedBody;
+    }
+
+    function getXml(baseUrl, headers, cfdiId) {
+        var finalUrl = baseUrl.replace('{id}', cfdiId);
+        var resp = https.get({ url: finalUrl, headers: headers });
+        
+        if (resp.code !== 200) {
+            var getErrorBody = safeParse(resp.body);
+            throw new Error('Falló descarga XML (HTTP ' + resp.code + '): ' + JSON.stringify(getErrorBody));
+        }
+        return safeParse(resp.body);
+    }
+
+    return { 
+        safeParse: safeParse,
+        postTimbrado: postTimbrado, 
+        getXml: getXml 
+    };
+});
+
+===================
+File: sads_fama_cfdi.js
+===================
+/**
+ * @NApiVersion 2.0
+ * @NModuleScope Public
+ * 
+ * Módulo: Mapeo y Actualización de Campos Nativos
+ */
+define(['N/record', 'N/encode', './sads_fama_logger'], function (record, encode, logger) {
+    'use strict';
+
+    function updateTransaction(txnId, txnType, originalPayload, facturamaData, xmlFileId, cfdiId, xmlContent) {
+        var fieldsToUpdate = {
+            'custbody_sads_fama_cfdi_resp_id': cfdiId,
+            'custbody_psg_ei_certified_edoc': xmlFileId
+        };
+
+        if (facturamaData.Complement && facturamaData.Complement.TaxStamp) {
+            var taxStamp = facturamaData.Complement.TaxStamp;
+
+            // 1. Mapeo Base
+            fieldsToUpdate['custbody_mx_cfdi_uuid'] = taxStamp.Uuid;
+            fieldsToUpdate['custbody_mx_cfdi_certify_timestamp'] = taxStamp.Date;
+            fieldsToUpdate['custbody_mx_cfdi_sat_serial'] = taxStamp.SatCertNumber;
+            fieldsToUpdate['custbody_mx_cfdi_sat_signature'] = taxStamp.SatSign;
+            fieldsToUpdate['custbody_mx_cfdi_issuer_signature'] = taxStamp.CfdiSign;
+            fieldsToUpdate['custbody_mx_cfdi_signature'] = taxStamp.CfdiSign;
+
+            if (facturamaData.OriginalString) {
+                fieldsToUpdate['custbody_mx_cfdi_cadena_original'] = facturamaData.OriginalString;
+            }
+
+            // 2. Mapeo Cruzado (Payload Original)
+            if (originalPayload.Issuer && originalPayload.Receiver) {
+                var last8Sello = taxStamp.CfdiSign.substring(taxStamp.CfdiSign.length - 8);
+                var qrUrl = 'https://verificacfdi.facturaelectronica.sat.gob.mx/default.aspx?id=' +
+                    taxStamp.Uuid + '&re=' + originalPayload.Issuer.Rfc +
+                    '&rr=' + originalPayload.Receiver.Rfc +
+                    '&tt=' + originalPayload.Total + '&fe=' + last8Sello;
+
+                fieldsToUpdate['custbody_mx_cfdi_qr_code'] = qrUrl;
+            }
+
+            if (originalPayload.Folio) fieldsToUpdate['custbody_mx_cfdi_folio'] = originalPayload.Folio;
+            if (originalPayload.Serie) fieldsToUpdate['custbody_mx_cfdi_serie'] = originalPayload.Serie;
+
+            // CONVERSIÓN SEGURA DE FECHA 
+            if (originalPayload.Date) {
+                try {
+                    var parts = originalPayload.Date.split('T');
+                    var dateParts = parts[0].split('-');
+                    var timeParts = parts[1].split(':');
+
+                    var issueDate = new Date(dateParts[0], parseInt(dateParts[1], 10) - 1, dateParts[2], timeParts[0], timeParts[1], timeParts[2]);
+                    fieldsToUpdate['custbody_mx_cfdi_issue_datetime'] = issueDate;
+                } catch (e) {
+                    logger.write('Advertencia CFDI - Fecha Emisión', 'Fallo al parsear Issue Date Time (' + originalPayload.Date + '). Detalle: ' + e.message);
+                }
+            }
+        }
+
+        // 3. Extracción del Número de Serie de CSD (Emisor)
+        if (facturamaData.Issuer && facturamaData.Issuer.SerialNumber) {
+            fieldsToUpdate['custbody_mx_cfdi_issuer_serial'] = facturamaData.Issuer.SerialNumber;
+        }
+        else if (xmlContent) {
+            try {
+                var xmlString = encode.convert({
+                    string: xmlContent,
+                    inputEncoding: encode.Encoding.BASE_64,
+                    outputEncoding: encode.Encoding.UTF_8
+                });
+
+                var match = xmlString.match(/NoCertificado="([0-9]{20})"/);
+                if (match && match[1]) {
+                    fieldsToUpdate['custbody_mx_cfdi_issuer_serial'] = match[1];
+                }
+            } catch (errBase64) {
+                // Logueamos si falla la conversión de Base64
+                logger.write('Advertencia CFDI - Decodificación XML', 'Fallo decodificación Base64 del XML, intentando en texto plano. Error: ' + errBase64.message);
+                try {
+                    var rawMatch = String(xmlContent).match(/NoCertificado="([0-9]{20})"/);
+                    if (rawMatch && rawMatch[1]) {
+                        fieldsToUpdate['custbody_mx_cfdi_issuer_serial'] = rawMatch[1];
+                    }
+                } catch (errText) {
+                    // Logueamos si también falla la extracción en texto plano
+                    logger.write('Error CFDI - Extracción CSD', 'Fallo extracción CSD en texto plano. Error: ' + errText.message);
+                }
+            }
+        }
+
+        // 4. Guardamos todo en la transacción (Protegido con Try/Catch)
+        try {
+            record.submitFields({
+                type: txnType,
+                id: txnId,
+                values: fieldsToUpdate,
+                options: { ignoreMandatoryFields: true }
+            });
+        } catch (submitErr) {
+            // Logueamos los campos exactos que causaron el rechazo
+            logger.write('Error Crítico CFDI - submitFields', {
+                error: submitErr.message,
+                camposIntentados: fieldsToUpdate
+            });
+
+            // Extraemos el UUID para protegerlo y mostrarlo en la interfaz
+            var uuidSalvado = fieldsToUpdate['custbody_mx_cfdi_uuid'] || 'UUID Desconocido';
+
+            // Lanzamos un error explícito que será visible en el Historial de Auditoría
+            throw new Error(
+                'ALERTA: El CFDI fue TIMBRADO EXITOSAMENTE en Facturama (UUID: ' + uuidSalvado +
+                '), pero ocurrió un error local en NetSuite al intentar guardar los campos de la transacción. ' +
+                'No vuelva a timbrar este documento. Contacte a soporte. Detalle NetSuite: ' + submitErr.message
+            );
+        }
+
+    } return { updateTransaction: updateTransaction };
+    
+});
+
+===================
+File: sads_fama_config.js
+===================
+/**
+ * @NApiVersion 2.0
+ * @NModuleScope Public
+ * 
+ * Módulo: Configuración y Autenticación
+ */
+define(['N/search', 'N/encode'], function(search, encode) {
+    'use strict';
+
+    function get(subsidiaryId) {
+        var configSearch = search.create({
+            type: 'customrecord_sads_fama_config',
+            filters: [
+                ['isinactive', 'is', 'F'], 'AND',
+                ['custrecord_sads_fama_sub', 'anyof', subsidiaryId]
+            ],
+            columns: [
+                'custrecord_sads_fama_user', 'custrecord_sads_fama_pass', 
+                'custrecord_sads_fama_url_api', 'custrecord_sads_fama_url_api_getxml'
+            ]
+        });
+        
+        var results = configSearch.run().getRange({ start: 0, end: 1 });
+        if (results.length === 0) {
+            throw new Error('No se encontró configuración de Facturama para subsidiaria: ' + subsidiaryId);
+        }
+
+        return {
+            user: results[0].getValue('custrecord_sads_fama_user'),
+            pass: results[0].getValue('custrecord_sads_fama_pass'),
+            apiPostUrl: results[0].getValue('custrecord_sads_fama_url_api'),
+            apiGetUrl: results[0].getValue('custrecord_sads_fama_url_api_getxml')
+        };
+    }
+
+    function getAuthHeaders(user, pass) {
+        var base64Encoded = encode.convert({
+            string: user + ':' + pass,
+            inputEncoding: encode.Encoding.UTF_8,
+            outputEncoding: encode.Encoding.BASE_64
+        });
+        return {
+            'Authorization': 'Basic ' + base64Encoded,
+            'Content-Type': 'application/json'
+        };
+    }
+
+    return { 
+        get: get, 
+        getAuthHeaders: getAuthHeaders 
+    };
+});
+
+===================
+File: sads_fama_files.js
+===================
+/**
+ * @NApiVersion 2.0
+ * @NModuleScope Public
+ * 
+ * Módulo: Gestor de Archivos
+ */
+define(['N/file', 'N/encode'], function(file, encode) {
+    'use strict';
+
+    var TARGET_FOLDER_ID = -15; // Carpeta Attachments to Send
+
+    function saveXml(fileName, base64Content) {
+        
+        // 1. Decodificar el Base64 que nos envía Facturama a texto plano UTF-8
+        var decodedXml = '';
+        try {
+            decodedXml = encode.convert({
+                string: base64Content,
+                inputEncoding: encode.Encoding.BASE_64,
+                outputEncoding: encode.Encoding.UTF_8
+            });
+        } catch (e) {
+            // Fallback por si en el futuro Facturama lo manda en texto plano
+            decodedXml = base64Content; 
+        }
+
+        // 2. Crear el archivo con el texto XML real
+        var xmlFile = file.create({
+            name: fileName,
+            fileType: file.Type.XMLDOC,
+            contents: decodedXml,
+            folder: TARGET_FOLDER_ID 
+        });
+        
+        return xmlFile.save();
+    }
+
+    return { saveXml: saveXml };
+});
+
+===================
+File: sads_fama_logger.js
+===================
+/**
+ * @NApiVersion 2.0
+ * @NModuleScope Public
+ * 
+ * Módulo: Logger Personalizado
+ */
+define(['N/record', 'N/log'], function(record, log) {
+    'use strict';
+
+    function write(title, messageData) {
+        try {
+            var logRecord = record.create({ type: 'customrecord_sads_fama_logger' });
+            var safeTitle = (title || 'Log sin título').substring(0, 300);
+            
+            var parsedMessage = '';
+            if (typeof messageData === 'object') {
+                try { parsedMessage = JSON.stringify(messageData); } 
+                catch(e) { parsedMessage = 'Objeto no parseable: ' + e.message; }
+            } else {
+                parsedMessage = String(messageData || '');
+            }
+            
+            var safeMessage = parsedMessage.substring(0, 3900);
+
+            logRecord.setValue({ fieldId: 'custrecord_sads_fama_log_title', value: safeTitle });
+            logRecord.setValue({ fieldId: 'custrecord_sads_fama_log_message', value: safeMessage });
+            logRecord.save({ ignoreMandatoryFields: true });
+        } catch (e) {
+            log.error('Fallo Crítico en Custom Logger', e.toString());
+        }
+    }
+
+    return { write: write };
+});
+
+===================
+File: pi_sads_fama_connector.js
+===================
+/**
+ * @NApiVersion 2.0
+ * @NScriptType plugintypeimpl
+ * @NModuleScope Public
+ * 
+ * SADS Facturama - Orquestador Principal
+ */
+define([
+    'N/search',
+    'N/record',
+    './lib/sads_fama_logger',
+    './lib/sads_fama_config',
+    './lib/sads_fama_api',
+    './lib/sads_fama_files',
+    './lib/sads_fama_cfdi'
+], function (search, record, logger, configModule, apiModule, filesModule, cfdiModule) {
+    'use strict';
+
+    /**
+     * Escribe directamente en el Historial de Auditoría Nativo de NetSuite
+     */
+    function writeNativeAuditTrail(txnId, customerId, userId, message, isError) {
+        try {
+            var auditRec = record.create({ type: 'customrecord_psg_ei_audit_trail' });
+            auditRec.setValue({ fieldId: 'custrecord_psg_ei_audit_transaction', value: txnId });
+            if (customerId) {
+                auditRec.setValue({ fieldId: 'custrecord_psg_ei_audit_entity', value: customerId });
+            }
+            // Tipo de Evento: 3 = Certificación de salida
+            auditRec.setValue({ fieldId: 'custrecord_psg_ei_audit_event', value: '3' });
+            auditRec.setValue({ fieldId: 'custrecord_psg_ei_audit_owner', value: userId });
+            auditRec.setValue({ fieldId: 'custrecord_psg_ei_audit_details', value: (isError ? '[ERROR] ' : '[ÉXITO] ') + message });
+            auditRec.save({ ignoreMandatoryFields: true });
+        } catch (e) {
+            logger.write('Error al crear Audit Trail Nativo', e.message);
+        }
+    }
+
+    function send(plugInContext) {
+        logger.write('1. INICIO', 'Plug-in invocado para transacción ID: ' + (plugInContext.transaction ? plugInContext.transaction.id : 'N/A'));
+        var txnId = plugInContext.transaction ? plugInContext.transaction.id : '';
+        var customerId = plugInContext.customer ? plugInContext.customer.id : '';
+        var userId = plugInContext.userId;
+
+        try {
+            var txnType = plugInContext.transaction.tranType || plugInContext.transaction.type;
+            var rawPayload = plugInContext.eInvoiceContent;
+            
+            if (!rawPayload) throw new Error('eInvoiceContent vacío.');
+            var originalPayload = apiModule.safeParse(rawPayload);
+
+            var txnLookup = search.lookupFields({
+                type: search.Type.TRANSACTION,
+                id: txnId,
+                columns: ['subsidiary', 'tranid']
+            });
+            var subsidiaryId = txnLookup.subsidiary[0].value;
+            var tranIdText = txnLookup.tranid;
+
+            var configData = configModule.get(subsidiaryId);
+            var headers = configModule.getAuthHeaders(configData.user, configData.pass);
+
+            // POST Timbrado
+            var facturamaData = apiModule.postTimbrado(configData.apiPostUrl, headers, rawPayload);
+            var cfdiId = facturamaData.Id;
+            var uuid = facturamaData.Complement ? facturamaData.Complement.TaxStamp.Uuid : 'UUID_N/A';
+
+            // GET XML
+            var xmlData = apiModule.getXml(configData.apiGetUrl, headers, cfdiId);
+
+            // Guardar Archivo Físico
+            var xmlContent = xmlData.Content || 'XML_VACIO';
+            var xmlFileId = filesModule.saveXml('CFDI_' + tranIdText + '_' + uuid + '.xml', xmlContent);
+            logger.write('5. ARCHIVO GUARDADO', 'Internal ID: ' + xmlFileId);
+
+            // Obtenemos el objeto con todos los campos fiscales
+            var extraFields = cfdiModule.getFieldsToUpdate(originalPayload, facturamaData, xmlFileId, cfdiId, xmlContent);
+            
+            var successMessage = 'PAC - CFDI Timbrado exitosamente con Facturama (UUID: ' + uuid + ')';
+
+            // 1. Forzamos la creación del Log en la tabla de Auditoría Nativa
+            writeNativeAuditTrail(txnId, customerId, userId, successMessage, false);
+
+            // 2. Retornamos el objeto para que NetSuite guarde los campos y regenere el PDF
+            var finalResult = {
+                transactionId: txnId,
+                transactionType: txnType,
+                entity: customerId || undefined,
+                eDocStatus: '1', // 1 = Para generación (Permite que se auto-genere el PDF)
+                eventType: '1',
+                details: successMessage,
+                owner: userId,
+                isUpdateFields: true, 
+                extraFieldsForUpdate: extraFields, 
+                bundleId: '',
+                bundleName: 'SADS Facturama Integration'
+            };
+
+            logger.write('6. FIN EXITOSO', 'Enviando finalResult al Framework Core.');
+
+            return {
+                success: true,
+                message: successMessage,
+                eiStatus: finalResult 
+            };
+
+        } catch (ex) {
+            logger.write('ERROR CRÍTICO', ex.message + '\n' + (ex.stack || ''));
+            
+            // Forzamos el Log de Error en la tabla de Auditoría Nativa
+            writeNativeAuditTrail(txnId, customerId, userId, ex.message, true);
+
+            var errorResult = {
+                transactionId: txnId,
+                transactionType: plugInContext.transaction ? (plugInContext.transaction.tranType || plugInContext.transaction.type) : '',
+                eDocStatus: '4', // 4 = Error
+                eventType: '4',
+                details: 'Fallo al timbrar con Facturama: ' + ex.message,
+                owner: userId,
+                isUpdateFields: false,
+                extraFieldsForUpdate: {}
+            };
+
+            return {
+                success: false,
+                message: 'Excepción: ' + ex.message,
+                eiStatus: errorResult
+            };
+        }
+    }
+
+    function getStatus(scriptContext) { return { success: true, message: 'Procesamiento síncrono.' }; }
+    function setSATCodesInstance(fakeSatCodesInstance) {}
+
+    return { send: send, getStatus: getStatus, setSATCodesInstance: setSATCodesInstance };
+});
+

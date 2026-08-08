@@ -1,0 +1,15 @@
+{
+    "contentsDirUUID": "d5b32943-8705-46cf-8696-e40fcb6653df",
+    "name": "Banamex Mexico",
+    "format_country": [157],
+    "payment_file_type": "EFT",
+    "include_all_currencies": false,
+    "ref_fields" : "Banamex Reference Fields.xml",
+    "entity_ref_fields" : "Banamex Entity Reference Fields.xml",
+    "field_validator": "Banamex Validator.xml",
+    "free_marker_body": "Banamex FreeMarker.txt",
+    "free_marker_body_st": "Banamex FreeMarker ST.txt",
+    "output_file_extension": "txt",
+    "output_file_encoding": "UTF-8",
+    "max_lines": 1024
+}

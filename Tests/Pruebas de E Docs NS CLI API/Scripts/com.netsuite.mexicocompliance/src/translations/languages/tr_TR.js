@@ -1,0 +1,124 @@
+/**
+ * Copyright (c) 2017, Oracle and/or its affiliates. All rights reserved.
+ *
+ * @NApiVersion 2.1
+ */
+
+define([], function () {
+
+	var translation = {};
+
+	translation['WITHHOLDING'] = 'Stopaj';
+	translation['EDIT_BUTTON'] = 'Düzenle';
+	translation['CANCEL_BUTTON'] = 'İptal';
+	translation['TAX_TYPE'] = 'Vergi Türü';
+	translation['EXAMPLE_PLAIN_TEXT'] = 'İngilizce metin';
+	translation['EXAMPLE_TEXT_WITH_INSERTED_VALUE'] = 'Vergi Oranı Geçmişi ({tax_code_name})';
+	translation['LABEL_BANK_INFO'] = 'Banka Bilgileri';
+	translation['LABEL_PAYMENT_METHOD'] = 'Ödeme Yöntemi';
+	translation['HELP_BANK_INFO'] = 'Alacaklının, bu işlemde kullanılacak banka bilgileri kaydını seçin. Bu alan Mexico Localization için kullanılır.';
+	translation['ERROR_DATE_RANGE'] = 'Geçerlilik Bitiş tarihi, Geçerlilik Başlangıç tarihinden sonra olmalıdır';
+	translation['ERROR_GENERAL_TITLE'] = 'Doğrulama Hatası';
+	translation['ERROR_MISSING_MAPPING'] = '{record_type} kayıt türü için eşleştirme eksik.';
+	translation['ERROR_SUBSIDIARY_COUNTRY_MISSING'] = 'Bu kimliğe sahip bağlı kuruluş için ülke bulunamadı';
+	translation['ERROR_SUBSIDIARY_MISSING'] = 'Kayıt veya kullanıcı için bağlı kuruluş bulunamadı';
+	translation['ERROR_UNEXPECTED_SAT_ITEM_CODE_1'] = 'Kod ile SAT Kalem Kodu';
+	translation['ERROR_UNEXPECTED_SAT_ITEM_CODE_2'] = 'bulunamadı';
+	translation['ERROR_RFC_COMPANY'] = 'RFC numarası Meksika için istenen biçimde (XXX000000XXX) olmalıdır. Bunun yerine yabancı kuruluşlar için genel RFC numarasını da (XEXX010101000) kullanabilirsiniz.';
+	translation['ERROR_RFC_PERSON'] = 'RFC numarası Meksika için istenen biçimde (XXXX000000XXX) olmalıdır.';
+	translation['ERROR_SAT_CODE_DUPLICATED'] = 'Başka bir kayıtta zaten kullanıldığından bu kodu giremezsiniz.';
+	translation['EI_AUDIT_TRAIL_CERTIFY_SUCCESS'] = 'E-Belge Başarıyla Onaylandı';
+	translation['ERROR_EI_AUDIT_TRAIL_NO_PAC'] = 'Etkin PAC Bağlantısı Bulunamadı.';
+	translation['ERROR_EI_AUDIT_TRAIL_NO_PAC_RESPONSE'] = 'PAC bağlantısı kurulmaya çalışıldı, ancak PAC\'den yanıt alınamadı';
+	translation['ERROR_EI_AUDIT_NO_PLUGIN_IMPLEMENTATION_FOUND'] = 'Geçerli Eklenti Uygulaması bulunmadığından PAC\'ye bağlanılamıyor';
+	translation['ERROR_EI_SUBSIDIARY_ALREADY_IN_USE'] = 'At least one of the selected subsidiaries is already configured on another enabled PAC. Make sure that you assign a subsidiary to one enabled PAC only.';
+	translation['ERROR_EI_ONLY_ONE_ENABLED_PAC_IS_ALLOWED'] = 'This PAC cannot be enabled because there is already an enabled PAC in your account. To enable this PAC, disable the currently enabled one and try again.';
+	translation['ERROR_UNIQUE_PAC_VIOLATE_BANNER_TITLE'] = 'Etkin PAC Bağlantısı Var';
+	translation['ERROR_NO_ACCEPT_DIALOG_MSG'] = 'Kaydetmeden önce Önemli mesajları okumanız ve kabul etmeniz gerekir.';
+	translation['PAC_LICENSE_AGREEMENT'] = 'Bu uygulamada bir sertifika hizmet sağlayıcısı seçtiğinizde Oracle ve NetSuite\'in bilgileri doğrudan PAC sertifika hizmeti sağlayıcısına transfer etmesine izin vermiş olursunuz. Bilgilerin transferini sağlamadan önce, tüm gerekli yetkilendirmelere sahip olduğunuzdan ve doğrudan PAC sertifika hizmeti sağlayıcısı ile gerekli tüm sözleşmeleri yaptığınızdan lütfen emin olun.';
+	translation['WARNING_GENERAL_TITLE'] = 'Doğrulama Uyarısı';
+	translation['ERROR_INVALID_OPERATION_TYPE'] = 'Yabancı bir satıcı seçildiğinde Gayrimenkul Kiralama işlem türü kullanılamaz. Bu seçimle devam etmek istiyor musunuz?';
+	translation['ERROR_INVALID_TAX_CODES_FOREIGN'] = 'Meksika - Yabancı satıcı ithalat dışı vergi kodunu ({tax_codes}) kullanamaz.Kayıt işlemine devam edilsin mi?';
+	translation['ERROR_INVALID_TAX_CODES_LOCAL'] = 'Meksika - Yerel satıcı ithalat vergi kodu ({tax_codes}) kullanamaz.Kayıt işlemine devam edilsin mi?';
+    translation['UUID_PDF'] = 'UUID';
+    translation['RFC_PDF'] = 'RFC';
+	translation['CFDI_USAGE_PDF'] = 'CFDI Kullanımı';
+	translation['INDUSTRY_TYPE_PDF'] = 'SEKTÖR TÜRÜ';
+	translation['CSD_SERIAL_NUMBER_PDF'] = 'CSD Seri Numarası';
+	translation['PAYMENT_METHOD_PDF'] = 'SAT Ödeme Yöntemi';
+	translation['PAYMENT_TERMS_PDF'] = 'SAT Ödeme Koşulu';
+	translation['TAX_PDF'] = 'Vergi';
+	translation['FACTOR_PDF'] = 'Faktör';
+	translation['ORIGINAL_STRING_PDF'] = 'Orijinal Dize';
+	translation['CFDI_SIGNATURE_PDF'] = 'CFDI İmzası';
+	translation['SAT_SIGNATURE_PDF'] = 'SAT İmzası';
+	translation['CERTIFICATION_TIMESTAMP_PDF'] = 'Sertifika Zaman Damgası';
+	translation['SAT_SERIAL_NUMBER_PDF'] = 'SAT Seri Numarası';
+	translation['AMOUNT_PDF'] = 'Tutar';
+	translation['AMOUNT_DUE_PDF'] = 'Vadesi Gelen Tutar';
+	translation['PAID_AMOUNT_PDF'] = 'Ödenen Tutar';
+	translation['ISSUANCE_PDF'] = 'EMİSYON';
+	translation['CUSTOMER_INFO_PDF'] = 'Müşteri Bilgileri';
+	translation['RECEIVER_INFO_PDF'] = 'Alıcı Bilgileri';
+	translation['ISSUER_INFO_PDF'] = 'Düzenleyenin Bilgileri';
+	translation['TRANSFERS_PDF'] = 'TRANSFERLER';
+	translation['WITHHOLDING_PDF'] = 'STOPAJ';
+	translation['TOTAL_WITHHODLING_TAXES_PDF'] = 'Toplam Stopaj Vergisi';
+	translation['TOTAL_TRANSFER_TAXES_PDF'] = 'Toplam Transfer Vergisi';
+	translation['PAC_RFC_PDF'] = 'PAC RFC';
+	translation['RELATED_CFDIS_PDF'] = 'İlgili CFDI\'lar';
+	translation['INVOICE_PDF'] = 'Fatura';
+	translation['SALES_ORDER_PDF'] = 'Satış Talebi';
+	translation['SHIP_TO_PDF'] = 'Sevkiyat Hedefi:';
+	translation['BILL_TO_PDF'] = 'Fatura Alıcısı';
+	translation['SHIP_VIA_PDF'] = 'Sevkiyat Yöntemi';
+	translation['SALES_REP_PDF'] = 'Satış Temsilcisi';
+	translation['PARTNER_PDF'] = 'İş Ortağı';
+	translation['DUE_DATE_PDF'] = 'Son Tarih';
+	translation['TERMS_PDF'] = 'Koşullar';
+	translation['CURRENCY_PDF'] = 'Para Birimi';
+	translation['QUANTITY_PDF'] = 'Miktar';
+	translation['UNIT_PDF'] = 'Birimler';
+	translation['ITEM_DESCRIPTION_PDF'] = 'Kalem Tanımı';
+	translation['DESCRIPTION_PDF'] = 'Tanım';
+	translation['UNIT_RATE_PDF'] = 'Birim Oranı';
+	translation['DISCOUNT_PDF'] = 'İndirim';
+	translation['SALES_INFO_PDF'] = 'Satış Bilgileri';
+	translation['SUBTOTAL_PDF'] = 'Alt Toplam';
+	translation['TAX_TOTAL_PDF'] = 'Vergi Toplamı';
+	translation['TOTAL_PDF'] = 'Toplam';
+	translation['PREVIOUS_AMOUNT_PDF'] = 'Önceki Tutar';
+	translation['PARTS_PDF'] = 'Parçalar';
+	translation['BASE_PDF'] = 'Taban';
+	translation['RATE_PDF'] = 'Oran';
+	translation['SERIE_PDF'] = 'SERIE';
+	translation['FOLIO_PDF'] = 'FOLIO';
+	translation['TRANSACTION_TYPE_CASH_SALE_PDF'] = 'I - Ingreso';
+	translation['TRANSACTION_TYPE_INVOICE_PDF'] = 'I - Ingreso';
+	translation['TRANSACTION_TYPE_CREDIT_MEMO_PDF'] = 'E - Egreso';
+	translation['TRANSACTION_TYPE_PAYMENT_PDF'] = 'P - Pago';
+	translation['TRANSACTION_TYPE_ITEM_FULFILMENT_PDF'] = 'T - Traslado';
+	translation['FOOTER_PDF'] = 'Bu belge, CFDI\'nın basılı bir temsilidir';
+	translation['RECOVERABILITY_PAGE_NAME'] = 'Mexico Localization Bileşenleri';
+	translation['RECOVERABILITY_FIELD_COMPONENT'] = 'Bileşen Adı';
+	translation['RECOVERABILITY_FIELD_STATUS'] = 'Durum';
+	translation['RECOVERABILITY_FIELD_UPDATED_DATE'] = 'Son Güncelleştirme Tarihi';
+	translation['RECOVERABILITY_FIELD_UPDATED_BY'] = 'Son Güncelleştiren';
+	translation['RECOVERABILITY_ACTION'] = 'İşlem';
+	translation['RECOVERABILITY_REINSTALL'] = 'Yeniden yükle';
+	translation['RECOVERABILITY_DETAILS'] = 'Ayrıntılar';
+	translation['RECOVERABILITY_CONFIRM'] = 'Onayla';
+	translation['RECOVERABILITY_CONFIRM_REINSTALL'] = '{COMPONENTNAME} bileşenini yeniden yüklemek istediğinizden emin misiniz?';
+	translation['RECOVERABILITY_INSTALLED'] = 'Bileşen başarıyla yüklendi.';
+	translation['RECOVERABILITY_REQUEST_FAILED'] = 'Talep Başarısız Oldu';
+	translation['RECOVERABILITY_REINSTALL_REQUEST_FAILED'] = 'Yeniden yükleme başarısız oldu.';
+	translation['RECOVERABILITY_NOT_SUPPORTED'] = 'Yeniden yükleme isteği başarısız oldu. Hedef SuiteApp {SUITEAPPNAME} desteklenmiyor.';
+	translation['RECOVERABILITY_NO_SHAREDMODULE'] = 'Paylaşılan modül bulunamıyor.';
+	translation['OPERATION_TYPE_PROFESSIONAL_SERVICES'] = 'Profesyonel Hizmetler';
+	translation['OPERATION_TYPE_REAL_ESTATE_LEASING'] = 'Gayrimenkul Kiralama';
+	translation['OPERATION_TYPE_OTHERS'] = 'Diğerleri';
+	translation['OPERATION_TYPE_DEPRECATED'] = 'İşlem Türü (Kullanımdan Kaldırılmış)';
+
+	return translation;
+});
+

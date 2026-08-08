@@ -1,0 +1,124 @@
+/**
+ * Copyright (c) 2017, Oracle and/or its affiliates. All rights reserved.
+ *
+ * @NApiVersion 2.1
+ */
+
+define([], function () {
+
+	var translation = {};
+
+	translation['WITHHOLDING'] = 'Forskuddstrekk';
+	translation['EDIT_BUTTON'] = 'Endre';
+	translation['CANCEL_BUTTON'] = 'Avbryt';
+	translation['TAX_TYPE'] = 'Skattetype';
+	translation['EXAMPLE_PLAIN_TEXT'] = 'Engelsk tekst';
+	translation['EXAMPLE_TEXT_WITH_INSERTED_VALUE'] = 'Historikk over avgiftssats ({tax_code_name})';
+	translation['LABEL_BANK_INFO'] = 'Bankinformasjon';
+	translation['LABEL_PAYMENT_METHOD'] = 'Betalingsmåte';
+	translation['HELP_BANK_INFO'] = 'Velg mottakerens bankopplysninger for å bruke denne transaksjonen. Dette feltet brukes til Mexico Localization .';
+	translation['ERROR_DATE_RANGE'] = 'Gyldig til-datoen må være senere enn Virksom fra-datoen';
+	translation['ERROR_GENERAL_TITLE'] = 'Valideringsfeil';
+	translation['ERROR_MISSING_MAPPING'] = 'Tilordning for oppføringstypen {record_type} mangler.';
+	translation['ERROR_SUBSIDIARY_COUNTRY_MISSING'] = 'Ingen land funnet for datterselskap med ID';
+	translation['ERROR_SUBSIDIARY_MISSING'] = 'Ingen datterselskap/underavdeling funnet for oppføringen eller brukeren';
+	translation['ERROR_UNEXPECTED_SAT_ITEM_CODE_1'] = 'SAT-artikkelnummer med kode';
+	translation['ERROR_UNEXPECTED_SAT_ITEM_CODE_2'] = 'ikke funnet';
+	translation['ERROR_RFC_COMPANY'] = 'RFC-nummeret må være i formatet som kreves for Mexico (XXX000000XXX). Alternativt kan du bruke generisk RFC-nummer for utenlandske enheter: XEXX010101000.';
+	translation['ERROR_RFC_PERSON'] = 'RFC-nummeret må være i formatet som kreves for Mexico (XXXX000000XXX).';
+	translation['ERROR_SAT_CODE_DUPLICATED'] = 'Du kan ikke angi denne koden, fordi den allerede er i bruk i en annen oppføring.';
+	translation['EI_AUDIT_TRAIL_CERTIFY_SUCCESS'] = 'E-dokumentet ble sertifisert';
+	translation['ERROR_EI_AUDIT_TRAIL_NO_PAC'] = 'Ingen aktiv PAC-tilkobling funnet.';
+	translation['ERROR_EI_AUDIT_TRAIL_NO_PAC_RESPONSE'] = 'Forsøkte å koble til PAC, men det kom ikke noe svar fra PAC';
+	translation['ERROR_EI_AUDIT_NO_PLUGIN_IMPLEMENTATION_FOUND'] = 'Kan ikke koble til PAC, fordi det ikke ble funnet noen gyldig plugin-implementering';
+	translation['ERROR_EI_SUBSIDIARY_ALREADY_IN_USE'] = 'At least one of the selected subsidiaries is already configured on another enabled PAC. Make sure that you assign a subsidiary to one enabled PAC only.';
+	translation['ERROR_EI_ONLY_ONE_ENABLED_PAC_IS_ALLOWED'] = 'This PAC cannot be enabled because there is already an enabled PAC in your account. To enable this PAC, disable the currently enabled one and try again.';
+	translation['ERROR_UNIQUE_PAC_VIOLATE_BANNER_TITLE'] = 'Aktiv PAC-tilkobling eksisterer';
+	translation['ERROR_NO_ACCEPT_DIALOG_MSG'] = 'Du må lese og godta Viktig melding før du lagrer.';
+	translation['PAC_LICENSE_AGREEMENT'] = 'Ved å velge en sertifiseringsleverandør i denne applikasjonen, tillater du at Oracle + NetSuite overfører informasjon direkte til den PAC-sertifiseringsleverandøren. Før du gjør det mulig å overføre informasjon, må du sørge for at du har innhentet alle nødvendige godkjennelser, og gjennomført eventuelle nødvendige avtaler direkte med PAC-sertifiseringsleverandøren.';
+	translation['WARNING_GENERAL_TITLE'] = 'Valideringsadvarsel';
+	translation['ERROR_INVALID_OPERATION_TYPE'] = 'Operasjonstypen Leasing av fast eiendom bør ikke brukes når du velger en utenlandsk leverandør. Fortsett med valget?';
+	translation['ERROR_INVALID_TAX_CODES_FOREIGN'] = 'Mexico - Utenlandsk leverandør bør ikke bruke skattekode for ikke-import ({tax_codes}).Fortsett med lagring?';
+	translation['ERROR_INVALID_TAX_CODES_LOCAL'] = 'Mexico - Lokal leverandør bør ikke bruke en skattekode for import ({tax_codes}).Fortsett med lagring?';
+    translation['UUID_PDF'] = 'UUID';
+    translation['RFC_PDF'] = 'RFC';
+	translation['CFDI_USAGE_PDF'] = 'CFDI bruk';
+	translation['INDUSTRY_TYPE_PDF'] = 'BRANSJETYPE';
+	translation['CSD_SERIAL_NUMBER_PDF'] = 'CSD-serienummer';
+	translation['PAYMENT_METHOD_PDF'] = 'SAT-betalingsmetode';
+	translation['PAYMENT_TERMS_PDF'] = 'SAT-betalingsvilkår';
+	translation['TAX_PDF'] = 'Avgift';
+	translation['FACTOR_PDF'] = 'Faktor';
+	translation['ORIGINAL_STRING_PDF'] = 'Originalstreng';
+	translation['CFDI_SIGNATURE_PDF'] = 'CFDI signatur';
+	translation['SAT_SIGNATURE_PDF'] = 'SAT-signatur';
+	translation['CERTIFICATION_TIMESTAMP_PDF'] = 'Sertifiseringstidsstempel';
+	translation['SAT_SERIAL_NUMBER_PDF'] = 'SAT-serienummer';
+	translation['AMOUNT_PDF'] = 'Beløp';
+	translation['AMOUNT_DUE_PDF'] = 'Skyldig beløp';
+	translation['PAID_AMOUNT_PDF'] = 'Betalt beløp';
+	translation['ISSUANCE_PDF'] = 'UTSTEDELSE';
+	translation['CUSTOMER_INFO_PDF'] = 'Kundeinformasjon';
+	translation['RECEIVER_INFO_PDF'] = 'Mottakeropplysninger';
+	translation['ISSUER_INFO_PDF'] = 'Utstederinformasjon';
+	translation['TRANSFERS_PDF'] = 'OVERFØRINGER';
+	translation['WITHHOLDING_PDF'] = 'FORSKUDDSTREKK';
+	translation['TOTAL_WITHHODLING_TAXES_PDF'] = 'Sum forskuddstrekk';
+	translation['TOTAL_TRANSFER_TAXES_PDF'] = 'Totalt overføringsavgift';
+	translation['PAC_RFC_PDF'] = 'PAC RFC';
+	translation['RELATED_CFDIS_PDF'] = 'Beslektede CFDI-er';
+	translation['INVOICE_PDF'] = 'Faktura';
+	translation['SALES_ORDER_PDF'] = 'Salgsordre';
+	translation['SHIP_TO_PDF'] = 'Forsendelse til';
+	translation['BILL_TO_PDF'] = 'Faktura til';
+	translation['SHIP_VIA_PDF'] = 'Send via';
+	translation['SALES_REP_PDF'] = 'Selger';
+	translation['PARTNER_PDF'] = 'Partner';
+	translation['DUE_DATE_PDF'] = 'Forfallsdato';
+	translation['TERMS_PDF'] = 'Vilkår';
+	translation['CURRENCY_PDF'] = 'Valuta';
+	translation['QUANTITY_PDF'] = 'Antall';
+	translation['UNIT_PDF'] = 'Enheter';
+	translation['ITEM_DESCRIPTION_PDF'] = 'Artikkelbeskrivelse';
+	translation['DESCRIPTION_PDF'] = 'Beskrivelse';
+	translation['UNIT_RATE_PDF'] = 'Enhetssats';
+	translation['DISCOUNT_PDF'] = 'Rabatt';
+	translation['SALES_INFO_PDF'] = 'Salgsinformasjon';
+	translation['SUBTOTAL_PDF'] = 'Delsum';
+	translation['TAX_TOTAL_PDF'] = 'Avgift totalt';
+	translation['TOTAL_PDF'] = 'Total';
+	translation['PREVIOUS_AMOUNT_PDF'] = 'Tidligere beløp';
+	translation['PARTS_PDF'] = 'Deler';
+	translation['BASE_PDF'] = 'Grunnlag';
+	translation['RATE_PDF'] = 'Sats';
+	translation['SERIE_PDF'] = 'SERIE';
+	translation['FOLIO_PDF'] = 'FOLIO';
+	translation['TRANSACTION_TYPE_CASH_SALE_PDF'] = 'I - Ingreso';
+	translation['TRANSACTION_TYPE_INVOICE_PDF'] = 'I - Ingreso';
+	translation['TRANSACTION_TYPE_CREDIT_MEMO_PDF'] = 'E - Egreso';
+	translation['TRANSACTION_TYPE_PAYMENT_PDF'] = 'P - Pago';
+	translation['TRANSACTION_TYPE_ITEM_FULFILMENT_PDF'] = 'T - Traslado';
+	translation['FOOTER_PDF'] = 'Dette dokumentet er en utskrift av en CFDI';
+	translation['RECOVERABILITY_PAGE_NAME'] = 'Mexico Localization Komponenter';
+	translation['RECOVERABILITY_FIELD_COMPONENT'] = 'Komponentnavn';
+	translation['RECOVERABILITY_FIELD_STATUS'] = 'Status';
+	translation['RECOVERABILITY_FIELD_UPDATED_DATE'] = 'Sist oppdatert dato';
+	translation['RECOVERABILITY_FIELD_UPDATED_BY'] = 'Sist oppdatert av';
+	translation['RECOVERABILITY_ACTION'] = 'Handling';
+	translation['RECOVERABILITY_REINSTALL'] = 'Installer på nytt';
+	translation['RECOVERABILITY_DETAILS'] = 'Detaljer';
+	translation['RECOVERABILITY_CONFIRM'] = 'Bekreft';
+	translation['RECOVERABILITY_CONFIRM_REINSTALL'] = 'Er du sikker på at du vil installere om {COMPONENTNAME} på nytt?';
+	translation['RECOVERABILITY_INSTALLED'] = 'Komponent installert.';
+	translation['RECOVERABILITY_REQUEST_FAILED'] = 'Forespørsel mislyktes';
+	translation['RECOVERABILITY_REINSTALL_REQUEST_FAILED'] = 'Forespørselen om reinstallering mislyktes.';
+	translation['RECOVERABILITY_NOT_SUPPORTED'] = 'Forespørselen om reinstallering mislyktes. SuiteApp-målet {SUITEAPPNAME} støttes ikke.';
+	translation['RECOVERABILITY_NO_SHAREDMODULE'] = 'Kunne ikke finne delte moduler.';
+	translation['OPERATION_TYPE_PROFESSIONAL_SERVICES'] = 'Profesjonelle tjenester';
+	translation['OPERATION_TYPE_REAL_ESTATE_LEASING'] = 'Eiendomsleasing';
+	translation['OPERATION_TYPE_OTHERS'] = 'Annet';
+	translation['OPERATION_TYPE_DEPRECATED'] = 'Operasjonstype (Utdatert)';
+
+	return translation;
+});
+

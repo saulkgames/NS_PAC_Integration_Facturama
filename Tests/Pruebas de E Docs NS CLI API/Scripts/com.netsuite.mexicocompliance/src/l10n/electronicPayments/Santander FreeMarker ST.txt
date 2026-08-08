@@ -1,0 +1,22 @@
+<#-- format specific processing -->
+
+<#function getBlockNumber>
+    <#assign processDate = pfa.custrecord_2663_file_creation_timestamp?date?long>
+    <#return processDate>
+</#function>
+
+<#-- template building -->
+#OUTPUT START#
+01000000160${setLength(cbank.custpage_eft_custrecord_2663_country_code,3)}S2${setPadding(((getBlockNumber())?number_to_date?string("dd")),"left"," ",2)}00001${setPadding(((getBlockNumber())?number_to_date?string("yyyyMMdd")),"left"," ",8)}01001${setLength("",40)}${setLength("",406)}
+<#assign value = 0>
+<#assign totalLines = 1>
+<#list payments as payment>
+    <#assign ebank = ebanks[payment_index]>
+    <#assign entity = entities[payment_index]>
+    <#assign totalLines = totalLines + 1 >
+	<#assign value = value + getAmount(payment)>
+02${setPadding(totalLines,"left","0",7)}6001${setPadding(((getBlockNumber())?number_to_date?string("yyyyMMdd")),"left"," ",8)}${setLength(cbank.custpage_eft_custrecord_2663_country_code,3)}${setLength(ebank.custrecord_2663_entity_bank_code,3)}${setPadding(formatAmount(getAmount(payment)),"left","0",15)}${setLength("",16)}97${setPadding(((getBlockNumber())?number_to_date?string("yyyyMMdd")),"left"," ",8)}01${setLength(cbank.custpage_eft_custrecord_2663_acct_num,20)}${setLength(cbank.name,40)}${setLength(taxregistrationnumber.custrecord_12144_taxregistrationnumber,18)}${setLength(ebank.custrecord_2663_entity_acct_suffix,2)}${setLength(ebank.custrecord_2663_entity_bank_no,20)}${setLength(entity.companyname,40)}${setLength(entity.defaulttaxreg,18)}${setLength("",40)}${setLength(entity.companyname,40)}${setPadding(formatAmount(getAmount(pfa.taxtotal)),"left","0",15)}0000000${setLength(payment.memo,40)}${setLength("",30)}00${setPadding(((getBlockNumber())?number_to_date?string("yyyyMMdd")),"left"," ",8)}${setLength("",12)}${setLength("",30)}${setLength("",30)}
+</#list>
+09${setPadding(totalLines+1,"left","0",7)}60${setPadding(((getBlockNumber())?number_to_date?string("dd")),"left"," ",2)}00001${setPadding(totalLines-1,"left","0",7)}${setPadding(value,"left","0",18)}${setLength("",40)}${setLength("",399)}
+#OUTPUT END#
+

@@ -1,0 +1,59 @@
+<#-- format specific processing -->
+
+<#function getTransactionDeliveryMethod>
+    <#assign value = ebank.custrecord_2663_entity_bank_code>
+	<#assign result = "">
+        <#if value == "073">
+            <#assign result = "001">
+        <#elseif value == "277">
+            <#assign result = "003">
+        <#else>
+            <#assign result = " ">
+        </#if>
+    <#return result>
+</#function>
+
+<#function getThirdPartyBankNumber>
+    <#assign value = ebank.custrecord_2663_entity_bank_code>
+	<#assign result = "">
+        <#if value == "072">
+            <#assign result = "000">
+        <#elseif value == "073">
+            <#assign result = "000">
+        <#elseif value == "277">
+            <#assign result = "002">
+        <#else>
+            <#assign result = " ">
+        </#if>
+    <#return result>
+</#function>
+
+<#function getEmail>
+	<#assign result = "">
+    <#assign value = entity.email>
+        <#if value != "">
+            <#assign result = "E-Mail">
+        <#else>
+            <#assign result = "NONE">
+	    </#if>
+    <#return result>
+</#function>
+
+<#function computeMaturityDate>
+    <#assign processDate = pfa.custrecord_2663_file_creation_timestamp?date?long>
+    <#assign expireDate = processDate?number + 1000 * 60 * 60 * 24 * 365>        
+    <#return expireDate>
+</#function>
+
+<#-- template building -->
+#OUTPUT START#
+<#assign value = 0>
+<#list payments as payment>
+    <#assign ebank = ebanks[payment_index]>
+    <#assign entity = entities[payment_index]>
+    <#assign totalLines = totalLines + 1 >
+	<#assign value = value + getAmount(payment)>	
+PAY${setLength(cbank.custpage_eft_custrecord_2663_country_code,3)}${setLength("",10)}${setLength(pfa.custrecord_2663_file_creation_timestamp?date?string("yyMMdd"),6)}${setLength(ebank.custrecord_2663_entity_bank_code,3)}${setLength(pfa.custrecord_2663_ref_note,15)}${setLength(pfa.name,8)}${setLength(entity.defaulttaxreg,20)}MXN${setLength(entity.accountnumber,20)}${setPadding(formatAmount(getAmount(payment)),"left","0",15)}${setPadding(((computeMaturityDate())?number_to_date?string("yyMMdd")),"left"," ",6)}${setLength("",35)}${setLength(payment.transactionnumber,35)}${setLength("",35)}${setLength("",35)}0601${setLength(entity.companyname,80)}${setLength((entity.address1+ " "),35)}${setLength(entity.address2,35)}${setLength("",15)}${setLength("",2)}${setLength("",12)}${setLength("",16)}${setLength(getThirdPartyBankNumber(),3)}${setLength("",8)}${setLength(ebank.custrecord_2663_entity_acct_no,35)}${setLength(ebank.custrecord_2663_entity_acct_suffix,2)}${setLength("",30)}${setPadding(formatAmount(getAmount(pfa.taxtotal)),"left","0",17)}N${setLength("",1)}${setLength(ebank.custrecord_2663_entity_swift,2)}${setLength(cbank.custpage_eft_custrecord_2663_acct_num,20)}${setLength("",16)}${setLength("",20)}${setLength("",15)}${setLength("",10)}${setLength("",2)}${setLength(getTransactionDeliveryMethod(),3)}${setLength("",50)}00000${setLength(entity.email,50)}${setPadding(formatAmount(getAmount(payment)),"left","0",15)}${setLength("",1)}${setLength(getEmail(),11)}${setLength("",1)}${setLength("",1)}${setLength("",253)}
+</#list>
+TRL000000000000001000000000649891000000000000000000000000000001
+#OUTPUT END#

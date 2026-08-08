@@ -1,0 +1,5 @@
+<refFields type='Santander Mexico'>
+  <refField id='custrecord_2663_entity_bank_code' label='Bank Code' mandatory='true' /> 
+  <refField id='custrecord_2663_entity_bank_no' label='Bank Account' mandatory='true' /> 
+  <refField id='custrecord_2663_entity_acct_suffix' label='Vendor Account Type' mandatory='true' /> 
+</refFields>

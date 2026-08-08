@@ -1,0 +1,124 @@
+/**
+ * Copyright (c) 2017, Oracle and/or its affiliates. All rights reserved.
+ *
+ * @NApiVersion 2.1
+ */
+
+define([], function () {
+
+	var translation = {};
+
+	translation['WITHHOLDING'] = 'Pidätys';
+	translation['EDIT_BUTTON'] = 'Muokkaa';
+	translation['CANCEL_BUTTON'] = 'Peruuta';
+	translation['TAX_TYPE'] = 'Verotyyppi';
+	translation['EXAMPLE_PLAIN_TEXT'] = 'Englanninkielinen teksti';
+	translation['EXAMPLE_TEXT_WITH_INSERTED_VALUE'] = 'Veroastehistoria ({tax_code_name})';
+	translation['LABEL_BANK_INFO'] = 'Pankkitiedot';
+	translation['LABEL_PAYMENT_METHOD'] = 'Maksutapa';
+	translation['HELP_BANK_INFO'] = 'Valitse maksunsaajan pankkitiedot, joita käytetään tämän kauppatapahtuman kohdalla. Tätä kenttää käytetään kohteessa Mexico Localization.';
+	translation['ERROR_DATE_RANGE'] = 'Voimassa tähän asti -päivämäärän on oltava Voimassa alkaen -päivämäärän jälkeen.';
+	translation['ERROR_GENERAL_TITLE'] = 'Validointivirhe';
+	translation['ERROR_MISSING_MAPPING'] = 'Kartoitus tietotyypille {record_type} puuttuu.';
+	translation['ERROR_SUBSIDIARY_COUNTRY_MISSING'] = 'Maata ei löytynyt tytäryhtiölle, jolla on tunnus';
+	translation['ERROR_SUBSIDIARY_MISSING'] = 'Tytäryhtiötä ei löytynyt tiedoille tai käyttäjälle';
+	translation['ERROR_UNEXPECTED_SAT_ITEM_CODE_1'] = 'SAT-kohdekoodi koodilla';
+	translation['ERROR_UNEXPECTED_SAT_ITEM_CODE_2'] = 'ei löytynyt';
+	translation['ERROR_RFC_COMPANY'] = 'RFC-numeron on oltava Meksikossa vaaditussa muodossa (XXX000000XXX). Vaihtoehtoisesti voit käyttää yleistä RFC-numeroa ulkomaisille kokonaisuuksille: XEXX010101000.';
+	translation['ERROR_RFC_PERSON'] = 'RFC-numeron on oltava Meksikossa vaaditussa muodossa (XXXX000000XXX).';
+	translation['ERROR_SAT_CODE_DUPLICATED'] = 'Et voi syöttää tätä koodia, koska sitä on jo käytetty olemassa olevissa tiedoissa.';
+	translation['EI_AUDIT_TRAIL_CERTIFY_SUCCESS'] = 'Sähköinen asiakirja sertifioitu onnistuneesti';
+	translation['ERROR_EI_AUDIT_TRAIL_NO_PAC'] = 'Aktiivista PAC-yhteyttä ei löydy.';
+	translation['ERROR_EI_AUDIT_TRAIL_NO_PAC_RESPONSE'] = 'Yritettiin muodostaa yhteys PAC:hen, mutta PAC ei antanut vastausta.';
+	translation['ERROR_EI_AUDIT_NO_PLUGIN_IMPLEMENTATION_FOUND'] = 'Yhteyden muodostaminen PAC:hen ei onnistu, koska voimassa olevaa liitännäisen käyttöönottoa ei löydy.';
+	translation['ERROR_EI_SUBSIDIARY_ALREADY_IN_USE'] = 'At least one of the selected subsidiaries is already configured on another enabled PAC. Make sure that you assign a subsidiary to one enabled PAC only.';
+	translation['ERROR_EI_ONLY_ONE_ENABLED_PAC_IS_ALLOWED'] = 'This PAC cannot be enabled because there is already an enabled PAC in your account. To enable this PAC, disable the currently enabled one and try again.';
+	translation['ERROR_UNIQUE_PAC_VIOLATE_BANNER_TITLE'] = 'Aktiivinen PAC-yhteys on olemassa';
+	translation['ERROR_NO_ACCEPT_DIALOG_MSG'] = 'Sinun täytyy lukea ja hyväksyä Tärkeää-viesti ennen tallentamista.';
+	translation['PAC_LICENSE_AGREEMENT'] = 'Valitsemalla sertifiointipalveluntarjoajan tässä sovelluksessa valtuutat Oraclen ja NetSuiten siirtämään tietoja suoraan kyseiselle PAC-sertifiointipalveluntarjoajalle. Varmista ennen tietojen siirron käyttöönottoa, että olet saanut kaikki tarvittavat valtuutukset ja tehnyt tarvittavat sopimukset suoraan PAC-sertifiointipalveluntarjoajan kanssa.';
+	translation['WARNING_GENERAL_TITLE'] = 'Validointivaroitus';
+	translation['ERROR_INVALID_OPERATION_TYPE'] = 'Ulkomaisen toimittajan valinnassa ei saa käyttää toimintatyyppiä Kiinteistövuokraus. Jatketaanko tällä valinnalla?';
+	translation['ERROR_INVALID_TAX_CODES_FOREIGN'] = 'Meksiko – Ulkomainen myyjä ei saa käyttää muuta kuin viennin verokoodia ({tax_codes}).Jatketaanko tallentamista?';
+	translation['ERROR_INVALID_TAX_CODES_LOCAL'] = 'Meksiko – Paikallinen myyjä ei saa käyttää tuontiverokoodia ({tax_codes}).Jatketaanko tallentamista?';
+    translation['UUID_PDF'] = 'UUID';
+    translation['RFC_PDF'] = 'RFC';
+	translation['CFDI_USAGE_PDF'] = 'CFDI-käyttö';
+	translation['INDUSTRY_TYPE_PDF'] = 'TOIMIALATYYPPI';
+	translation['CSD_SERIAL_NUMBER_PDF'] = 'CSD-sarjanumero';
+	translation['PAYMENT_METHOD_PDF'] = 'SAT-maksutapa';
+	translation['PAYMENT_TERMS_PDF'] = 'SAT-maksuehto';
+	translation['TAX_PDF'] = 'Vero';
+	translation['FACTOR_PDF'] = 'Tekijä';
+	translation['ORIGINAL_STRING_PDF'] = 'Alkuperäinen merkkijono';
+	translation['CFDI_SIGNATURE_PDF'] = 'CFDI-allekirjoitus';
+	translation['SAT_SIGNATURE_PDF'] = 'SAT-allekirjoitus';
+	translation['CERTIFICATION_TIMESTAMP_PDF'] = 'Sertifioinnin aikaleima';
+	translation['SAT_SERIAL_NUMBER_PDF'] = 'SAT-sarjanumero';
+	translation['AMOUNT_PDF'] = 'Summa';
+	translation['AMOUNT_DUE_PDF'] = 'Maksettava summa';
+	translation['PAID_AMOUNT_PDF'] = 'Maksettu summa';
+	translation['ISSUANCE_PDF'] = 'LIIKKEELLELASKU';
+	translation['CUSTOMER_INFO_PDF'] = 'Asiakkaan tiedot';
+	translation['RECEIVER_INFO_PDF'] = 'Vastaanottajan tiedot';
+	translation['ISSUER_INFO_PDF'] = 'Myöntäjän tiedot';
+	translation['TRANSFERS_PDF'] = 'SIIRROT';
+	translation['WITHHOLDING_PDF'] = 'PIDÄTYS';
+	translation['TOTAL_WITHHODLING_TAXES_PDF'] = 'Veronpidätykset yhteensä';
+	translation['TOTAL_TRANSFER_TAXES_PDF'] = 'Varainsiirtoverot yhteensä';
+	translation['PAC_RFC_PDF'] = 'PAC RFC';
+	translation['RELATED_CFDIS_PDF'] = 'Liittyvät CFDI-mallit';
+	translation['INVOICE_PDF'] = 'Lasku';
+	translation['SALES_ORDER_PDF'] = 'Myyntitilaus';
+	translation['SHIP_TO_PDF'] = 'Vastaanottajan osoite';
+	translation['BILL_TO_PDF'] = 'Laskutusosoite';
+	translation['SHIP_VIA_PDF'] = 'Toimittaja';
+	translation['SALES_REP_PDF'] = 'Myyntiedustaja';
+	translation['PARTNER_PDF'] = 'Yhteistyökumppani';
+	translation['DUE_DATE_PDF'] = 'Erääntymispäivämäärä';
+	translation['TERMS_PDF'] = 'Ehdot';
+	translation['CURRENCY_PDF'] = 'Valuutta';
+	translation['QUANTITY_PDF'] = 'Määrä';
+	translation['UNIT_PDF'] = 'Yksiköt';
+	translation['ITEM_DESCRIPTION_PDF'] = 'Kohteen kuvaus';
+	translation['DESCRIPTION_PDF'] = 'Kuvaus';
+	translation['UNIT_RATE_PDF'] = 'Yksikön hinta';
+	translation['DISCOUNT_PDF'] = 'Alennus';
+	translation['SALES_INFO_PDF'] = 'Myyntitiedot';
+	translation['SUBTOTAL_PDF'] = 'Välisumma';
+	translation['TAX_TOTAL_PDF'] = 'Verot yhteensä';
+	translation['TOTAL_PDF'] = 'Yhteensä';
+	translation['PREVIOUS_AMOUNT_PDF'] = 'Edellinen summa';
+	translation['PARTS_PDF'] = 'Osat';
+	translation['BASE_PDF'] = 'Pohja';
+	translation['RATE_PDF'] = 'Hinta';
+	translation['SERIE_PDF'] = 'SERIE';
+	translation['FOLIO_PDF'] = 'FOLIO';
+	translation['TRANSACTION_TYPE_CASH_SALE_PDF'] = 'I - Ingreso';
+	translation['TRANSACTION_TYPE_INVOICE_PDF'] = 'I - Ingreso';
+	translation['TRANSACTION_TYPE_CREDIT_MEMO_PDF'] = 'E - Egreso';
+	translation['TRANSACTION_TYPE_PAYMENT_PDF'] = 'P - Pago';
+	translation['TRANSACTION_TYPE_ITEM_FULFILMENT_PDF'] = 'T - Traslado';
+	translation['FOOTER_PDF'] = 'Tämä asiakirja on CFDI-mallin painettu versio';
+	translation['RECOVERABILITY_PAGE_NAME'] = 'Mexico Localization Komponentit';
+	translation['RECOVERABILITY_FIELD_COMPONENT'] = 'Komponentin nimi';
+	translation['RECOVERABILITY_FIELD_STATUS'] = 'Tila';
+	translation['RECOVERABILITY_FIELD_UPDATED_DATE'] = 'Viimeisin päivityspäivämäärä';
+	translation['RECOVERABILITY_FIELD_UPDATED_BY'] = 'Viimeisimmän päivityksen tekijä';
+	translation['RECOVERABILITY_ACTION'] = 'Toiminta';
+	translation['RECOVERABILITY_REINSTALL'] = 'Asenna uudelleen';
+	translation['RECOVERABILITY_DETAILS'] = 'Tiedot';
+	translation['RECOVERABILITY_CONFIRM'] = 'Vahvista';
+	translation['RECOVERABILITY_CONFIRM_REINSTALL'] = 'Haluatko varmasti asentaa kohteen {COMPONENTNAME} uudelleen?';
+	translation['RECOVERABILITY_INSTALLED'] = 'Komponentti asennettu onnistuneesti.';
+	translation['RECOVERABILITY_REQUEST_FAILED'] = 'Pyyntö epäonnistui';
+	translation['RECOVERABILITY_REINSTALL_REQUEST_FAILED'] = 'Uudelleenasentamispyyntö epäonnistui.';
+	translation['RECOVERABILITY_NOT_SUPPORTED'] = 'Uudelleenasentamispyyntö epäonnistui. Kohde-SuiteAppia {SUITEAPPNAME} ei tueta.';
+	translation['RECOVERABILITY_NO_SHAREDMODULE'] = 'Jaettua moduulia ei voida paikantaa.';
+	translation['OPERATION_TYPE_PROFESSIONAL_SERVICES'] = 'Ammattipalvelut';
+	translation['OPERATION_TYPE_REAL_ESTATE_LEASING'] = 'Kiinteistövuokraus';
+	translation['OPERATION_TYPE_OTHERS'] = 'Muut';
+	translation['OPERATION_TYPE_DEPRECATED'] = 'Toimintatyyppi (merkitty vanhentuneeksi)';
+
+	return translation;
+});
+

@@ -1,0 +1,18 @@
+{
+    "name":"Inbound vendor bill template",
+    "description":"Inbound e-document template in XML format to be used for vendor bill generation.",
+    "edocPackage":"Default E-Document Package",
+    "edocDescription": "This is the default E-Document Package. Assign e-document templates and sending methods to be used for your transactions.",
+    "transactionType":[
+       "17" 
+    ],
+    "customDataSourcePluginImpl": "",
+    "templateContent":"",
+    "templateXsd": "",
+    "outboundXsd":"",
+    "fieldMappingInboundEdoc": "/{bundleId}/src/l10n/electronicInvoicing/InboundMappingVendorBill.json",
+    "xpath": [],
+    "regex": [],
+    "lockTxnOnStatus": [],
+    "subsidiary": []
+}

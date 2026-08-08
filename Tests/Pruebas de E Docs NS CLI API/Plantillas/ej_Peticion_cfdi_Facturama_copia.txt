@@ -1,0 +1,47 @@
+{	    
+	"CfdiType": "I",
+	"PaymentForm": "01",
+	"PaymentMethod": "PUE",
+	"ExpeditionPlace" : "78240",
+	"Date" : "2022-03-14 14:00:00",
+	"Folio": 120,
+    "Issuer": {
+        "FiscalRegime": "601",
+        "Rfc": "EKU9003173C9",
+        "Name": "ESCUELA KEMPER URGATE"
+    },
+	"Receiver": {
+		"Rfc": "URE180429TM6",
+		"CfdiUse": "G03",
+	"Name": "UNIVERSIDAD ROBOTICA ESPAÑOLA",
+	"FiscalRegime": "601",
+	"TaxZipCode" : "65000",
+		"Address": {
+			"Street" : "Guadalcazar del receptor",
+			"ExteriorNumber" : "300",
+			"InteriorNumber" : "A",
+			"Neighborhood": "Las lomas",
+			"ZipCode" : "65000",
+			"Municipality" : "San Luis Potosi",
+			"State" : "San Luis Potosi",
+			"Country" : "México"
+		}
+	},
+	"Items": [{        
+		"ProductCode": "25173108",
+		"Description": "GPS estandar pruebas",
+		"UnitCode": "E48",
+		"Quantity": 1.0,
+		"UnitPrice": 100.0,
+		"Subtotal": 100.00,
+	"TaxObject" : "02",
+		"Taxes": [{
+			"Total": 16,
+            "Name": "IVA",
+            "Base": 100,
+            "Rate": 0.16,
+            "IsRetention": false
+		}],
+		"Total": 116
+	}]	
+}

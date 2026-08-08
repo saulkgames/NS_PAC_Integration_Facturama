@@ -1,0 +1,124 @@
+/**
+ * Copyright (c) 2017, Oracle and/or its affiliates. All rights reserved.
+ *
+ * @NApiVersion 2.1
+ */
+
+define([], function () {
+
+	var translation = {};
+
+	translation['WITHHOLDING'] = 'Källskatt';
+	translation['EDIT_BUTTON'] = 'Redigera';
+	translation['CANCEL_BUTTON'] = 'Avbryt';
+	translation['TAX_TYPE'] = 'Skattetyp';
+	translation['EXAMPLE_PLAIN_TEXT'] = 'Engelsk text';
+	translation['EXAMPLE_TEXT_WITH_INSERTED_VALUE'] = 'Skattesatshistorik ({tax_code_name})';
+	translation['LABEL_BANK_INFO'] = 'Bankinformation';
+	translation['LABEL_PAYMENT_METHOD'] = 'Betalningssätt';
+	translation['HELP_BANK_INFO'] = 'Välj posten med betalningsmottagarens bankinformation som ska användas för transaktionen. Detta fält används för Mexico Localization.';
+	translation['ERROR_DATE_RANGE'] = 'Datumet i Giltig till måste infalla efter datumet i Giltig från';
+	translation['ERROR_GENERAL_TITLE'] = 'Valideringsfel';
+	translation['ERROR_MISSING_MAPPING'] = 'Mappningen av posttypen {record_type} saknas.';
+	translation['ERROR_SUBSIDIARY_COUNTRY_MISSING'] = 'Inget land hittades för dotterbolaget med ID';
+	translation['ERROR_SUBSIDIARY_MISSING'] = 'Inget dotterbolag hittades för posten eller användaren';
+	translation['ERROR_UNEXPECTED_SAT_ITEM_CODE_1'] = 'Artikelkod enligt SAT med kod';
+	translation['ERROR_UNEXPECTED_SAT_ITEM_CODE_2'] = 'hittades inte';
+	translation['ERROR_RFC_COMPANY'] = 'RFC-numret måste vara i det format som är obligatoriskt för Mexiko (XXX000000XXX). Du kan också använda det generiska RFC-numret för utländska entiteter: XEXX010101000.';
+	translation['ERROR_RFC_PERSON'] = 'RFC-numret måste vara i det format som är obligatoriskt för Mexiko (XXXX000000XXX).';
+	translation['ERROR_SAT_CODE_DUPLICATED'] = 'Du kan inte ange den här koden eftersom den redan har använts i en annan post.';
+	translation['EI_AUDIT_TRAIL_CERTIFY_SUCCESS'] = 'E-dokumentet har certifierats';
+	translation['ERROR_EI_AUDIT_TRAIL_NO_PAC'] = 'Ingen aktiv PAC-anslutning hittades.';
+	translation['ERROR_EI_AUDIT_TRAIL_NO_PAC_RESPONSE'] = 'Försökte ansluta till PAC, men fick inget svar från PAC';
+	translation['ERROR_EI_AUDIT_NO_PLUGIN_IMPLEMENTATION_FOUND'] = 'Kunde inte ansluta till PAC eftersom ingen giltig implementering av insticksprogram hittades';
+	translation['ERROR_EI_SUBSIDIARY_ALREADY_IN_USE'] = 'At least one of the selected subsidiaries is already configured on another enabled PAC. Make sure that you assign a subsidiary to one enabled PAC only.';
+	translation['ERROR_EI_ONLY_ONE_ENABLED_PAC_IS_ALLOWED'] = 'This PAC cannot be enabled because there is already an enabled PAC in your account. To enable this PAC, disable the currently enabled one and try again.';
+	translation['ERROR_UNIQUE_PAC_VIOLATE_BANNER_TITLE'] = 'Aktiv PAC-anslutning finns';
+	translation['ERROR_NO_ACCEPT_DIALOG_MSG'] = 'Du måste läsa igenom och acceptera det viktiga meddelandet innan du kan spara.';
+	translation['PAC_LICENSE_AGREEMENT'] = 'När du väljer en leverantör av certifieringstjänster i detta program ger du Oracle + NetSuite behörighet att överföra information direkt till denna PAC-leverantör av certifieringstjänster. Innan du möjliggör denna informationsöverföring ska du kontrollera att du har fått alla nödvändiga godkännanden och slutit alla nödvändiga avtal direkt med PAC-leverantören av certifieringstjänster.';
+	translation['WARNING_GENERAL_TITLE'] = 'Valideringsvarning';
+	translation['ERROR_INVALID_OPERATION_TYPE'] = 'Verksamhetstypen Fastighetsleasing bör inte användas när du väljer en utländsk leverantör. Fortsätt med det här valet?';
+	translation['ERROR_INVALID_TAX_CODES_FOREIGN'] = 'Mexiko – Utländsk leverantör bör inte ha en icke-importbaserad skattekod ({tax_codes}).Fortsätt spara?';
+	translation['ERROR_INVALID_TAX_CODES_LOCAL'] = 'Mexiko – Lokal leverantör bör inte ha en importbaserad skattekod ({tax_codes}).Fortsätt spara?';
+    translation['UUID_PDF'] = 'UUID';
+    translation['RFC_PDF'] = 'RFC';
+	translation['CFDI_USAGE_PDF'] = 'CFDI-användning';
+	translation['INDUSTRY_TYPE_PDF'] = 'INDUSTRITYP';
+	translation['CSD_SERIAL_NUMBER_PDF'] = 'CSD-serienummer';
+	translation['PAYMENT_METHOD_PDF'] = 'Betalningsmetod enligt SAT';
+	translation['PAYMENT_TERMS_PDF'] = 'Betalningsvillkor enligt SAT';
+	translation['TAX_PDF'] = 'Skatt';
+	translation['FACTOR_PDF'] = 'Faktor';
+	translation['ORIGINAL_STRING_PDF'] = 'Ursprunglig sträng';
+	translation['CFDI_SIGNATURE_PDF'] = 'CFDI-signatur';
+	translation['SAT_SIGNATURE_PDF'] = 'SAT-signatur';
+	translation['CERTIFICATION_TIMESTAMP_PDF'] = 'Tidsstämpel för certifiering';
+	translation['SAT_SERIAL_NUMBER_PDF'] = 'SAT-serienummer';
+	translation['AMOUNT_PDF'] = 'Belopp';
+	translation['AMOUNT_DUE_PDF'] = 'Belopp att betala';
+	translation['PAID_AMOUNT_PDF'] = 'Betalt belopp';
+	translation['ISSUANCE_PDF'] = 'UTFÄRDANDE';
+	translation['CUSTOMER_INFO_PDF'] = 'Kundinformation';
+	translation['RECEIVER_INFO_PDF'] = 'Mottagarens information';
+	translation['ISSUER_INFO_PDF'] = 'Utfärdarens information';
+	translation['TRANSFERS_PDF'] = 'ÖVERLÅTELSER';
+	translation['WITHHOLDING_PDF'] = 'KÄLLSKATT';
+	translation['TOTAL_WITHHODLING_TAXES_PDF'] = 'Total källskatt';
+	translation['TOTAL_TRANSFER_TAXES_PDF'] = 'Total överlåtelseskatt';
+	translation['PAC_RFC_PDF'] = 'RFC för PAC';
+	translation['RELATED_CFDIS_PDF'] = 'Relaterade CFDI';
+	translation['INVOICE_PDF'] = 'Faktura';
+	translation['SALES_ORDER_PDF'] = 'Kundorder';
+	translation['SHIP_TO_PDF'] = 'Leveransadress';
+	translation['BILL_TO_PDF'] = 'Fakturaadress';
+	translation['SHIP_VIA_PDF'] = 'Leverera med';
+	translation['SALES_REP_PDF'] = 'Säljare';
+	translation['PARTNER_PDF'] = 'Partner';
+	translation['DUE_DATE_PDF'] = 'Förfallodatum';
+	translation['TERMS_PDF'] = 'Betalningsvillkor';
+	translation['CURRENCY_PDF'] = 'Valuta';
+	translation['QUANTITY_PDF'] = 'Kvantitet';
+	translation['UNIT_PDF'] = 'Enheter';
+	translation['ITEM_DESCRIPTION_PDF'] = 'Artikelbeskrivning';
+	translation['DESCRIPTION_PDF'] = 'Beskrivning';
+	translation['UNIT_RATE_PDF'] = 'Enhetstaxa';
+	translation['DISCOUNT_PDF'] = 'Rabatt';
+	translation['SALES_INFO_PDF'] = 'Försäljningsinformation';
+	translation['SUBTOTAL_PDF'] = 'Delsumma';
+	translation['TAX_TOTAL_PDF'] = 'Summa skatt';
+	translation['TOTAL_PDF'] = 'Summa';
+	translation['PREVIOUS_AMOUNT_PDF'] = 'Tidigare belopp';
+	translation['PARTS_PDF'] = 'Delar';
+	translation['BASE_PDF'] = 'Bas';
+	translation['RATE_PDF'] = 'Taxa';
+	translation['SERIE_PDF'] = 'SERIE';
+	translation['FOLIO_PDF'] = 'FOLIO';
+	translation['TRANSACTION_TYPE_CASH_SALE_PDF'] = 'I - Ingreso';
+	translation['TRANSACTION_TYPE_INVOICE_PDF'] = 'I - Ingreso';
+	translation['TRANSACTION_TYPE_CREDIT_MEMO_PDF'] = 'E - Egreso';
+	translation['TRANSACTION_TYPE_PAYMENT_PDF'] = 'P - Pago';
+	translation['TRANSACTION_TYPE_ITEM_FULFILMENT_PDF'] = 'T - Traslado';
+	translation['FOOTER_PDF'] = 'Det här dokument är en utskriven version av ett CFDI';
+	translation['RECOVERABILITY_PAGE_NAME'] = 'Mexico Localization Komponenter';
+	translation['RECOVERABILITY_FIELD_COMPONENT'] = 'Komponentnamn';
+	translation['RECOVERABILITY_FIELD_STATUS'] = 'Status';
+	translation['RECOVERABILITY_FIELD_UPDATED_DATE'] = 'Datum för senaste uppdatering';
+	translation['RECOVERABILITY_FIELD_UPDATED_BY'] = 'Uppdaterades senast av';
+	translation['RECOVERABILITY_ACTION'] = 'Åtgärd';
+	translation['RECOVERABILITY_REINSTALL'] = 'Installera om';
+	translation['RECOVERABILITY_DETAILS'] = 'Information';
+	translation['RECOVERABILITY_CONFIRM'] = 'Bekräfta';
+	translation['RECOVERABILITY_CONFIRM_REINSTALL'] = 'Är du säker på att du vill installera om {COMPONENTNAME}?';
+	translation['RECOVERABILITY_INSTALLED'] = 'Komponenten har installerats.';
+	translation['RECOVERABILITY_REQUEST_FAILED'] = 'Begäran misslyckades';
+	translation['RECOVERABILITY_REINSTALL_REQUEST_FAILED'] = 'Begäran om ominstallation misslyckades.';
+	translation['RECOVERABILITY_NOT_SUPPORTED'] = 'Begäran om ominstallation misslyckades. Mål-SuiteApp {SUITEAPPNAME} stöds inte.';
+	translation['RECOVERABILITY_NO_SHAREDMODULE'] = 'Kunde inte hitta delad modul.';
+	translation['OPERATION_TYPE_PROFESSIONAL_SERVICES'] = 'Professionella tjänster';
+	translation['OPERATION_TYPE_REAL_ESTATE_LEASING'] = 'Fastighetsleasing';
+	translation['OPERATION_TYPE_OTHERS'] = 'Andra';
+	translation['OPERATION_TYPE_DEPRECATED'] = 'Verksamhetstyp (utfasad)';
+
+	return translation;
+});
+

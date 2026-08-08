@@ -1,0 +1,124 @@
+/**
+ * Copyright (c) 2017, Oracle and/or its affiliates. All rights reserved.
+ *
+ * @NApiVersion 2.1
+ */
+
+define([], function () {
+
+	var translation = {};
+
+	translation['WITHHOLDING'] = 'การหัก ณ ที่จ่าย';
+	translation['EDIT_BUTTON'] = 'แก้ไข';
+	translation['CANCEL_BUTTON'] = 'ยกเลิก';
+	translation['TAX_TYPE'] = 'ประเภทภาษี';
+	translation['EXAMPLE_PLAIN_TEXT'] = 'ข้อความภาษาอังกฤษ';
+	translation['EXAMPLE_TEXT_WITH_INSERTED_VALUE'] = 'ประวัติอัตราภาษี ({tax_code_name})';
+	translation['LABEL_BANK_INFO'] = 'ข้อมูลธนาคาร';
+	translation['LABEL_PAYMENT_METHOD'] = 'วิธีการชำระเงิน';
+	translation['HELP_BANK_INFO'] = 'เลือกบันทึกข้อมูลธนาคารของผู้รับที่จะใช้สำหรับธุรกรรมนี้ ใช่ช่องนี้สำหรับ Mexico Localization';
+	translation['ERROR_DATE_RANGE'] = 'วันที่มีผลถึงจะต้องอยู่หลังวันที่มีผลตั้งแต่';
+	translation['ERROR_GENERAL_TITLE'] = 'ข้อผิดพลาดการตรวจสอบความถูกต้อง';
+	translation['ERROR_MISSING_MAPPING'] = 'แผนผังสำหรับประเภทไฟล์ข้อมูล {record_type} หายไป';
+	translation['ERROR_SUBSIDIARY_COUNTRY_MISSING'] = 'ไม่พบประเทศสำหรับรายการย่อยที่มี ID';
+	translation['ERROR_SUBSIDIARY_MISSING'] = 'ไม่พบรายการย่อยสำหรับไฟล์ข้อมูลหรือผู้ใช้';
+	translation['ERROR_UNEXPECTED_SAT_ITEM_CODE_1'] = 'รหัสรายการ SAT ที่มีรหัส';
+	translation['ERROR_UNEXPECTED_SAT_ITEM_CODE_2'] = 'ไม่พบ';
+	translation['ERROR_RFC_COMPANY'] = 'หมายเลข RFC ต้องอยู่ในรูปแบบที่กำหนดไว้สำหรับเม็กซิโก (XXX000000XXX) หรือคุณสามารถใช้หมายเลข RFC ทั่วไปสำหรับเอนทิตี้ต่างประเทศ: XEXX010101000';
+	translation['ERROR_RFC_PERSON'] = 'หมายเลข RFC ต้องอยู่ในรูปแบบที่กำหนดไว้สำหรับเม็กซิโก (XXXX000000XXX)';
+	translation['ERROR_SAT_CODE_DUPLICATED'] = 'คุณไม่สามารถใส่รหัสนี้ได้เนื่องจากมีการใช้กับไฟล์ข้อมูลอื่นแล้ว';
+	translation['EI_AUDIT_TRAIL_CERTIFY_SUCCESS'] = 'รับรอง E-Document เรียบร้อยแล้ว';
+	translation['ERROR_EI_AUDIT_TRAIL_NO_PAC'] = 'ไม่พบการเชื่อมต่อ PAC ที่ใช้งานอยู่';
+	translation['ERROR_EI_AUDIT_TRAIL_NO_PAC_RESPONSE'] = 'พยายามเชื่อมต่อกับ PAC แต่ไม่มีการตอบสนองจาก PAC';
+	translation['ERROR_EI_AUDIT_NO_PLUGIN_IMPLEMENTATION_FOUND'] = 'ไม่สามารถเชื่อมต่อกับ PAC ได้เนื่องจากไม่พบการใช้งานปลั๊กอินที่ถูกต้อง';
+	translation['ERROR_EI_SUBSIDIARY_ALREADY_IN_USE'] = 'At least one of the selected subsidiaries is already configured on another enabled PAC. Make sure that you assign a subsidiary to one enabled PAC only.';
+	translation['ERROR_EI_ONLY_ONE_ENABLED_PAC_IS_ALLOWED'] = 'This PAC cannot be enabled because there is already an enabled PAC in your account. To enable this PAC, disable the currently enabled one and try again.';
+	translation['ERROR_UNIQUE_PAC_VIOLATE_BANNER_TITLE'] = 'มีการเชื่อมต่อ PAC ที่ใช้งานอยู่';
+	translation['ERROR_NO_ACCEPT_DIALOG_MSG'] = 'คุณต้องอ่านและยอมรับข้อความสำคัญก่อนบันทึก';
+	translation['PAC_LICENSE_AGREEMENT'] = 'ด้วยการเลือกผู้ให้บริการออกใบรับรองในแอปพลิเคชันนี้ แสดงว่าคุณกำลังอนุญาตให้ Oracle + NetSuite โอนข้อมูลไปยังผู้ให้บริการออกใบรับรอง PAC โดยตรง ก่อนเปิดใช้งานการโอนข้อมูล โปรดตรวจสอบให้แน่ใจว่าคุณได้รับการอนุญาตที่จำเป็นทั้งหมดและดำเนินการตามข้อตกลงที่จำเป็นกับผู้ให้บริการออกใบรับรอง PAC โดยตรง';
+	translation['WARNING_GENERAL_TITLE'] = 'คำเตือนการตรวจสอบความถูกต้อง';
+	translation['ERROR_INVALID_OPERATION_TYPE'] = 'ไม่ควรใช้ประเภทการดำเนินการเช่าอสังหาริมทรัพย์เมื่อเลือกผู้ค้าต่างประเทศ ดำเนินการต่อด้วยตัวเลือกนี้หรือไม่';
+	translation['ERROR_INVALID_TAX_CODES_FOREIGN'] = 'เม็กซิโก - ผู้ค้าต่างประเทศไม่ควรใช้รหัสภาษีที่ไม่ได้นำเข้า ({tax_codes})ดำเนินการบันทึกต่อหรือไม่';
+	translation['ERROR_INVALID_TAX_CODES_LOCAL'] = 'เม็กซิโก - ผู้ค้าในประเทศไม่ควรใช้รหัสภาษีที่นำเข้า ({tax_codes})ดำเนินการบันทึกต่อหรือไม่';
+    translation['UUID_PDF'] = 'UUID';
+    translation['RFC_PDF'] = 'RFC';
+	translation['CFDI_USAGE_PDF'] = 'การใช้งาน CFDI';
+	translation['INDUSTRY_TYPE_PDF'] = 'ประเภทอุตสาหกรรม';
+	translation['CSD_SERIAL_NUMBER_PDF'] = 'หมายเลขซีเรียล CSD';
+	translation['PAYMENT_METHOD_PDF'] = 'วิธีการการชำระเงิน SAT';
+	translation['PAYMENT_TERMS_PDF'] = 'เงื่อนไขการชำระเงิน SAT';
+	translation['TAX_PDF'] = 'ภาษี';
+	translation['FACTOR_PDF'] = 'ปัจจัย';
+	translation['ORIGINAL_STRING_PDF'] = 'สตริงเริ่มแรก';
+	translation['CFDI_SIGNATURE_PDF'] = 'ลายเซ็น CFDI';
+	translation['SAT_SIGNATURE_PDF'] = 'ลายเซ็น SAT';
+	translation['CERTIFICATION_TIMESTAMP_PDF'] = 'ตราประทับเวลาใบรับรอง';
+	translation['SAT_SERIAL_NUMBER_PDF'] = 'หมายเลขซีเรียล SAT';
+	translation['AMOUNT_PDF'] = 'จำนวน';
+	translation['AMOUNT_DUE_PDF'] = 'จำนวนที่ต้องชำระ';
+	translation['PAID_AMOUNT_PDF'] = 'จำนวนที่ชำระแล้ว';
+	translation['ISSUANCE_PDF'] = 'การออก';
+	translation['CUSTOMER_INFO_PDF'] = 'ข้อมูลลูกค้า';
+	translation['RECEIVER_INFO_PDF'] = 'ข้อมูลผู้รับ';
+	translation['ISSUER_INFO_PDF'] = 'ข้อมูลผู้ออก';
+	translation['TRANSFERS_PDF'] = 'การโอนเงิน';
+	translation['WITHHOLDING_PDF'] = 'การหัก ณ ที่จ่าย';
+	translation['TOTAL_WITHHODLING_TAXES_PDF'] = 'ภาษีหัก ณ ที่จ่ายทั้งหมด';
+	translation['TOTAL_TRANSFER_TAXES_PDF'] = 'ภาษีการโอนเงินทั้งหมด';
+	translation['PAC_RFC_PDF'] = 'RFC ของ PAC';
+	translation['RELATED_CFDIS_PDF'] = 'CFDI ที่เกี่ยวข้อง';
+	translation['INVOICE_PDF'] = 'ใบเรียกเก็บเงิน';
+	translation['SALES_ORDER_PDF'] = 'ใบสั่งขาย';
+	translation['SHIP_TO_PDF'] = 'จัดส่งไปยัง';
+	translation['BILL_TO_PDF'] = 'เรียกเก็บเงินไปยัง';
+	translation['SHIP_VIA_PDF'] = 'ขนส่งทาง';
+	translation['SALES_REP_PDF'] = 'ตัวแทนฝ่ายขาย';
+	translation['PARTNER_PDF'] = 'คู่ค้า';
+	translation['DUE_DATE_PDF'] = 'วันครบกำหนด';
+	translation['TERMS_PDF'] = 'เงื่อนไข';
+	translation['CURRENCY_PDF'] = 'สกุลเงิน';
+	translation['QUANTITY_PDF'] = 'ปริมาณ';
+	translation['UNIT_PDF'] = 'หน่วย';
+	translation['ITEM_DESCRIPTION_PDF'] = 'คำอธิบายรายการ';
+	translation['DESCRIPTION_PDF'] = 'คำอธิบาย';
+	translation['UNIT_RATE_PDF'] = 'อัตราหน่วย';
+	translation['DISCOUNT_PDF'] = 'ส่วนลด';
+	translation['SALES_INFO_PDF'] = 'ข้อมูลการขาย';
+	translation['SUBTOTAL_PDF'] = 'ยอดรวมย่อย';
+	translation['TAX_TOTAL_PDF'] = 'จำนวนภาษีทั้งหมด';
+	translation['TOTAL_PDF'] = 'ยอดรวม';
+	translation['PREVIOUS_AMOUNT_PDF'] = 'จำนวนก่อนหน้า';
+	translation['PARTS_PDF'] = 'ชิ้นส่วน';
+	translation['BASE_PDF'] = 'ฐาน';
+	translation['RATE_PDF'] = 'อัตรา';
+	translation['SERIE_PDF'] = 'SERIE';
+	translation['FOLIO_PDF'] = 'FOLIO';
+	translation['TRANSACTION_TYPE_CASH_SALE_PDF'] = 'I - Ingreso';
+	translation['TRANSACTION_TYPE_INVOICE_PDF'] = 'I - Ingreso';
+	translation['TRANSACTION_TYPE_CREDIT_MEMO_PDF'] = 'E - Egreso';
+	translation['TRANSACTION_TYPE_PAYMENT_PDF'] = 'P - Pago';
+	translation['TRANSACTION_TYPE_ITEM_FULFILMENT_PDF'] = 'T - Traslado';
+	translation['FOOTER_PDF'] = 'เอกสารนี้เป็นเอกสารแทน CFDI ที่ตีพิมพ์แล้ว';
+	translation['RECOVERABILITY_PAGE_NAME'] = 'Mexico Localization โดเมนย่อย';
+	translation['RECOVERABILITY_FIELD_COMPONENT'] = 'ชื่อโดเมนย่อย';
+	translation['RECOVERABILITY_FIELD_STATUS'] = 'สถานะ';
+	translation['RECOVERABILITY_FIELD_UPDATED_DATE'] = 'วันที่ปรับปรุงแก้ไขล่าสุด';
+	translation['RECOVERABILITY_FIELD_UPDATED_BY'] = 'ปรับปรุงแก้ไขล่าสุดโดย';
+	translation['RECOVERABILITY_ACTION'] = 'การดำเนินการ';
+	translation['RECOVERABILITY_REINSTALL'] = 'ติดตั้งใหม่';
+	translation['RECOVERABILITY_DETAILS'] = 'รายละเอียด';
+	translation['RECOVERABILITY_CONFIRM'] = 'ยืนยัน';
+	translation['RECOVERABILITY_CONFIRM_REINSTALL'] = 'คุณแน่ใจหรือไม่ว่าต้องการติดตั้ง {COMPONENTNAME} ใหม่';
+	translation['RECOVERABILITY_INSTALLED'] = 'ติดตั้งโดเมนย่อยเรียบร้อยแล้ว';
+	translation['RECOVERABILITY_REQUEST_FAILED'] = 'คำขอล้มเหลว';
+	translation['RECOVERABILITY_REINSTALL_REQUEST_FAILED'] = 'คำขอติดตั้งใหม่ล้มเหลว';
+	translation['RECOVERABILITY_NOT_SUPPORTED'] = 'คำขอติดตั้งใหม่ล้มเหลว SuiteApp เป้าหมาย {SUITEAPPNAME} ไม่ได้รับการสนับสนุน';
+	translation['RECOVERABILITY_NO_SHAREDMODULE'] = 'ไม่พบโมดูลที่แชร์';
+	translation['OPERATION_TYPE_PROFESSIONAL_SERVICES'] = 'บริการระดับมืออาชีพ';
+	translation['OPERATION_TYPE_REAL_ESTATE_LEASING'] = 'การให้เช่าอสังหาริมทรัพย์';
+	translation['OPERATION_TYPE_OTHERS'] = 'อื่นๆ';
+	translation['OPERATION_TYPE_DEPRECATED'] = 'ประเภทการดำเนินการ (เลิกใช้แล้ว)';
+
+	return translation;
+});
+

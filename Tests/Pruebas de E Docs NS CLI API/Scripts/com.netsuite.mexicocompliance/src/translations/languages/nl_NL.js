@@ -1,0 +1,124 @@
+/**
+ * Copyright (c) 2017, Oracle and/or its affiliates. All rights reserved.
+ *
+ * @NApiVersion 2.1
+ */
+
+define([], function () {
+
+	var translation = {};
+
+	translation['WITHHOLDING'] = 'Inhouding';
+	translation['EDIT_BUTTON'] = 'Bewerken';
+	translation['CANCEL_BUTTON'] = 'Annuleren';
+	translation['TAX_TYPE'] = 'Belastingtype';
+	translation['EXAMPLE_PLAIN_TEXT'] = 'Engelse tekst';
+	translation['EXAMPLE_TEXT_WITH_INSERTED_VALUE'] = 'Geschiedenis belastingtarief ({tax_code_name})';
+	translation['LABEL_BANK_INFO'] = 'Bankinformatie';
+	translation['LABEL_PAYMENT_METHOD'] = 'Betaalmethode';
+	translation['HELP_BANK_INFO'] = 'Selecteer het bankgegevensrecord van de begunstigde om te gebruiken voor deze transactie. Dit veld wordt gebruikt voor Mexico Localization.';
+	translation['ERROR_DATE_RANGE'] = 'De datum Geldig tot moet later zijn dan de ingangsdatum';
+	translation['ERROR_GENERAL_TITLE'] = 'Validatiefout';
+	translation['ERROR_MISSING_MAPPING'] = 'Toewijzing voor recordtype {record_type} ontbreekt.';
+	translation['ERROR_SUBSIDIARY_COUNTRY_MISSING'] = 'Geen land gevonden voor een dochteronderneming met ID';
+	translation['ERROR_SUBSIDIARY_MISSING'] = 'Geen dochteronderneming gevonden voor record of gebruiker';
+	translation['ERROR_UNEXPECTED_SAT_ITEM_CODE_1'] = 'SAT-itemcode met code';
+	translation['ERROR_UNEXPECTED_SAT_ITEM_CODE_2'] = 'niet gevonden';
+	translation['ERROR_RFC_COMPANY'] = 'Het RFC-nummer moet de opmaak hebben die vereist is voor Mexico (XXX000000XXX). U kunt ook het generieke RFC-nummer gebruiken voor buitenlandse entiteiten: XEXX010101000.';
+	translation['ERROR_RFC_PERSON'] = 'Het RFC-nummer moet de opmaak hebben die vereist is voor Mexico (XXXX000000XXX).';
+	translation['ERROR_SAT_CODE_DUPLICATED'] = 'U kunt deze code niet invoeren omdat deze al in een ander record is gebruikt.';
+	translation['EI_AUDIT_TRAIL_CERTIFY_SUCCESS'] = 'E-document succesvol gecertificeerd';
+	translation['ERROR_EI_AUDIT_TRAIL_NO_PAC'] = 'Geen actieve PAC-verbinding gevonden.';
+	translation['ERROR_EI_AUDIT_TRAIL_NO_PAC_RESPONSE'] = 'Poging om verbinding te maken met PAC, maar PAC gaf geen respons';
+	translation['ERROR_EI_AUDIT_NO_PLUGIN_IMPLEMENTATION_FOUND'] = 'Kan geen verbinding maken met PAC omdat er geen geldige plug-in-implementatie is gevonden';
+	translation['ERROR_EI_SUBSIDIARY_ALREADY_IN_USE'] = 'At least one of the selected subsidiaries is already configured on another enabled PAC. Make sure that you assign a subsidiary to one enabled PAC only.';
+	translation['ERROR_EI_ONLY_ONE_ENABLED_PAC_IS_ALLOWED'] = 'This PAC cannot be enabled because there is already an enabled PAC in your account. To enable this PAC, disable the currently enabled one and try again.';
+	translation['ERROR_UNIQUE_PAC_VIOLATE_BANNER_TITLE'] = 'Actieve PAC-verbinding';
+	translation['ERROR_NO_ACCEPT_DIALOG_MSG'] = 'Voordat u opslaat, moet u het bericht Belangrijk lezen en hiermee akkoord gaan.';
+	translation['PAC_LICENSE_AGREEMENT'] = 'Door in deze toepassing een certificatiedienstverlener te selecteren, machtigt u Oracle + NetSuite om informatie rechtstreeks naar de betreffende PAC-certificeringsdienstverlener te verzenden. Voordat u de overdracht van informatie mogelijk kunt maken, moet u ervoor zorgen dat u alle benodigde autorisaties hebt verkregen en alle vereiste overeenkomsten rechtstreeks met de PAC-certificeringsdienstverlener hebt uitgevoerd.';
+	translation['WARNING_GENERAL_TITLE'] = 'Validatiewaarschuwing';
+	translation['ERROR_INVALID_OPERATION_TYPE'] = 'Het bewerkingstype Vastgoedleasing mag niet worden gebruikt tijdens het selecteren van een buitenlandse leverancier. Doorgaan met de selectie?';
+	translation['ERROR_INVALID_TAX_CODES_FOREIGN'] = 'Mexico - Buitenlandse leverancier mag geen lokale belastingcode ({tax_codes}) gebruiken.Doorgaan met opslaan?';
+	translation['ERROR_INVALID_TAX_CODES_LOCAL'] = 'Mexico - Lokale leverancier mag geen importbelastingcode ({tax_codes}) gebruiken.Doorgaan met opslaan?';
+    translation['UUID_PDF'] = 'UUID';
+    translation['RFC_PDF'] = 'RFC';
+	translation['CFDI_USAGE_PDF'] = 'CFDI-gebruik';
+	translation['INDUSTRY_TYPE_PDF'] = 'INDUSTRIETYPE';
+	translation['CSD_SERIAL_NUMBER_PDF'] = 'CSD-serienummer';
+	translation['PAYMENT_METHOD_PDF'] = 'SAT-betaalmethode';
+	translation['PAYMENT_TERMS_PDF'] = 'SAT-betaaltermijn';
+	translation['TAX_PDF'] = 'Belasting';
+	translation['FACTOR_PDF'] = 'Factor';
+	translation['ORIGINAL_STRING_PDF'] = 'Originele reeks';
+	translation['CFDI_SIGNATURE_PDF'] = 'CFDI-handtekening';
+	translation['SAT_SIGNATURE_PDF'] = 'SAT-handtekening';
+	translation['CERTIFICATION_TIMESTAMP_PDF'] = 'Tijdstempel certificering';
+	translation['SAT_SERIAL_NUMBER_PDF'] = 'SAT-serienummer';
+	translation['AMOUNT_PDF'] = 'Bedrag';
+	translation['AMOUNT_DUE_PDF'] = 'Te betalen bedrag';
+	translation['PAID_AMOUNT_PDF'] = 'Betaald bedrag';
+	translation['ISSUANCE_PDF'] = 'UITGAVE';
+	translation['CUSTOMER_INFO_PDF'] = 'Klantinformatie';
+	translation['RECEIVER_INFO_PDF'] = 'Ontvangersgegevens';
+	translation['ISSUER_INFO_PDF'] = 'Uitgeverinformatie';
+	translation['TRANSFERS_PDF'] = 'OVERBOEKINGEN';
+	translation['WITHHOLDING_PDF'] = 'INHOUDING';
+	translation['TOTAL_WITHHODLING_TAXES_PDF'] = 'Totaal ingehouden belastingen';
+	translation['TOTAL_TRANSFER_TAXES_PDF'] = 'Totaal overgeboekte belastingen';
+	translation['PAC_RFC_PDF'] = 'PAC RFC';
+	translation['RELATED_CFDIS_PDF'] = 'Gerelateerde CFDI\'s';
+	translation['INVOICE_PDF'] = 'Factuur';
+	translation['SALES_ORDER_PDF'] = 'Verkooporder';
+	translation['SHIP_TO_PDF'] = 'Verzenden naar';
+	translation['BILL_TO_PDF'] = 'Factureren aan';
+	translation['SHIP_VIA_PDF'] = 'Verzenden via';
+	translation['SALES_REP_PDF'] = 'Vertegenwoordiger';
+	translation['PARTNER_PDF'] = 'Partner';
+	translation['DUE_DATE_PDF'] = 'Einddatum';
+	translation['TERMS_PDF'] = 'Voorwaarden';
+	translation['CURRENCY_PDF'] = 'Valuta';
+	translation['QUANTITY_PDF'] = 'Hoeveelheid';
+	translation['UNIT_PDF'] = 'Eenheden';
+	translation['ITEM_DESCRIPTION_PDF'] = 'Omschrijving item';
+	translation['DESCRIPTION_PDF'] = 'Beschrijving';
+	translation['UNIT_RATE_PDF'] = 'Eenheidstarief';
+	translation['DISCOUNT_PDF'] = 'Korting';
+	translation['SALES_INFO_PDF'] = 'Verkoopinformatie';
+	translation['SUBTOTAL_PDF'] = 'Subtotaal';
+	translation['TAX_TOTAL_PDF'] = 'Totale belasting';
+	translation['TOTAL_PDF'] = 'Totaal';
+	translation['PREVIOUS_AMOUNT_PDF'] = 'Vorig bedrag';
+	translation['PARTS_PDF'] = 'Delen';
+	translation['BASE_PDF'] = 'Basis';
+	translation['RATE_PDF'] = 'Tarief';
+	translation['SERIE_PDF'] = 'SERIE';
+	translation['FOLIO_PDF'] = 'FOLIO';
+	translation['TRANSACTION_TYPE_CASH_SALE_PDF'] = 'I - Ingreso';
+	translation['TRANSACTION_TYPE_INVOICE_PDF'] = 'I - Ingreso';
+	translation['TRANSACTION_TYPE_CREDIT_MEMO_PDF'] = 'E - Egreso';
+	translation['TRANSACTION_TYPE_PAYMENT_PDF'] = 'P - Pago';
+	translation['TRANSACTION_TYPE_ITEM_FULFILMENT_PDF'] = 'T - Traslado';
+	translation['FOOTER_PDF'] = 'Dit document is een gedrukte versie van een CFDI';
+	translation['RECOVERABILITY_PAGE_NAME'] = 'Mexico Localization Componenten';
+	translation['RECOVERABILITY_FIELD_COMPONENT'] = 'Componentnaam';
+	translation['RECOVERABILITY_FIELD_STATUS'] = 'Status';
+	translation['RECOVERABILITY_FIELD_UPDATED_DATE'] = 'Datum laatst bijgewerkt';
+	translation['RECOVERABILITY_FIELD_UPDATED_BY'] = 'Laatst bijgewerkt door';
+	translation['RECOVERABILITY_ACTION'] = 'Actie';
+	translation['RECOVERABILITY_REINSTALL'] = 'Opnieuw installeren';
+	translation['RECOVERABILITY_DETAILS'] = 'Details';
+	translation['RECOVERABILITY_CONFIRM'] = 'Bevestigen';
+	translation['RECOVERABILITY_CONFIRM_REINSTALL'] = 'Weet u zeker dat u {COMPONENTNAME} opnieuw wilt installeren?';
+	translation['RECOVERABILITY_INSTALLED'] = 'Component geïnstalleerd.';
+	translation['RECOVERABILITY_REQUEST_FAILED'] = 'Verzoek mislukt';
+	translation['RECOVERABILITY_REINSTALL_REQUEST_FAILED'] = 'Verzoek opnieuw installeren mislukt.';
+	translation['RECOVERABILITY_NOT_SUPPORTED'] = 'Verzoek opnieuw installeren mislukt. Doel SuiteApp {SUITEAPPNAME} wordt niet ondersteund.';
+	translation['RECOVERABILITY_NO_SHAREDMODULE'] = 'Kan gedeelde module niet vinden.';
+	translation['OPERATION_TYPE_PROFESSIONAL_SERVICES'] = 'Professionele diensten';
+	translation['OPERATION_TYPE_REAL_ESTATE_LEASING'] = 'Vastgoedleasing';
+	translation['OPERATION_TYPE_OTHERS'] = 'Andere';
+	translation['OPERATION_TYPE_DEPRECATED'] = 'Bewerkingstype (verouderd)';
+
+	return translation;
+});
+

@@ -1,0 +1,124 @@
+/**
+ * Copyright (c) 2017, Oracle and/or its affiliates. All rights reserved.
+ *
+ * @NApiVersion 2.1
+ */
+
+define([], function () {
+
+	var translation = {};
+
+	translation['WITHHOLDING'] = 'Pemotongan';
+	translation['EDIT_BUTTON'] = 'Edit';
+	translation['CANCEL_BUTTON'] = 'Batal';
+	translation['TAX_TYPE'] = 'Jenis Pajak';
+	translation['EXAMPLE_PLAIN_TEXT'] = 'Teks bahasa Inggris';
+	translation['EXAMPLE_TEXT_WITH_INSERTED_VALUE'] = 'Riwayat Tarif Pajak ({tax_code_name})';
+	translation['LABEL_BANK_INFO'] = 'Informasi Bank';
+	translation['LABEL_PAYMENT_METHOD'] = 'Metode Pembayaran';
+	translation['HELP_BANK_INFO'] = 'Pilih data informasi bank penerima pembayaran untuk digunakan pada transaksi ini. Bidang ini digunakan untuk Mexico Localization.';
+	translation['ERROR_DATE_RANGE'] = 'Tanggal Berlaku Sampai harus setelah tanggal Berlaku Dari';
+	translation['ERROR_GENERAL_TITLE'] = 'Kesalahan Validasi';
+	translation['ERROR_MISSING_MAPPING'] = 'Pemetaan untuk jenis data {record_type} tidak ada.';
+	translation['ERROR_SUBSIDIARY_COUNTRY_MISSING'] = 'Negara tidak ditemukan untuk anak perusahaan dengan ID';
+	translation['ERROR_SUBSIDIARY_MISSING'] = 'Anak perusahaan tidak ditemukan untuk data atau pengguna';
+	translation['ERROR_UNEXPECTED_SAT_ITEM_CODE_1'] = 'Kode Item SAT dengan kode';
+	translation['ERROR_UNEXPECTED_SAT_ITEM_CODE_2'] = 'tidak ditemukan';
+	translation['ERROR_RFC_COMPANY'] = 'Nomor RFC harus dalam format yang diperlukan untuk Meksiko (XXX000000XXX). Atau, Anda dapat menggunakan nomor RFC umum untuk entitas asing: XEXX010101000.';
+	translation['ERROR_RFC_PERSON'] = 'Nomor RFC harus dalam format yang diperlukan untuk Meksiko (XXXX000000XXX).';
+	translation['ERROR_SAT_CODE_DUPLICATED'] = 'Anda tidak dapat memasukkan kode ini karena sudah digunakan pada data lain.';
+	translation['EI_AUDIT_TRAIL_CERTIFY_SUCCESS'] = 'Dokumen Elektronik Berhasil Disertifikasi';
+	translation['ERROR_EI_AUDIT_TRAIL_NO_PAC'] = 'Koneksi PAC Aktif Tidak Ditemukan.';
+	translation['ERROR_EI_AUDIT_TRAIL_NO_PAC_RESPONSE'] = 'Mencoba menghubungi PAC, tetapi tidak ada respons dari PAC';
+	translation['ERROR_EI_AUDIT_NO_PLUGIN_IMPLEMENTATION_FOUND'] = 'Tidak dapat menghubungi PAC karena Implementasi Plug-in yang Valid tidak ditemukan';
+	translation['ERROR_EI_SUBSIDIARY_ALREADY_IN_USE'] = 'At least one of the selected subsidiaries is already configured on another enabled PAC. Make sure that you assign a subsidiary to one enabled PAC only.';
+	translation['ERROR_EI_ONLY_ONE_ENABLED_PAC_IS_ALLOWED'] = 'This PAC cannot be enabled because there is already an enabled PAC in your account. To enable this PAC, disable the currently enabled one and try again.';
+	translation['ERROR_UNIQUE_PAC_VIOLATE_BANNER_TITLE'] = 'Koneksi PAC Aktif Ada';
+	translation['ERROR_NO_ACCEPT_DIALOG_MSG'] = 'Anda harus membaca dan menyetujui Pesan penting sebelum menyimpan.';
+	translation['PAC_LICENSE_AGREEMENT'] = 'Dengan memilih penyedia layanan sertifikasi dalam aplikasi ini, Anda mengizinkan Oracle + NetSuite untuk mentransfer informasi secara langsung kepada penyedia layanan sertifikasi PAC itu. Sebelum mengaktifkan transfer informasi, pastikan bahwa Anda telah memperoleh semua otorisasi yang diperlukan dan melaksanakan perjanjian yang diperlukan secara langsung dengan penyedia layanan sertifikasi PAC.';
+	translation['WARNING_GENERAL_TITLE'] = 'Peringatan Validasi';
+	translation['ERROR_INVALID_OPERATION_TYPE'] = 'Jenis operasi Penyewaan Real Estate tidak boleh digunakan saat memilih vendor asing. Lanjutkan dengan pemilihan ini?';
+	translation['ERROR_INVALID_TAX_CODES_FOREIGN'] = 'Meksiko - Vendor asing tidak boleh menggunakan kode pajak nonimpor ({tax_codes}).Lanjutkan menyimpan?';
+	translation['ERROR_INVALID_TAX_CODES_LOCAL'] = 'Meksiko - Vendor lokal tidak boleh menggunakan kode pajak impor ({tax_codes}).Lanjutkan menyimpan?';
+    translation['UUID_PDF'] = 'UUID';
+    translation['RFC_PDF'] = 'RFC';
+	translation['CFDI_USAGE_PDF'] = 'Penggunaan CFDI';
+	translation['INDUSTRY_TYPE_PDF'] = 'JENIS INDUSTRI';
+	translation['CSD_SERIAL_NUMBER_PDF'] = 'Nomor Seri CSD';
+	translation['PAYMENT_METHOD_PDF'] = 'Metode Pembayaran SAT';
+	translation['PAYMENT_TERMS_PDF'] = 'Ketentuan Pembayaran SAT';
+	translation['TAX_PDF'] = 'Pajak';
+	translation['FACTOR_PDF'] = 'Faktor';
+	translation['ORIGINAL_STRING_PDF'] = 'String Asli';
+	translation['CFDI_SIGNATURE_PDF'] = 'Tanda Tangan CFDI';
+	translation['SAT_SIGNATURE_PDF'] = 'Tanda Tangan SAT';
+	translation['CERTIFICATION_TIMESTAMP_PDF'] = 'Cap Waktu Sertifikasi';
+	translation['SAT_SERIAL_NUMBER_PDF'] = 'Nomor Seri SAT';
+	translation['AMOUNT_PDF'] = 'Jumlah';
+	translation['AMOUNT_DUE_PDF'] = 'Jumlah Harus Dibayar';
+	translation['PAID_AMOUNT_PDF'] = 'Jumlah Dibayarkan';
+	translation['ISSUANCE_PDF'] = 'PENERBITAN';
+	translation['CUSTOMER_INFO_PDF'] = 'Informasi Pelanggan';
+	translation['RECEIVER_INFO_PDF'] = 'Informasi Penerima';
+	translation['ISSUER_INFO_PDF'] = 'Informasi Penerbit';
+	translation['TRANSFERS_PDF'] = 'TRANSFER';
+	translation['WITHHOLDING_PDF'] = 'PEMOTONGAN';
+	translation['TOTAL_WITHHODLING_TAXES_PDF'] = 'Total Pajak Pemotongan';
+	translation['TOTAL_TRANSFER_TAXES_PDF'] = 'Total Pajak Transfer';
+	translation['PAC_RFC_PDF'] = 'PAC RFC';
+	translation['RELATED_CFDIS_PDF'] = 'CFDI Terkait';
+	translation['INVOICE_PDF'] = 'Faktur';
+	translation['SALES_ORDER_PDF'] = 'Pesanan Penjualan';
+	translation['SHIP_TO_PDF'] = 'Kirim Ke';
+	translation['BILL_TO_PDF'] = 'Tagih Ke';
+	translation['SHIP_VIA_PDF'] = 'Kirim Melalui';
+	translation['SALES_REP_PDF'] = 'Perwakilan Penjualan';
+	translation['PARTNER_PDF'] = 'Mitra';
+	translation['DUE_DATE_PDF'] = 'Tanggal Jatuh Tempo';
+	translation['TERMS_PDF'] = 'Ketentuan';
+	translation['CURRENCY_PDF'] = 'Mata Uang';
+	translation['QUANTITY_PDF'] = 'Jumlah';
+	translation['UNIT_PDF'] = 'Unit';
+	translation['ITEM_DESCRIPTION_PDF'] = 'Deskripsi Item';
+	translation['DESCRIPTION_PDF'] = 'Deskripsi';
+	translation['UNIT_RATE_PDF'] = 'Harga Unit';
+	translation['DISCOUNT_PDF'] = 'Diskon';
+	translation['SALES_INFO_PDF'] = 'Informasi Penjualan';
+	translation['SUBTOTAL_PDF'] = 'Subtotal';
+	translation['TAX_TOTAL_PDF'] = 'Total Pajak';
+	translation['TOTAL_PDF'] = 'Total';
+	translation['PREVIOUS_AMOUNT_PDF'] = 'Jumlah Sebelumnya';
+	translation['PARTS_PDF'] = 'Bagian';
+	translation['BASE_PDF'] = 'Dasar';
+	translation['RATE_PDF'] = 'Tingkat';
+	translation['SERIE_PDF'] = 'SERIE';
+	translation['FOLIO_PDF'] = 'FOLIO';
+	translation['TRANSACTION_TYPE_CASH_SALE_PDF'] = 'I - Ingreso';
+	translation['TRANSACTION_TYPE_INVOICE_PDF'] = 'I - Ingreso';
+	translation['TRANSACTION_TYPE_CREDIT_MEMO_PDF'] = 'E - Egreso';
+	translation['TRANSACTION_TYPE_PAYMENT_PDF'] = 'P - Pago';
+	translation['TRANSACTION_TYPE_ITEM_FULFILMENT_PDF'] = 'T - Traslado';
+	translation['FOOTER_PDF'] = 'Dokumen ini adalah representasi cetak dari CFDI';
+	translation['RECOVERABILITY_PAGE_NAME'] = 'Mexico Localization Komponen';
+	translation['RECOVERABILITY_FIELD_COMPONENT'] = 'Nama Komponen';
+	translation['RECOVERABILITY_FIELD_STATUS'] = 'Status';
+	translation['RECOVERABILITY_FIELD_UPDATED_DATE'] = 'Tanggal Terakhir Diperbarui';
+	translation['RECOVERABILITY_FIELD_UPDATED_BY'] = 'Terakhir Diperbarui Oleh';
+	translation['RECOVERABILITY_ACTION'] = 'Tindakan';
+	translation['RECOVERABILITY_REINSTALL'] = 'Instal Ulang';
+	translation['RECOVERABILITY_DETAILS'] = 'Detail';
+	translation['RECOVERABILITY_CONFIRM'] = 'Konfirmasi';
+	translation['RECOVERABILITY_CONFIRM_REINSTALL'] = 'Anda yakin ingin menginstal ulang {COMPONENTNAME}?';
+	translation['RECOVERABILITY_INSTALLED'] = 'Komponen berhasil diinstal.';
+	translation['RECOVERABILITY_REQUEST_FAILED'] = 'Permintaan Gagal';
+	translation['RECOVERABILITY_REINSTALL_REQUEST_FAILED'] = 'Permintaan instal ulang gagal.';
+	translation['RECOVERABILITY_NOT_SUPPORTED'] = 'Permintaan instal ulang gagal. SuiteApp Target {SUITEAPPNAME} tidak didukung.';
+	translation['RECOVERABILITY_NO_SHAREDMODULE'] = 'Tidak dapat menemukan modul bersama.';
+	translation['OPERATION_TYPE_PROFESSIONAL_SERVICES'] = 'Layanan Profesional';
+	translation['OPERATION_TYPE_REAL_ESTATE_LEASING'] = 'Penyewaan Real Estate';
+	translation['OPERATION_TYPE_OTHERS'] = 'Lainnya';
+	translation['OPERATION_TYPE_DEPRECATED'] = 'Jenis Operasi (Tidak Digunakan Lagi)';
+
+	return translation;
+});
+

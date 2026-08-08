@@ -1,0 +1,4 @@
+<refFields type="Santander Mexico">
+	<refField id='custrecord_2663_country_code' label='Bank Code' mandatory="true" helptext="Enter the 3-digit code that identifies the company’s bank."/>
+	<refField id='custrecord_2663_acct_num' label='Account Number' mandatory="true" helptext="Enter your company's bank account number where the funds will be debited (20 digits)."/>
+</refFields>

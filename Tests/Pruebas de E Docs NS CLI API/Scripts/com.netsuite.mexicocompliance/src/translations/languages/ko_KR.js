@@ -1,0 +1,124 @@
+/**
+ * Copyright (c) 2017, Oracle and/or its affiliates. All rights reserved.
+ *
+ * @NApiVersion 2.1
+ */
+
+define([], function () {
+
+	var translation = {};
+
+	translation['WITHHOLDING'] = '원천징수';
+	translation['EDIT_BUTTON'] = '편집';
+	translation['CANCEL_BUTTON'] = '취소';
+	translation['TAX_TYPE'] = '세금 유형';
+	translation['EXAMPLE_PLAIN_TEXT'] = '영어 텍스트';
+	translation['EXAMPLE_TEXT_WITH_INSERTED_VALUE'] = '세율 기록({tax_code_name})';
+	translation['LABEL_BANK_INFO'] = '은행 정보';
+	translation['LABEL_PAYMENT_METHOD'] = '지급 방식';
+	translation['HELP_BANK_INFO'] = '이 거래에 사용할 수취인의 은행 정보 레코드를 선택하십시오. 이 필드는 Mexico Localization에 사용됩니다.';
+	translation['ERROR_DATE_RANGE'] = '유효 종료 날짜는 발효 날짜보다 나중이어야 합니다.';
+	translation['ERROR_GENERAL_TITLE'] = '유효성 검증 오류';
+	translation['ERROR_MISSING_MAPPING'] = '레코드 유형 {record_type} 매핑이 누락되었습니다.';
+	translation['ERROR_SUBSIDIARY_COUNTRY_MISSING'] = 'ID로 자회사 국가를 찾을 수 없음';
+	translation['ERROR_SUBSIDIARY_MISSING'] = '레코드 또는 사용자 자회사를 찾을 수 없음';
+	translation['ERROR_UNEXPECTED_SAT_ITEM_CODE_1'] = '코드가 있는 SAT 품목 코드';
+	translation['ERROR_UNEXPECTED_SAT_ITEM_CODE_2'] = '찾을 수 없음';
+	translation['ERROR_RFC_COMPANY'] = 'RFC 번호는 멕시코(XXX000000XXX)에 필요한 형식이어야 합니다. 또는 외국 개체에 일반 RFC 번호를 사용할 수 있습니다. XEXX010101000.';
+	translation['ERROR_RFC_PERSON'] = 'RFC 번호는 멕시코(XXXX000000XXX)에 필요한 형식이어야 합니다.';
+	translation['ERROR_SAT_CODE_DUPLICATED'] = '이미 다른 레코드에 사용되었기 때문에 이 코드를 입력할 수 없습니다.';
+	translation['EI_AUDIT_TRAIL_CERTIFY_SUCCESS'] = '전자 문서가 성공적으로 인증됨';
+	translation['ERROR_EI_AUDIT_TRAIL_NO_PAC'] = '활성 PAC 연결을 찾을 수 없습니다.';
+	translation['ERROR_EI_AUDIT_TRAIL_NO_PAC_RESPONSE'] = 'PAC와 연결을 시도했지만 PAC로부터 응답이 없습니다.';
+	translation['ERROR_EI_AUDIT_NO_PLUGIN_IMPLEMENTATION_FOUND'] = '유효한 플러그인 구현을 찾을 수 없기 때문에 PAC에 연결할 수 없습니다.';
+	translation['ERROR_EI_SUBSIDIARY_ALREADY_IN_USE'] = 'At least one of the selected subsidiaries is already configured on another enabled PAC. Make sure that you assign a subsidiary to one enabled PAC only.';
+	translation['ERROR_EI_ONLY_ONE_ENABLED_PAC_IS_ALLOWED'] = 'This PAC cannot be enabled because there is already an enabled PAC in your account. To enable this PAC, disable the currently enabled one and try again.';
+	translation['ERROR_UNIQUE_PAC_VIOLATE_BANNER_TITLE'] = '활성 PAC 연결이 존재합니다';
+	translation['ERROR_NO_ACCEPT_DIALOG_MSG'] = '저장하기 전에 중요 메시지를 읽고 동의해야 합니다';
+	translation['PAC_LICENSE_AGREEMENT'] = '이 애플리케이션에서 인증 서비스 공급자를 선택하면 Oracle + NetSuite가 해당 PAC 인증 서비스 공급자에게 정보를 직접 이전하도록 승인하게 됩니다. 정보 이전을 활성화하기 전에 PAC 인증 서비스 공급자와 필요한 모든 승인을 직접 받고 필요한 모든 계약을 체결했는지 확인하십시오.';
+	translation['WARNING_GENERAL_TITLE'] = '유효성 경고';
+	translation['ERROR_INVALID_OPERATION_TYPE'] = '해외 공급자를 선택할 때 작업 유형 부동산 임대를 사용하지 않아야 합니다. 선택을 계속하시겠습니까?';
+	translation['ERROR_INVALID_TAX_CODES_FOREIGN'] = '멕시코 - 해외 공급 업체는 비 수입 세금코드를 사용하지 않아야 합니다({tax_codes}).계속 저장하시겠습니까?';
+	translation['ERROR_INVALID_TAX_CODES_LOCAL'] = '멕시코 - 현지 공급 업체는 수입 세금코드를 사용하지 않아야 합니다({tax_codes}).계속 저장하시겠습니까?';
+	translation['UUID_PDF'] = 'UUID';
+	translation['RFC_PDF'] = 'RFC';
+	translation['CFDI_USAGE_PDF'] = 'CFDI 사용';
+	translation['INDUSTRY_TYPE_PDF'] = '업종';
+	translation['CSD_SERIAL_NUMBER_PDF'] = 'CSD 일련 번호';
+	translation['PAYMENT_METHOD_PDF'] = 'SAT 지급 방식';
+	translation['PAYMENT_TERMS_PDF'] = 'SAT 지급 조건';
+	translation['TAX_PDF'] = '세금';
+	translation['FACTOR_PDF'] = '인수';
+	translation['ORIGINAL_STRING_PDF'] = '원본 문자열';
+	translation['CFDI_SIGNATURE_PDF'] = 'CFDI 서명';
+	translation['SAT_SIGNATURE_PDF'] = 'SAT 서명';
+	translation['CERTIFICATION_TIMESTAMP_PDF'] = '인증 타임 스탬프';
+	translation['SAT_SERIAL_NUMBER_PDF'] = 'SAT 일련 번호';
+	translation['AMOUNT_PDF'] = '금액';
+	translation['AMOUNT_DUE_PDF'] = '정산액';
+	translation['PAID_AMOUNT_PDF'] = '지급된 금액';
+	translation['ISSUANCE_PDF'] = '발행';
+	translation['CUSTOMER_INFO_PDF'] = '고객 정보';
+	translation['RECEIVER_INFO_PDF'] = '수령인 정보';
+	translation['ISSUER_INFO_PDF'] = '발행자 정보';
+	translation['TRANSFERS_PDF'] = '이전';
+	translation['WITHHOLDING_PDF'] = '원천징수';
+	translation['TOTAL_WITHHODLING_TAXES_PDF'] = '총 원천징수세';
+	translation['TOTAL_TRANSFER_TAXES_PDF'] = '총 양도세';
+	translation['PAC_RFC_PDF'] = 'PAC RFC';
+	translation['RELATED_CFDIS_PDF'] = '관련 CFDI';
+	translation['INVOICE_PDF'] = '송장';
+	translation['SALES_ORDER_PDF'] = '판매 주문';
+	translation['SHIP_TO_PDF'] = '배송지';
+	translation['BILL_TO_PDF'] = '청구지';
+	translation['SHIP_VIA_PDF'] = '배송 방식';
+	translation['SALES_REP_PDF'] = '영업 담당자';
+	translation['PARTNER_PDF'] = '파트너';
+	translation['DUE_DATE_PDF'] = '만기일';
+	translation['TERMS_PDF'] = '조건';
+	translation['CURRENCY_PDF'] = '통화';
+	translation['QUANTITY_PDF'] = '수량';
+	translation['UNIT_PDF'] = '단위';
+	translation['ITEM_DESCRIPTION_PDF'] = '품목 설명';
+	translation['DESCRIPTION_PDF'] = '설명';
+	translation['UNIT_RATE_PDF'] = '단위 요금';
+	translation['DISCOUNT_PDF'] = '할인';
+	translation['SALES_INFO_PDF'] = '영업 정보';
+	translation['SUBTOTAL_PDF'] = '소계';
+	translation['TAX_TOTAL_PDF'] = '세금 합계';
+	translation['TOTAL_PDF'] = '합계';
+	translation['PREVIOUS_AMOUNT_PDF'] = '이전 금액';
+	translation['PARTS_PDF'] = '부품';
+	translation['BASE_PDF'] = '기준';
+	translation['RATE_PDF'] = '요금';
+	translation['SERIE_PDF'] = 'SERIE';
+	translation['FOLIO_PDF'] = 'FOLIO';
+	translation['TRANSACTION_TYPE_CASH_SALE_PDF'] = 'I - Ingreso';
+	translation['TRANSACTION_TYPE_INVOICE_PDF'] = 'I - Ingreso';
+	translation['TRANSACTION_TYPE_CREDIT_MEMO_PDF'] = 'E - Egreso';
+	translation['TRANSACTION_TYPE_PAYMENT_PDF'] = 'P - Pago';
+	translation['TRANSACTION_TYPE_ITEM_FULFILMENT_PDF'] = 'T - Traslado';
+	translation['FOOTER_PDF'] = '이 문서는 CFDI를 인쇄하여 나타낸 것입니다.';
+	translation['RECOVERABILITY_PAGE_NAME'] = 'Mexico Localization 구성 요소';
+	translation['RECOVERABILITY_FIELD_COMPONENT'] = '구성 요소 이름';
+	translation['RECOVERABILITY_FIELD_STATUS'] = '상태';
+	translation['RECOVERABILITY_FIELD_UPDATED_DATE'] = '최근 업데이트 날짜';
+	translation['RECOVERABILITY_FIELD_UPDATED_BY'] = '최근 업데이트 담당자';
+	translation['RECOVERABILITY_ACTION'] = '작업';
+	translation['RECOVERABILITY_REINSTALL'] = '다시 설치';
+	translation['RECOVERABILITY_DETAILS'] = '상세정보';
+	translation['RECOVERABILITY_CONFIRM'] = '확인';
+	translation['RECOVERABILITY_CONFIRM_REINSTALL'] = '{COMPONENTNAME}을(를) 다시 설치하시겠습니까?';
+	translation['RECOVERABILITY_INSTALLED'] = '구성 요소가 성공적으로 설치되었습니다.';
+	translation['RECOVERABILITY_REQUEST_FAILED'] = '요청이 실패했습니다';
+	translation['RECOVERABILITY_REINSTALL_REQUEST_FAILED'] = '다시 설치 요청이 실패했습니다';
+	translation['RECOVERABILITY_NOT_SUPPORTED'] = '다시 설치 요청이 실패했습니다 타깃 SuiteApp {SUITEAPPNAME}이(가) 지원되지 않습니다.';
+	translation['RECOVERABILITY_NO_SHAREDMODULE'] = '공유 모듈을 찾을 수 없습니다.';
+	translation['OPERATION_TYPE_PROFESSIONAL_SERVICES'] = '전문 서비스';
+	translation['OPERATION_TYPE_REAL_ESTATE_LEASING'] = '부동산 임대';
+	translation['OPERATION_TYPE_OTHERS'] = '기타';
+	translation['OPERATION_TYPE_DEPRECATED'] = '작업 유형(사용할 수 없게 됨)';
+
+	return translation;
+});
+

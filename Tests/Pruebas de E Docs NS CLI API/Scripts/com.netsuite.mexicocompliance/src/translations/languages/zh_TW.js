@@ -1,0 +1,124 @@
+/**
+ * Copyright (c) 2017, Oracle and/or its affiliates. All rights reserved.
+ *
+ * @NApiVersion 2.1
+ */
+
+define([], function () {
+
+	var translation = {};
+
+	translation['WITHHOLDING'] = '預扣';
+	translation['EDIT_BUTTON'] = '編輯';
+	translation['CANCEL_BUTTON'] = '取消';
+	translation['TAX_TYPE'] = '稅金類型';
+	translation['EXAMPLE_PLAIN_TEXT'] = '英文文字';
+	translation['EXAMPLE_TEXT_WITH_INSERTED_VALUE'] = '稅率歷史記錄 ({tax_code_name})';
+	translation['LABEL_BANK_INFO'] = '銀行資訊';
+	translation['LABEL_PAYMENT_METHOD'] = '付款方法';
+	translation['HELP_BANK_INFO'] = '請選取要用於這筆交易的受款人銀行資訊記錄。此欄位用於 Mexico Localization。';
+	translation['ERROR_DATE_RANGE'] = '「有效結束日期」必須晚於「有效開始日期」';
+	translation['ERROR_GENERAL_TITLE'] = '驗證錯誤';
+	translation['ERROR_MISSING_MAPPING'] = '缺少記錄類型 {record_type} 的對映。';
+	translation['ERROR_SUBSIDIARY_COUNTRY_MISSING'] = '找不到具有 ID 之子公司的國家/地區';
+	translation['ERROR_SUBSIDIARY_MISSING'] = '找不到記錄或使用者的子公司';
+	translation['ERROR_UNEXPECTED_SAT_ITEM_CODE_1'] = '具有代碼的 SAT 項目代碼';
+	translation['ERROR_UNEXPECTED_SAT_ITEM_CODE_2'] = '找不到';
+	translation['ERROR_RFC_COMPANY'] = 'RFC 號碼必須採用墨西哥所需的格式 (XXX000000XXX)。或者，您可以對外國實體使用一般 RFC 號碼：XEXX010101000。';
+	translation['ERROR_RFC_PERSON'] = 'RFC 號碼必須採用墨西哥所需的格式 (XXXX000000XXX)。';
+	translation['ERROR_SAT_CODE_DUPLICATED'] = '您無法輸入此代碼，因為此代碼已經用於另一筆記錄。';
+	translation['EI_AUDIT_TRAIL_CERTIFY_SUCCESS'] = '已成功認證電子文件';
+	translation['ERROR_EI_AUDIT_TRAIL_NO_PAC'] = '找不到現用 PAC 連線。';
+	translation['ERROR_EI_AUDIT_TRAIL_NO_PAC_RESPONSE'] = '已嘗試與 PAC 連線，但是 PAC 沒有回應';
+	translation['ERROR_EI_AUDIT_NO_PLUGIN_IMPLEMENTATION_FOUND'] = '由於找不到有效的外掛程式實行，因此無法連線到 PAC';
+	translation['ERROR_EI_SUBSIDIARY_ALREADY_IN_USE'] = 'At least one of the selected subsidiaries is already configured on another enabled PAC. Make sure that you assign a subsidiary to one enabled PAC only.';
+	translation['ERROR_EI_ONLY_ONE_ENABLED_PAC_IS_ALLOWED'] = 'This PAC cannot be enabled because there is already an enabled PAC in your account. To enable this PAC, disable the currently enabled one and try again.';
+	translation['ERROR_UNIQUE_PAC_VIOLATE_BANNER_TITLE'] = '有現用 PAC 連線';
+	translation['ERROR_NO_ACCEPT_DIALOG_MSG'] = '儲存前，您必須先閱讀並同意重要訊息。';
+	translation['PAC_LICENSE_AGREEMENT'] = '在此應用程式中選取認證服務提供者，您就會授權 Oracle 和 NetSuite 將資訊直接轉移到該 PAC 認證服務提供者。在啟用資訊轉移之前，請確定您已取得所有必要授權，並直接與 PAC 認證服務提供者執行任何必要協議。';
+	translation['WARNING_GENERAL_TITLE'] = '驗證警告';
+	translation['ERROR_INVALID_OPERATION_TYPE'] = '選取外商供貨商時，不得使用「不動產租賃」作業類型。繼續選取嗎？';
+	translation['ERROR_INVALID_TAX_CODES_FOREIGN'] = '墨西哥 - 外商供貨商不得使用非進口稅金代碼 ({tax_codes})。繼續儲存嗎？';
+	translation['ERROR_INVALID_TAX_CODES_LOCAL'] = '墨西哥 - 本地供貨商不得使用進口稅金代碼 ({tax_codes})。繼續儲存嗎？';
+	translation['UUID_PDF'] = 'UUID';
+	translation['RFC_PDF'] = 'RFC';
+	translation['CFDI_USAGE_PDF'] = 'CFDI 使用';
+	translation['INDUSTRY_TYPE_PDF'] = '產業類型';
+	translation['CSD_SERIAL_NUMBER_PDF'] = 'CSD 序號';
+	translation['PAYMENT_METHOD_PDF'] = 'SAT 付款方法';
+	translation['PAYMENT_TERMS_PDF'] = 'SAT 付款條款';
+	translation['TAX_PDF'] = '稅金';
+	translation['FACTOR_PDF'] = '要素';
+	translation['ORIGINAL_STRING_PDF'] = '原始字串';
+	translation['CFDI_SIGNATURE_PDF'] = 'CFDI 簽章';
+	translation['SAT_SIGNATURE_PDF'] = 'SAT 簽章';
+	translation['CERTIFICATION_TIMESTAMP_PDF'] = '認證時間戳記';
+	translation['SAT_SERIAL_NUMBER_PDF'] = 'SAT 序號';
+	translation['AMOUNT_PDF'] = '金額';
+	translation['AMOUNT_DUE_PDF'] = '到期需付金額';
+	translation['PAID_AMOUNT_PDF'] = '已付金額';
+	translation['ISSUANCE_PDF'] = '發放';
+	translation['CUSTOMER_INFO_PDF'] = '客戶資訊';
+	translation['RECEIVER_INFO_PDF'] = '收件人資訊';
+	translation['ISSUER_INFO_PDF'] = '發放款項機構的資訊';
+	translation['TRANSFERS_PDF'] = '轉讓';
+	translation['WITHHOLDING_PDF'] = '預扣';
+	translation['TOTAL_WITHHODLING_TAXES_PDF'] = '總預扣稅金';
+	translation['TOTAL_TRANSFER_TAXES_PDF'] = '總轉讓稅金';
+	translation['PAC_RFC_PDF'] = 'PAC RFC';
+	translation['RELATED_CFDIS_PDF'] = '相關 CFDI';
+	translation['INVOICE_PDF'] = '發票';
+	translation['SALES_ORDER_PDF'] = '業務訂單';
+	translation['SHIP_TO_PDF'] = '運送地點';
+	translation['BILL_TO_PDF'] = '帳單寄送地點';
+	translation['SHIP_VIA_PDF'] = '出貨方式';
+	translation['SALES_REP_PDF'] = '銷售代表';
+	translation['PARTNER_PDF'] = '合作夥伴';
+	translation['DUE_DATE_PDF'] = '到期日';
+	translation['TERMS_PDF'] = '條款';
+	translation['CURRENCY_PDF'] = '貨幣';
+	translation['QUANTITY_PDF'] = '數量';
+	translation['UNIT_PDF'] = '單位';
+	translation['ITEM_DESCRIPTION_PDF'] = '項目說明';
+	translation['DESCRIPTION_PDF'] = '說明';
+	translation['UNIT_RATE_PDF'] = '單位費率';
+	translation['DISCOUNT_PDF'] = '折扣';
+	translation['SALES_INFO_PDF'] = '銷售資訊';
+	translation['SUBTOTAL_PDF'] = '小計';
+	translation['TAX_TOTAL_PDF'] = '稅金總計';
+	translation['TOTAL_PDF'] = '總計';
+	translation['PREVIOUS_AMOUNT_PDF'] = '前期金額';
+	translation['PARTS_PDF'] = '零件';
+	translation['BASE_PDF'] = '基礎';
+	translation['RATE_PDF'] = '費率';
+	translation['SERIE_PDF'] = 'SERIE';
+	translation['FOLIO_PDF'] = 'FOLIO';
+	translation['TRANSACTION_TYPE_CASH_SALE_PDF'] = 'I - Ingreso';
+	translation['TRANSACTION_TYPE_INVOICE_PDF'] = 'I - Ingreso';
+	translation['TRANSACTION_TYPE_CREDIT_MEMO_PDF'] = 'E - Egreso';
+	translation['TRANSACTION_TYPE_PAYMENT_PDF'] = 'P - Pago';
+	translation['TRANSACTION_TYPE_ITEM_FULFILMENT_PDF'] = 'T - Traslado';
+	translation['FOOTER_PDF'] = '本文件是 CFDI 的列印表示法';
+	translation['RECOVERABILITY_PAGE_NAME'] = 'Mexico Localization 組件';
+	translation['RECOVERABILITY_FIELD_COMPONENT'] = '組件名稱';
+	translation['RECOVERABILITY_FIELD_STATUS'] = '狀態';
+	translation['RECOVERABILITY_FIELD_UPDATED_DATE'] = '最後更新日期';
+	translation['RECOVERABILITY_FIELD_UPDATED_BY'] = '最後更新者';
+	translation['RECOVERABILITY_ACTION'] = '動作';
+	translation['RECOVERABILITY_REINSTALL'] = '重新安裝';
+	translation['RECOVERABILITY_DETAILS'] = '詳細資料';
+	translation['RECOVERABILITY_CONFIRM'] = '確認';
+	translation['RECOVERABILITY_CONFIRM_REINSTALL'] = '確定要重新安裝 {COMPONENTNAME} 嗎？';
+	translation['RECOVERABILITY_INSTALLED'] = '已成功安裝組件。';
+	translation['RECOVERABILITY_REQUEST_FAILED'] = '要求失敗';
+	translation['RECOVERABILITY_REINSTALL_REQUEST_FAILED'] = '重新安裝要求失敗。';
+	translation['RECOVERABILITY_NOT_SUPPORTED'] = '重新安裝要求失敗。不支援目標 SuiteApp {SUITEAPPNAME}。';
+	translation['RECOVERABILITY_NO_SHAREDMODULE'] = '無法找出共用模組。';
+	translation['OPERATION_TYPE_PROFESSIONAL_SERVICES'] = '專業服務';
+	translation['OPERATION_TYPE_REAL_ESTATE_LEASING'] = '不動產租賃';
+	translation['OPERATION_TYPE_OTHERS'] = '其他';
+	translation['OPERATION_TYPE_DEPRECATED'] = '作業類型 (已淘汰)';
+
+	return translation;
+});
+

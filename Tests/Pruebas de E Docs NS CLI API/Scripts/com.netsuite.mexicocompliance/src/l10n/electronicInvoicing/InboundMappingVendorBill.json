@@ -1,0 +1,27 @@
+<#ftl ns_prefixes={"cfdi":"http://www.sat.gob.mx/cfd/3" , "tfd":"http://www.sat.gob.mx/TimbreFiscalDigital"}>
+{
+ <#assign currencyIsoNameMap = {
+    "USD":"US Dollar",
+    "MXN" : "Mexican Peso",
+    "CAD" : "Canadian Dollars",
+    "EUR" : "Euros",
+    "GBP" : "British Pound"
+  }>    
+"tranid": "${XML["cfdi:Comprobante"]["cfdi:Complemento"]["tfd:TimbreFiscalDigital"].@UUID}",
+"currency": "${currencyIsoNameMap[XML["cfdi:Comprobante"].@Moneda]}",
+"exchangerate": "${XML["cfdi:Comprobante"].@TipoCambio}",
+"custbody_mx_inbound_bill_uuid": "${XML["cfdi:Comprobante"]["cfdi:Complemento"]["tfd:TimbreFiscalDigital"].@UUID}",
+"item": [
+<#list XML["cfdi:Comprobante"]["cfdi:Conceptos"]["cfdi:Concepto"] as item>
+{
+"vendorcode": "${item.@ClaveProdServ}",
+"vendorname": "${item.@ClaveProdServ}",
+"quantity": "${item.@Cantidad}",
+"rate": "${item.@ValorUnitario}",
+"amount": "${item.@Importe}",
+"description": "${item.@Descripcion}",
+"inventorydetailreq":false
+}<#if item_has_next>,</#if>
+</#list>
+]
+}

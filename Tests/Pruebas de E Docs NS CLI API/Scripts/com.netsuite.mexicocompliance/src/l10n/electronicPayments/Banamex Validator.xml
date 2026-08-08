@@ -1,0 +1,77 @@
+<fieldValidatorList>
+
+<fieldValidator>
+	<fieldName>custrecord_2663_country_code</fieldName>
+	<validatorList>
+		<validator type="len">
+			<param name="minLength">3</param>
+			<param name="maxLength">3</param>
+		</validator>
+		<validator type='num' />
+	</validatorList>
+</fieldValidator>
+
+<fieldValidator>
+	<fieldName>custrecord_2663_acct_num</fieldName>
+	<validatorList>
+		<validator type="len">
+			<param name="minLength">11</param>
+			<param name="maxLength">11</param>
+		</validator>
+        <validator type="validChars">
+            <param name="validChars">0-9A-Za-z</param>
+        </validator>
+	</validatorList>
+</fieldValidator>
+
+<fieldValidator>
+	<fieldName>custrecord_2663_entity_bank_code</fieldName>
+	<validatorList>
+		<validator type="len">
+			<param name="minLength">3</param>
+			<param name="maxLength">3</param>
+		</validator>
+	</validatorList>
+</fieldValidator>
+
+<fieldValidator>
+	<fieldName>custrecord_2663_entity_bank_no</fieldName>
+	<validatorList>
+		<validator type="len">
+			<param name="minLength">3</param>
+			<param name="maxLength">3</param>
+		</validator>
+	</validatorList>
+</fieldValidator>
+
+<fieldValidator>
+	<fieldName>custrecord_2663_entity_acct_suffix</fieldName>
+	<validatorList>
+		<validator type="len">
+			<param name="minLength">2</param>
+			<param name="maxLength">2</param>
+		</validator>
+	</validatorList>
+</fieldValidator>
+
+<fieldValidator>
+	<fieldName>custrecord_2663_entity_swift</fieldName>
+	<validatorList>
+		<validator type="len">
+			<param name="minLength">2</param>
+			<param name="maxLength">2</param>
+		</validator>
+	</validatorList>
+</fieldValidator>
+
+<fieldValidator>
+	<fieldName>custrecord_2663_entity_acct_no</fieldName>
+	<validatorList>
+		<validator type="len">
+			<param name="minLength">11</param>
+			<param name="maxLength">11</param>
+		</validator>
+	</validatorList>
+</fieldValidator>
+
+</fieldValidatorList>

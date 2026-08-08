@@ -1,0 +1,124 @@
+/**
+ * Copyright (c) 2017, Oracle and/or its affiliates. All rights reserved.
+ *
+ * @NApiVersion 2.1
+ */
+
+define([], function () {
+
+	var translation = {};
+
+	translation['WITHHOLDING'] = 'Khấu trừ';
+	translation['EDIT_BUTTON'] = 'Chỉnh sửa';
+	translation['CANCEL_BUTTON'] = 'Hủy';
+	translation['TAX_TYPE'] = 'Loại thuế';
+	translation['EXAMPLE_PLAIN_TEXT'] = 'Văn bản tiếng Anh';
+	translation['EXAMPLE_TEXT_WITH_INSERTED_VALUE'] = 'Lịch sử thuế suất ({tax_code_name})';
+	translation['LABEL_BANK_INFO'] = 'Thông tin ngân hàng';
+	translation['LABEL_PAYMENT_METHOD'] = 'Phương thức thanh toán';
+	translation['HELP_BANK_INFO'] = 'Chọn hồ sơ thông tin ngân hàng của người nhận thanh toán để sử dụng cho giao dịch này. Trường này được dùng cho Mexico Localization.';
+	translation['ERROR_DATE_RANGE'] = 'Ngày Có hiệu lực đến phải đến sau ngày Có hiệu lực từ';
+	translation['ERROR_GENERAL_TITLE'] = 'Lỗi xác thực';
+	translation['ERROR_MISSING_MAPPING'] = 'Thiếu ánh xạ cho loại hồ sơ{record_type}.';
+	translation['ERROR_SUBSIDIARY_COUNTRY_MISSING'] = 'Không tìm thấy quốc gia nào cho công ty con có ID';
+	translation['ERROR_SUBSIDIARY_MISSING'] = 'Không tìm thấy công ty con nào cho hồ sơ hoặc người dùng';
+	translation['ERROR_UNEXPECTED_SAT_ITEM_CODE_1'] = 'Mã mặt hàng SAT với mã';
+	translation['ERROR_UNEXPECTED_SAT_ITEM_CODE_2'] = 'không tìm thấy';
+	translation['ERROR_RFC_COMPANY'] = 'Số RFC phải ở định dạng bắt buộc đối với Mexico (XXX000000XXX). Ngoài ra, bạn có thể sử dụng số RFC chung cho các thực thể nước ngoài: XEXX010101000.';
+	translation['ERROR_RFC_PERSON'] = 'Số RFC phải ở định dạng bắt buộc đối với Mexico (XXXX000000XXX).';
+	translation['ERROR_SAT_CODE_DUPLICATED'] = 'Bạn không thể nhập mã này vì nó đã được dùng trên một hồ sơ khác.';
+	translation['EI_AUDIT_TRAIL_CERTIFY_SUCCESS'] = 'Đã chứng nhận tài liệu điện tử thành công';
+	translation['ERROR_EI_AUDIT_TRAIL_NO_PAC'] = 'Không tìm thấy kết nối PAC hoạt động nào.';
+	translation['ERROR_EI_AUDIT_TRAIL_NO_PAC_RESPONSE'] = 'Đã thử kết nối với PAC, nhưng không có phản hồi nào từ PAC';
+	translation['ERROR_EI_AUDIT_NO_PLUGIN_IMPLEMENTATION_FOUND'] = 'Không thể kết nối đến PAC do không tìm thấy Triển khai trình cắm hợp lệ nào';
+	translation['ERROR_EI_SUBSIDIARY_ALREADY_IN_USE'] = 'At least one of the selected subsidiaries is already configured on another enabled PAC. Make sure that you assign a subsidiary to one enabled PAC only.';
+	translation['ERROR_EI_ONLY_ONE_ENABLED_PAC_IS_ALLOWED'] = 'This PAC cannot be enabled because there is already an enabled PAC in your account. To enable this PAC, disable the currently enabled one and try again.';
+	translation['ERROR_UNIQUE_PAC_VIOLATE_BANNER_TITLE'] = 'Đang tồn tại kết nối PAC hiện hoạt';
+	translation['ERROR_NO_ACCEPT_DIALOG_MSG'] = 'Bạn phải đọc và đồng ý với Thông điệp quan trọng trước khi lưu.';
+	translation['PAC_LICENSE_AGREEMENT'] = 'Bằng việc chọn một nhà cung cấp dịch vụ chứng nhận trong ứng dụng này, bạn sẽ ủy quyền cho Oracle + NetSuite chuyển giao thông tin trực tiếp cho nhà cung cấp dịch vụ chứng nhận PAC đó. Trước khi cho phép chuyển giao thông tin, vui lòng đảm bảo rằng bạn đã lấy được ủy quyền đầy đủ cần thiết và đã thi hành bất kỳ thỏa thuận bắt buộc trực tiếp nào với nhà cung cấp dịch vụ chứng nhận PAC.';
+	translation['WARNING_GENERAL_TITLE'] = 'Cảnh báo xác thực';
+	translation['ERROR_INVALID_OPERATION_TYPE'] = 'Không nên sử dụng loại hoạt động là Cho thuê bất động sản khi chọn nhà cung cấp nước ngoài. Tiếp tục với lựa chọn này?';
+	translation['ERROR_INVALID_TAX_CODES_FOREIGN'] = 'Mexico - Nhà cung cấp nước ngoài không nên sử dụng mã số thuế không phải nhập khẩu ({tax_codes}).Tiếp tục lưu?';
+	translation['ERROR_INVALID_TAX_CODES_LOCAL'] = 'Mexico - Nhà cung cấp địa phương không nên sử dụng mã số thuế nhập khẩu ({tax_codes}).Tiếp tục lưu?';
+    translation['UUID_PDF'] = 'UUID';
+    translation['RFC_PDF'] = 'RFC';
+	translation['CFDI_USAGE_PDF'] = 'Sử dụng CFDI';
+	translation['INDUSTRY_TYPE_PDF'] = 'LOẠI NGÀNH';
+	translation['CSD_SERIAL_NUMBER_PDF'] = 'Số sê-ri CSD';
+	translation['PAYMENT_METHOD_PDF'] = 'Phương thức thanh toán SAT';
+	translation['PAYMENT_TERMS_PDF'] = 'Thời hạn thanh toán SAT';
+	translation['TAX_PDF'] = 'Thuế';
+	translation['FACTOR_PDF'] = 'Yếu tố';
+	translation['ORIGINAL_STRING_PDF'] = 'Chuỗi gốc';
+	translation['CFDI_SIGNATURE_PDF'] = 'Chữ ký CFDI';
+	translation['SAT_SIGNATURE_PDF'] = 'Chữ ký SAT';
+	translation['CERTIFICATION_TIMESTAMP_PDF'] = 'Dấu thời gian chứng nhận';
+	translation['SAT_SERIAL_NUMBER_PDF'] = 'Số sê-ri SAT';
+	translation['AMOUNT_PDF'] = 'Số tiền';
+	translation['AMOUNT_DUE_PDF'] = 'Số tiền phải trả';
+	translation['PAID_AMOUNT_PDF'] = 'Khoản đã thanh toán';
+	translation['ISSUANCE_PDF'] = 'CẤP';
+	translation['CUSTOMER_INFO_PDF'] = 'Thông tin khách hàng';
+	translation['RECEIVER_INFO_PDF'] = 'Thông tin Người nhận';
+	translation['ISSUER_INFO_PDF'] = 'Thông tin người gửi';
+	translation['TRANSFERS_PDF'] = 'CHUYỂN GIAO';
+	translation['WITHHOLDING_PDF'] = 'KHẤU TRỪ';
+	translation['TOTAL_WITHHODLING_TAXES_PDF'] = 'Tổng thuế khấu trừ';
+	translation['TOTAL_TRANSFER_TAXES_PDF'] = 'Tổng thuế chuyển giao';
+	translation['PAC_RFC_PDF'] = 'RFC PAC';
+	translation['RELATED_CFDIS_PDF'] = 'CFDI liên quan';
+	translation['INVOICE_PDF'] = 'Hóa đơn';
+	translation['SALES_ORDER_PDF'] = 'Đơn đặt hàng';
+	translation['SHIP_TO_PDF'] = 'Vận chuyển tới';
+	translation['BILL_TO_PDF'] = 'Gửi hóa đơn đến';
+	translation['SHIP_VIA_PDF'] = 'Vận chuyển qua';
+	translation['SALES_REP_PDF'] = 'Đại diện kinh doanh';
+	translation['PARTNER_PDF'] = 'Đối tác';
+	translation['DUE_DATE_PDF'] = 'Ngày đáo hạn';
+	translation['TERMS_PDF'] = 'Các giai đoạn';
+	translation['CURRENCY_PDF'] = 'Tiền tệ';
+	translation['QUANTITY_PDF'] = 'Số lượng';
+	translation['UNIT_PDF'] = 'Đơn vị';
+	translation['ITEM_DESCRIPTION_PDF'] = 'Mô tả mặt hàng';
+	translation['DESCRIPTION_PDF'] = 'Mô tả';
+	translation['UNIT_RATE_PDF'] = 'Hối suất đơn vị';
+	translation['DISCOUNT_PDF'] = 'Chiết khấu';
+	translation['SALES_INFO_PDF'] = 'Thông tin doanh thu';
+	translation['SUBTOTAL_PDF'] = 'Tổng phụ';
+	translation['TAX_TOTAL_PDF'] = 'Tổng thuế';
+	translation['TOTAL_PDF'] = 'Tổng';
+	translation['PREVIOUS_AMOUNT_PDF'] = 'Số tiền trước đó';
+	translation['PARTS_PDF'] = 'Các phần';
+	translation['BASE_PDF'] = 'Cơ sở';
+	translation['RATE_PDF'] = 'Tỷ lệ';
+	translation['SERIE_PDF'] = 'SERIE';
+	translation['FOLIO_PDF'] = 'FOLIO';
+	translation['TRANSACTION_TYPE_CASH_SALE_PDF'] = 'I - Ingreso';
+	translation['TRANSACTION_TYPE_INVOICE_PDF'] = 'I - Ingreso';
+	translation['TRANSACTION_TYPE_CREDIT_MEMO_PDF'] = 'E - Egreso';
+	translation['TRANSACTION_TYPE_PAYMENT_PDF'] = 'P - Pago';
+	translation['TRANSACTION_TYPE_ITEM_FULFILMENT_PDF'] = 'T - Traslado';
+	translation['FOOTER_PDF'] = 'Tài liệu này là bản in đại diện của một CFDI';
+	translation['RECOVERABILITY_PAGE_NAME'] = 'Mexico Localization Thành phần';
+	translation['RECOVERABILITY_FIELD_COMPONENT'] = 'Tên thành phần';
+	translation['RECOVERABILITY_FIELD_STATUS'] = 'Trạng thái';
+	translation['RECOVERABILITY_FIELD_UPDATED_DATE'] = 'Ngày cập nhật lần cuối';
+	translation['RECOVERABILITY_FIELD_UPDATED_BY'] = 'Người cập nhật lần cuối';
+	translation['RECOVERABILITY_ACTION'] = 'Hành động';
+	translation['RECOVERABILITY_REINSTALL'] = 'Cài đặt lại';
+	translation['RECOVERABILITY_DETAILS'] = 'Chi tiết';
+	translation['RECOVERABILITY_CONFIRM'] = 'Xác nhận';
+	translation['RECOVERABILITY_CONFIRM_REINSTALL'] = 'Bạn có chắc muốn cài đặt lại {COMPONENTNAME}?';
+	translation['RECOVERABILITY_INSTALLED'] = 'Đã cài đặt thành phần thành công.';
+	translation['RECOVERABILITY_REQUEST_FAILED'] = 'Yêu cầu không thành công';
+	translation['RECOVERABILITY_REINSTALL_REQUEST_FAILED'] = 'Yêu cầu cài đặt lại không thành công.';
+	translation['RECOVERABILITY_NOT_SUPPORTED'] = 'Yêu cầu cài đặt lại không thành công. SuiteApp mục tiêu {SUITEAPPNAME} không được hỗ trợ.';
+	translation['RECOVERABILITY_NO_SHAREDMODULE'] = 'Không thể định vị mô-đun được chia sẻ.';
+	translation['OPERATION_TYPE_PROFESSIONAL_SERVICES'] = 'Dịch vụ chuyên nghiệp';
+	translation['OPERATION_TYPE_REAL_ESTATE_LEASING'] = 'Cho thuê bất động sản';
+	translation['OPERATION_TYPE_OTHERS'] = 'Khác';
+	translation['OPERATION_TYPE_DEPRECATED'] = 'Loại hoạt động (Không được chấp nhận)';
+
+	return translation;
+});
+

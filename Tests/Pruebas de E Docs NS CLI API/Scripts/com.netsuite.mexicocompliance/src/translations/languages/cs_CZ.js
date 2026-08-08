@@ -1,0 +1,125 @@
+/**
+ * Copyright (c) 2017, Oracle and/or its affiliates. All rights reserved.
+ *
+ * @NApiVersion 2.1
+ */
+
+define([], function () {
+
+	var translation = {};
+
+	translation['WITHHOLDING'] = 'Srážky';
+	translation['EDIT_BUTTON'] = 'Upravit';
+	translation['CANCEL_BUTTON'] = 'Zrušit';
+	translation['TAX_TYPE'] = 'Typ daně';
+	translation['EXAMPLE_PLAIN_TEXT'] = 'Anglický text';
+	translation['EXAMPLE_TEXT_WITH_INSERTED_VALUE'] = 'Historie sazeb daně ({tax_code_name})';
+	translation['LABEL_BANK_INFO'] = 'Bankovní údaje';
+	translation['LABEL_PAYMENT_METHOD'] = 'Způsob platby';
+	translation['HELP_BANK_INFO'] = 'Vyberte záznam bankovních údajů příjemce platby, který bude použit pro tuto transakci. Toto pole se používá pro Mexico Localization.';
+	translation['ERROR_DATE_RANGE'] = 'Datum Platí do musí následovat po datu Platné od.';
+	translation['ERROR_GENERAL_TITLE'] = 'Chyba ověření';
+	translation['ERROR_MISSING_MAPPING'] = 'Mapování pro typ záznamu {record_type} chybí.';
+	translation['ERROR_SUBSIDIARY_COUNTRY_MISSING'] = 'Nenalezena země pro pobočku s ID';
+	translation['ERROR_SUBSIDIARY_MISSING'] = 'Nenalezena pobočka pro záznam nebo uživatele';
+	translation['ERROR_UNEXPECTED_SAT_ITEM_CODE_1'] = 'Kód položky SAT s kódem';
+	translation['ERROR_UNEXPECTED_SAT_ITEM_CODE_2'] = 'nebyl zalezen';
+	translation['ERROR_RFC_COMPANY'] = 'Číslo RFC musí být ve formátu požadovaném pro Mexiko (XXX000000XXX). U zahraničních subjektů můžete alternativně použít obecné číslo RFC: XEXX010101000.';
+	translation['ERROR_RFC_PERSON'] = 'Číslo RFC musí být ve formátu požadovaném pro Mexiko (XXX000000XXX).';
+	translation['ERROR_SAT_CODE_DUPLICATED'] = 'Tento kód nelze zadat, protože již byl použit pro jiný záznam.';
+	translation['EI_AUDIT_TRAIL_CERTIFY_SUCCESS'] = 'Elektronický dokument byl úspěšně certifikován';
+	translation['ERROR_EI_AUDIT_TRAIL_NO_PAC'] = 'Nebylo nalezeno žádné aktivní připojení k poskytovateli PAC.';
+	translation['ERROR_EI_AUDIT_TRAIL_NO_PAC_RESPONSE'] = 'Proběhl pokus o spojení s poskytovatelem PAC, ale od poskytovatele nebyla obdržena žádná odpověď.';
+	translation['ERROR_EI_AUDIT_NO_PLUGIN_IMPLEMENTATION_FOUND'] = 'S poskytovatelem PAC se nelze spojit, protože nebyla nalezena platná implementace modulu plug-in.';
+	translation['ERROR_EI_SUBSIDIARY_ALREADY_IN_USE'] = 'At least one of the selected subsidiaries is already configured on another enabled PAC. Make sure that you assign a subsidiary to one enabled PAC only.';
+	translation['ERROR_EI_ONLY_ONE_ENABLED_PAC_IS_ALLOWED'] = 'This PAC cannot be enabled because there is already an enabled PAC in your account. To enable this PAC, disable the currently enabled one and try again.';
+	translation['ERROR_UNIQUE_PAC_VIOLATE_BANNER_TITLE'] = 'Existuje aktivní připojení k poskytovateli PAC';
+	translation['ERROR_NO_ACCEPT_DIALOG_MSG'] = 'Před uložením je nutné si přečíst důležité sdělení a souhlasit s ním.';
+	translation['PAC_LICENSE_AGREEMENT'] = 'Výběrem poskytovatele certifikačních služeb v této aplikaci opravňujete společnosti Oracle a NetSuite k přenosu informací přímo danému poskytovateli certifikačních služeb poskytovatele PAC. Před povolením přenosu informací ověřte, zda máte všechna potřebná povolení a zda jste s poskytovatelem certifikačních služeb poskytovatele PAC uzavřeli všechny povinné smlouvy.';
+	translation['WARNING_GENERAL_TITLE'] = 'Varování k ověření';
+	translation['ERROR_INVALID_OPERATION_TYPE'] = 'Pokud vyberete zahraničního dodavatele, neměl by být použit typ operace Pronájem nemovitostí. Chcete pokračovat s vybranou položkou?';
+	translation['ERROR_INVALID_TAX_CODES_FOREIGN'] = 'Mexiko – zahraniční dodavatel by neměl používat daňový kód bez dovozu ({tax_codes}).Pokračovat v ukládání?';
+	translation['ERROR_INVALID_TAX_CODES_LOCAL'] = 'Možnost Mexiko – místní dodavatel by neměla používat daňový kód s dovozem ({tax_codes}).Pokračovat v ukládání?';
+	translation['UUID_PDF'] = 'UUID';
+	translation['RFC_PDF'] = 'RFC';
+	translation['CFDI_USAGE_PDF'] = 'Použití CFDI';
+	translation['INDUSTRY_TYPE_PDF'] = 'TYP ODVĚTVÍ';
+	translation['CSD_SERIAL_NUMBER_PDF'] = 'Sériové číslo CSD';
+	translation['PAYMENT_METHOD_PDF'] = 'Způsob platby SAT';
+	translation['PAYMENT_TERMS_PDF'] = 'Platební podmínka SAT';
+	translation['TAX_PDF'] = 'Daň';
+	translation['FACTOR_PDF'] = 'Koeficient';
+	translation['ORIGINAL_STRING_PDF'] = 'Původní řetězec';
+	translation['CFDI_SIGNATURE_PDF'] = 'Podpis CFDI';
+	translation['SAT_SIGNATURE_PDF'] = 'Podpis úřadu SAT';
+	translation['CERTIFICATION_TIMESTAMP_PDF'] = 'Časová známka certifikace';
+	translation['SAT_SERIAL_NUMBER_PDF'] = 'Sériové číslo SAT';
+	translation['AMOUNT_PDF'] = 'Částka';
+	translation['AMOUNT_DUE_PDF'] = 'Splatná částka';
+	translation['PAID_AMOUNT_PDF'] = 'Uhrazená částka';
+	translation['ISSUANCE_PDF'] = 'VYSTAVENÍ';
+	translation['CUSTOMER_INFO_PDF'] = 'Informace o zákazníkovi';
+	translation['RECEIVER_INFO_PDF'] = 'Informace o příjemci';
+	translation['ISSUER_INFO_PDF'] = 'Informace o vydavateli';
+	translation['TRANSFERS_PDF'] = 'PŘEVODY';
+	translation['WITHHOLDING_PDF'] = 'SRÁŽKY';
+	translation['TOTAL_WITHHODLING_TAXES_PDF'] = 'Srážkové daně celkem';
+	translation['TOTAL_TRANSFER_TAXES_PDF'] = 'Daně z převodu celkem';
+	translation['PAC_RFC_PDF'] = 'RFC poskytovatele PAC';
+	translation['RELATED_CFDIS_PDF'] = 'Související doklady CFDI';
+	translation['INVOICE_PDF'] = 'Faktura';
+	translation['SALES_ORDER_PDF'] = 'Prodejní objednávka';
+	translation['SHIP_TO_PDF'] = 'Místo dodání';
+	translation['BILL_TO_PDF'] = 'Příjemce faktury';
+	translation['SHIP_VIA_PDF'] = 'Odeslat pomocí';
+	translation['SALES_REP_PDF'] = 'Obchodní zástupce';
+	translation['PARTNER_PDF'] = 'Partner';
+	translation['DUE_DATE_PDF'] = 'Datum splatnosti';
+	translation['TERMS_PDF'] = 'Podmínky';
+	translation['CURRENCY_PDF'] = 'Měna';
+	translation['QUANTITY_PDF'] = 'Množství';
+	translation['UNIT_PDF'] = 'Jednotky';
+	translation['ITEM_DESCRIPTION_PDF'] = 'Popis položky';
+	translation['DESCRIPTION_PDF'] = 'Popis';
+	translation['UNIT_RATE_PDF'] = 'Jednotková sazba';
+	translation['DISCOUNT_PDF'] = 'Sleva';
+	translation['SALES_INFO_PDF'] = 'Informace o prodeji';
+	translation['SUBTOTAL_PDF'] = 'Mezisoučet';
+	translation['TAX_TOTAL_PDF'] = 'Daň celkem';
+	translation['TOTAL_PDF'] = 'Celkem';
+	translation['PREVIOUS_AMOUNT_PDF'] = 'Předchozí částka';
+	translation['PARTS_PDF'] = 'Části';
+	translation['BASE_PDF'] = 'Základ';
+	translation['RATE_PDF'] = 'Sazba';
+	translation['FOLIO_PDF'] = 'Svazek';
+	translation['SERIE_PDF'] = 'SERIE';
+	translation['FOLIO_PDF'] = 'FOLIO';
+	translation['TRANSACTION_TYPE_CASH_SALE_PDF'] = 'I - Ingreso';
+	translation['TRANSACTION_TYPE_INVOICE_PDF'] = 'I - Ingreso';
+	translation['TRANSACTION_TYPE_CREDIT_MEMO_PDF'] = 'E - Egreso';
+	translation['TRANSACTION_TYPE_PAYMENT_PDF'] = 'P - Pago';
+	translation['TRANSACTION_TYPE_ITEM_FULFILMENT_PDF'] = 'T - Traslado';
+	translation['FOOTER_PDF'] = 'Tento dokument představuje vytištěné podání dokladu CFDI';
+	translation['RECOVERABILITY_PAGE_NAME'] = 'Mexico Localization – komponenty';
+	translation['RECOVERABILITY_FIELD_COMPONENT'] = 'Název komponenty';
+	translation['RECOVERABILITY_FIELD_STATUS'] = 'Stav';
+	translation['RECOVERABILITY_FIELD_UPDATED_DATE'] = 'Datum poslední aktualizace';
+	translation['RECOVERABILITY_FIELD_UPDATED_BY'] = 'Poslední aktualizaci provedl(a)';
+	translation['RECOVERABILITY_ACTION'] = 'Akce';
+	translation['RECOVERABILITY_REINSTALL'] = 'Přeinstalovat';
+	translation['RECOVERABILITY_DETAILS'] = 'Detaily';
+	translation['RECOVERABILITY_CONFIRM'] = 'Potvrdit';
+	translation['RECOVERABILITY_CONFIRM_REINSTALL'] = 'Opravdu chcete přeinstalovat {COMPONENTNAME}?';
+	translation['RECOVERABILITY_INSTALLED'] = 'Komponenta byla úspěšně nainstalována.';
+	translation['RECOVERABILITY_REQUEST_FAILED'] = 'Požadavek se nezdařil';
+	translation['RECOVERABILITY_REINSTALL_REQUEST_FAILED'] = 'Požadavek na přeinstalaci se nezdařil.';
+	translation['RECOVERABILITY_NOT_SUPPORTED'] = 'Požadavek na přeinstalaci se nezdařil. Cílová aplikace SuiteApp {SUITEAPPNAME} není podporována.';
+	translation['RECOVERABILITY_NO_SHAREDMODULE'] = 'Sdílený modul nelze vyhledat.';
+	translation['OPERATION_TYPE_PROFESSIONAL_SERVICES'] = 'Profesionální služby';
+	translation['OPERATION_TYPE_REAL_ESTATE_LEASING'] = 'Pronájem nemovitostí';
+	translation['OPERATION_TYPE_OTHERS'] = 'Jiné';
+	translation['OPERATION_TYPE_DEPRECATED'] = 'Typ operace (zastaralé)';
+
+	return translation;
+});
+

@@ -1,0 +1,7 @@
+<refFields type='Banamex Mexico'>
+  <refField id='custrecord_2663_entity_bank_code' label='Transaction Code' mandatory='true' /> 
+  <refField id='custrecord_2663_entity_bank_no' label='Third Party Bank Number' mandatory='true' /> 
+  <refField id='custrecord_2663_entity_acct_suffix' label='Account Type CR' mandatory='true' /> 
+  <refField id='custrecord_2663_entity_swift' label='Third Party Credit Date' mandatory='true' />
+  <refField id='custrecord_2663_entity_acct_no' label='Third Party Account Number' mandatory='true' />
+</refFields>

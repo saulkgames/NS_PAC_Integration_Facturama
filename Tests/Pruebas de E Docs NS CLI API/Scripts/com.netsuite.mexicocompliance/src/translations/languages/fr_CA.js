@@ -1,0 +1,124 @@
+/**
+ * Copyright (c) 2017, Oracle and/or its affiliates. All rights reserved.
+ *
+ * @NApiVersion 2.1
+ */
+
+define([], function () {
+
+	var translation = {};
+
+	translation['WITHHOLDING'] = 'Retenues';
+	translation['EDIT_BUTTON'] = 'Modifier';
+	translation['CANCEL_BUTTON'] = 'Annuler';
+	translation['TAX_TYPE'] = 'Type d’impôt';
+	translation['EXAMPLE_PLAIN_TEXT'] = 'Texte en anglais';
+	translation['EXAMPLE_TEXT_WITH_INSERTED_VALUE'] = 'Historique des taux d’imposition ({tax_code_name})';
+	translation['LABEL_BANK_INFO'] = 'Informations bancaires';
+	translation['LABEL_PAYMENT_METHOD'] = 'Mode de paiement';
+	translation['HELP_BANK_INFO'] = 'Sélectionnez le dossier d’informations bancaires du bénéficiaire à utiliser pour cette transaction. Ce champ est utilisé pour Mexico Localization.';
+	translation['ERROR_DATE_RANGE'] = 'La date du champ Valide jusqu’au doit être ultérieure à la date du champ Entrée en vigueur le.';
+	translation['ERROR_GENERAL_TITLE'] = 'Erreur de validation';
+	translation['ERROR_MISSING_MAPPING'] = 'Le mappage du type de dossier {record_type} est manquant.';
+	translation['ERROR_SUBSIDIARY_COUNTRY_MISSING'] = 'Aucun pays trouvé pour la filiale avec l’ID';
+	translation['ERROR_SUBSIDIARY_MISSING'] = 'Aucune filiale trouvée pour le dossier ou l’utilisateur';
+	translation['ERROR_UNEXPECTED_SAT_ITEM_CODE_1'] = 'Code d’article SAT avec le code';
+	translation['ERROR_UNEXPECTED_SAT_ITEM_CODE_2'] = 'introuvable';
+	translation['ERROR_RFC_COMPANY'] = 'Le numéro RFC doit être au format requis pour le Mexique (XXX000000XXX). Vous pouvez également utiliser le numéro RFC générique pour les entités étrangères : XEXX010101000.';
+	translation['ERROR_RFC_PERSON'] = 'Le numéro RFC doit être au format requis pour le Mexique (XXXX000000XXX).';
+	translation['ERROR_SAT_CODE_DUPLICATED'] = 'Vous ne pouvez pas entrer ce code, car il a déjà été utilisé sur un autre dossier.';
+	translation['EI_AUDIT_TRAIL_CERTIFY_SUCCESS'] = 'Document électronique certifié avec succès';
+	translation['ERROR_EI_AUDIT_TRAIL_NO_PAC'] = 'Aucune connexion PAC active trouvée.';
+	translation['ERROR_EI_AUDIT_TRAIL_NO_PAC_RESPONSE'] = 'Tentative de connexion au PAC, mais aucune réponse du PAC.';
+	translation['ERROR_EI_AUDIT_NO_PLUGIN_IMPLEMENTATION_FOUND'] = 'Impossible de se connecter au PAC, car aucune implémentation de plug-in valide n’a été trouvée.';
+	translation['ERROR_UNIQUE_PAC_VIOLATE_BANNER_TITLE'] = 'Il existe une connexion PAC active.';
+	translation['ERROR_EI_SUBSIDIARY_ALREADY_IN_USE'] = 'At least one of the selected subsidiaries is already configured on another enabled PAC. Make sure that you assign a subsidiary to one enabled PAC only.';
+	translation['ERROR_EI_ONLY_ONE_ENABLED_PAC_IS_ALLOWED'] = 'This PAC cannot be enabled because there is already an enabled PAC in your account. To enable this PAC, disable the currently enabled one and try again.';
+	translation['ERROR_NO_ACCEPT_DIALOG_MSG'] = 'Vous devez lire et accepter le message Important avant d’enregistrer.';
+	translation['PAC_LICENSE_AGREEMENT'] = 'En sélectionnant un fournisseur de services de certification dans cette application, vous autorisez Oracle + NetSuite à transférer des informations directement à ce fournisseur de services de certification PAC. Avant d’autoriser le transfert d’informations, veuillez vérifier que vous avez obtenu toutes les autorisations nécessaires et signé tous les accords requis directement avec le fournisseur de services de certification PAC.';
+	translation['WARNING_GENERAL_TITLE'] = 'Avertissement concernant la validation';
+	translation['ERROR_INVALID_OPERATION_TYPE'] = 'Le type d’opération Crédit-bail immobilier ne doit pas être utilisé lors de la sélection d’un fournisseur étranger. Poursuivre avec cette sélection ?';
+	translation['ERROR_INVALID_TAX_CODES_FOREIGN'] = 'Mexique - Le fournisseur étranger ne doit pas utiliser un code fiscal de non-importation ({tax_codes}).Continuer à enregistrer ?';
+	translation['ERROR_INVALID_TAX_CODES_LOCAL'] = 'Mexique - Le fournisseur local ne doit pas utiliser un code fiscal d’importation ({tax_codes}).Continuer à enregistrer ?';
+	translation['UUID_PDF'] = 'UUID';
+	translation['RFC_PDF'] = 'RFC';
+	translation['CFDI_USAGE_PDF'] = 'Utilisation du CFDI';
+	translation['INDUSTRY_TYPE_PDF'] = 'TYPE DE SECTEUR';
+	translation['CSD_SERIAL_NUMBER_PDF'] = 'Numéro de série CSD';
+	translation['PAYMENT_METHOD_PDF'] = 'Mode de paiement SAT';
+	translation['PAYMENT_TERMS_PDF'] = 'Modalité de paiement SAT';
+	translation['TAX_PDF'] = 'Taxes';
+	translation['FACTOR_PDF'] = 'Facteur';
+	translation['ORIGINAL_STRING_PDF'] = 'Chaîne initiale';
+	translation['CFDI_SIGNATURE_PDF'] = 'Signature du CFDI';
+	translation['SAT_SIGNATURE_PDF'] = 'Signature du SAT';
+	translation['CERTIFICATION_TIMESTAMP_PDF'] = 'Horodatage de la certification';
+	translation['SAT_SERIAL_NUMBER_PDF'] = 'Numéro de série SAT';
+	translation['AMOUNT_PDF'] = 'Montant';
+	translation['AMOUNT_DUE_PDF'] = 'Montant dû';
+	translation['PAID_AMOUNT_PDF'] = 'Montant payé';
+	translation['ISSUANCE_PDF'] = 'DÉLIVRANCE';
+	translation['CUSTOMER_INFO_PDF'] = 'Informations du client';
+	translation['RECEIVER_INFO_PDF'] = 'Information sur le destinataire';
+	translation['ISSUER_INFO_PDF'] = 'Informations de l’émetteur';
+	translation['TRANSFERS_PDF'] = 'TRANSFERTS';
+	translation['WITHHOLDING_PDF'] = 'RETENUES';
+	translation['TOTAL_WITHHODLING_TAXES_PDF'] = 'Total des retenues d’impôt';
+	translation['TOTAL_TRANSFER_TAXES_PDF'] = 'Total des taxes de transfert';
+	translation['PAC_RFC_PDF'] = 'RFC du PAC';
+	translation['RELATED_CFDIS_PDF'] = 'CFDI associés';
+	translation['INVOICE_PDF'] = 'Facture';
+	translation['SALES_ORDER_PDF'] = 'Commande client';
+	translation['SHIP_TO_PDF'] = 'Adresse de livraison';
+	translation['BILL_TO_PDF'] = 'Adresse de facturation';
+	translation['SHIP_VIA_PDF'] = 'Expédition via';
+	translation['SALES_REP_PDF'] = 'Responsable commercial';
+	translation['PARTNER_PDF'] = 'Partenaire';
+	translation['DUE_DATE_PDF'] = 'Date d’échéance';
+	translation['TERMS_PDF'] = 'Modalités';
+	translation['CURRENCY_PDF'] = 'Devise';
+	translation['QUANTITY_PDF'] = 'Quantité';
+	translation['UNIT_PDF'] = 'Unités';
+	translation['ITEM_DESCRIPTION_PDF'] = 'Description d’article';
+	translation['DESCRIPTION_PDF'] = 'Description';
+	translation['UNIT_RATE_PDF'] = 'Taux unitaire';
+	translation['DISCOUNT_PDF'] = 'Remise';
+	translation['SALES_INFO_PDF'] = 'Informations sur les ventes';
+	translation['SUBTOTAL_PDF'] = 'Sous-total';
+	translation['TAX_TOTAL_PDF'] = 'Total des impôts';
+	translation['TOTAL_PDF'] = 'Total';
+	translation['PREVIOUS_AMOUNT_PDF'] = 'Montant précédent';
+	translation['PARTS_PDF'] = 'Pièces';
+	translation['BASE_PDF'] = 'Base';
+	translation['RATE_PDF'] = 'Taux';
+	translation['SERIE_PDF'] = 'SERIE';
+	translation['FOLIO_PDF'] = 'FOLIO';
+	translation['TRANSACTION_TYPE_CASH_SALE_PDF'] = 'I - Ingreso';
+	translation['TRANSACTION_TYPE_INVOICE_PDF'] = 'I - Ingreso';
+	translation['TRANSACTION_TYPE_CREDIT_MEMO_PDF'] = 'E - Egreso';
+	translation['TRANSACTION_TYPE_PAYMENT_PDF'] = 'P - Pago';
+	translation['TRANSACTION_TYPE_ITEM_FULFILMENT_PDF'] = 'T - Traslado';
+	translation['FOOTER_PDF'] = 'Ce document est une représentation imprimée d’un CFDI';
+	translation['RECOVERABILITY_PAGE_NAME'] = 'Mexico Localization Composants';
+	translation['RECOVERABILITY_FIELD_COMPONENT'] = 'Nom du composant';
+	translation['RECOVERABILITY_FIELD_STATUS'] = 'Statut';
+	translation['RECOVERABILITY_FIELD_UPDATED_DATE'] = 'Date de dernière mise à jour';
+	translation['RECOVERABILITY_FIELD_UPDATED_BY'] = 'Dernière mise à jour par';
+	translation['RECOVERABILITY_ACTION'] = 'Action';
+	translation['RECOVERABILITY_REINSTALL'] = 'Réinstaller';
+	translation['RECOVERABILITY_DETAILS'] = 'Détails';
+	translation['RECOVERABILITY_CONFIRM'] = 'Confirmer';
+	translation['RECOVERABILITY_CONFIRM_REINSTALL'] = 'Êtes-vous sûr de vouloir réinstaller {COMPONENTNAME} ?';
+	translation['RECOVERABILITY_INSTALLED'] = 'Composant installé avec succès.';
+	translation['RECOVERABILITY_REQUEST_FAILED'] = 'Échec de la demande';
+	translation['RECOVERABILITY_REINSTALL_REQUEST_FAILED'] = 'La demande de réinstallation a échoué.';
+	translation['RECOVERABILITY_NOT_SUPPORTED'] = 'La demande de réinstallation a échoué. La SuiteApp {SUITEAPPNAME} cible n’est pas prise en charge.';
+	translation['RECOVERABILITY_NO_SHAREDMODULE'] = 'Impossible de trouver le module partagé.';
+	translation['OPERATION_TYPE_PROFESSIONAL_SERVICES'] = 'Services professionnels';
+	translation['OPERATION_TYPE_REAL_ESTATE_LEASING'] = 'Crédit-bail immobilier';
+	translation['OPERATION_TYPE_OTHERS'] = 'Autres';
+	translation['OPERATION_TYPE_DEPRECATED'] = 'Type d’opération (obsolète)';
+
+	return translation;
+});
+

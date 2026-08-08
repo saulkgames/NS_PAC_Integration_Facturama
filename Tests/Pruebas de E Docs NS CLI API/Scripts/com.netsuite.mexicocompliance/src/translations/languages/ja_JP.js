@@ -1,0 +1,124 @@
+/**
+ * Copyright (c) 2017, Oracle and/or its affiliates. All rights reserved.
+ *
+ * @NApiVersion 2.1
+ */
+
+define([], function () {
+
+	var translation = {};
+
+	translation['WITHHOLDING'] = '源泉徴収';
+	translation['EDIT_BUTTON'] = '編集';
+	translation['CANCEL_BUTTON'] = 'キャンセル';
+	translation['TAX_TYPE'] = '税金の種類';
+	translation['EXAMPLE_PLAIN_TEXT'] = '英語テキスト';
+	translation['EXAMPLE_TEXT_WITH_INSERTED_VALUE'] = '税率の履歴（{tax_code_name}）';
+	translation['LABEL_BANK_INFO'] = '銀行情報';
+	translation['LABEL_PAYMENT_METHOD'] = '支払方法';
+	translation['HELP_BANK_INFO'] = 'このトランザクションに使用する受取人の銀行情報レコードを選択します。このフィールドはMexico Localizationに使用されます。';
+	translation['ERROR_DATE_RANGE'] = '有効期限日は、適用開始日より後にする必要があります';
+	translation['ERROR_GENERAL_TITLE'] = '検証エラー';
+	translation['ERROR_MISSING_MAPPING'] = 'レコードタイプ{record_type}のマッピングがありません。';
+	translation['ERROR_SUBSIDIARY_COUNTRY_MISSING'] = 'IDを持つ連結子会社の国が見つかりません';
+	translation['ERROR_SUBSIDIARY_MISSING'] = 'レコードもしくはユーザーの連結子会社が見つかりません';
+	translation['ERROR_UNEXPECTED_SAT_ITEM_CODE_1'] = 'コードを持つSATアイテムコード';
+	translation['ERROR_UNEXPECTED_SAT_ITEM_CODE_2'] = '見つかりません';
+	translation['ERROR_RFC_COMPANY'] = 'RFC番号はメキシコ用として要求されるフォーマット（XXX000000XXX）である必要があります 。または、外国のエンティティ用に次の一般的なRFC番号を使用することができます。XEXX010101000。';
+	translation['ERROR_RFC_PERSON'] = 'RFC番号はメキシコ用として要求されるフォーマット（XXXX000000XXX）である必要があります 。';
+	translation['ERROR_SAT_CODE_DUPLICATED'] = 'このコードは別のレコードで既に使用されているため、入力できません。';
+	translation['EI_AUDIT_TRAIL_CERTIFY_SUCCESS'] = '電子ドキュメントが正常に証明されました';
+	translation['ERROR_EI_AUDIT_TRAIL_NO_PAC'] = '有効なPAC接続が見つかりません';
+	translation['ERROR_EI_AUDIT_TRAIL_NO_PAC_RESPONSE'] = 'PACに接続しようとしましたが、PACから応答がありませんでした';
+	translation['ERROR_EI_AUDIT_NO_PLUGIN_IMPLEMENTATION_FOUND'] = '実装された有効なプラグインが見つからないため、PACに接続できません';
+	translation['ERROR_EI_SUBSIDIARY_ALREADY_IN_USE'] = 'At least one of the selected subsidiaries is already configured on another enabled PAC. Make sure that you assign a subsidiary to one enabled PAC only.';
+	translation['ERROR_EI_ONLY_ONE_ENABLED_PAC_IS_ALLOWED'] = 'This PAC cannot be enabled because there is already an enabled PAC in your account. To enable this PAC, disable the currently enabled one and try again.';
+	translation['ERROR_UNIQUE_PAC_VIOLATE_BANNER_TITLE'] = '有効なPAC接続が存在します';
+	translation['ERROR_NO_ACCEPT_DIALOG_MSG'] = '保存する前に「重要」メッセージを読み、同意する必要があります。';
+	translation['PAC_LICENSE_AGREEMENT'] = 'このアプリケーションで証明サービスプロバイダーを選択することにより、そのPAC証明サービスプロバイダーに情報を直接伝達することをOracleとNetSuiteに認めることとなります。情報の伝達を可能にする前に、すべての必要な承認を得て、必須となるあらゆる合意をPAC認定サービスプロバイダーと直接取り交わしていることを確認してください。';
+	translation['WARNING_GENERAL_TITLE'] = '検証の警告';
+	translation['ERROR_INVALID_OPERATION_TYPE'] = '外国の仕入先を選択する場合は、オペレーションの種類で「不動産賃貸」を使用しないでください。選択を継続しますか？';
+	translation['ERROR_INVALID_TAX_CODES_FOREIGN'] = 'メキシコ - 外国の仕入先には、非輸入税金コード（{tax_codes}）を使用しないでください。保存を続けますか？';
+	translation['ERROR_INVALID_TAX_CODES_LOCAL'] = 'メキシコ - 現地の仕入先には、輸入税金コード（{tax_codes}）を使用しないでください。保存を続けますか？';
+    translation['UUID_PDF'] = 'UUID';
+    translation['RFC_PDF'] = 'RFC';
+	translation['CFDI_USAGE_PDF'] = 'CFDI用途';
+	translation['INDUSTRY_TYPE_PDF'] = '業種';
+	translation['CSD_SERIAL_NUMBER_PDF'] = 'CSDシリアル番号';
+	translation['PAYMENT_METHOD_PDF'] = 'SAT支払方法';
+	translation['PAYMENT_TERMS_PDF'] = 'SAT支払条件';
+	translation['TAX_PDF'] = '税金';
+	translation['FACTOR_PDF'] = '要素';
+	translation['ORIGINAL_STRING_PDF'] = '元の文字列';
+	translation['CFDI_SIGNATURE_PDF'] = 'CFDI署名';
+	translation['SAT_SIGNATURE_PDF'] = 'SAT署名';
+	translation['CERTIFICATION_TIMESTAMP_PDF'] = '証明タイムスタンプ';
+	translation['SAT_SERIAL_NUMBER_PDF'] = 'SATシリアル番号';
+	translation['AMOUNT_PDF'] = '金額';
+	translation['AMOUNT_DUE_PDF'] = '請求金額';
+	translation['PAID_AMOUNT_PDF'] = '支払額';
+	translation['ISSUANCE_PDF'] = '発行';
+	translation['CUSTOMER_INFO_PDF'] = '顧客情報';
+	translation['RECEIVER_INFO_PDF'] = '受取人情報';
+	translation['ISSUER_INFO_PDF'] = '発行者情報';
+	translation['TRANSFERS_PDF'] = '振替';
+	translation['WITHHOLDING_PDF'] = '源泉徴収';
+	translation['TOTAL_WITHHODLING_TAXES_PDF'] = '合計源泉徴収税';
+	translation['TOTAL_TRANSFER_TAXES_PDF'] = '合計譲渡税';
+	translation['PAC_RFC_PDF'] = 'PAC RFC';
+	translation['RELATED_CFDIS_PDF'] = '関連CFDI';
+	translation['INVOICE_PDF'] = '請求書';
+	translation['SALES_ORDER_PDF'] = '注文書';
+	translation['SHIP_TO_PDF'] = '配送先';
+	translation['BILL_TO_PDF'] = '請求先';
+	translation['SHIP_VIA_PDF'] = '出荷方法';
+	translation['SALES_REP_PDF'] = '営業担当者';
+	translation['PARTNER_PDF'] = 'パートナー';
+	translation['DUE_DATE_PDF'] = '期日';
+	translation['TERMS_PDF'] = '支払条件';
+	translation['CURRENCY_PDF'] = '通貨';
+	translation['QUANTITY_PDF'] = '数量';
+	translation['UNIT_PDF'] = '単位';
+	translation['ITEM_DESCRIPTION_PDF'] = 'アイテム説明';
+	translation['DESCRIPTION_PDF'] = '説明';
+	translation['UNIT_RATE_PDF'] = '単位レート';
+	translation['DISCOUNT_PDF'] = 'ディスカウント';
+	translation['SALES_INFO_PDF'] = '販売情報';
+	translation['SUBTOTAL_PDF'] = '小計';
+	translation['TAX_TOTAL_PDF'] = '税金の合計';
+	translation['TOTAL_PDF'] = '合計';
+	translation['PREVIOUS_AMOUNT_PDF'] = '以前の金額';
+	translation['PARTS_PDF'] = '部品';
+	translation['BASE_PDF'] = 'ベース';
+	translation['RATE_PDF'] = 'レート';
+	translation['SERIE_PDF'] = 'SERIE';
+	translation['FOLIO_PDF'] = 'FOLIO';
+	translation['TRANSACTION_TYPE_CASH_SALE_PDF'] = 'I - Ingreso';
+	translation['TRANSACTION_TYPE_INVOICE_PDF'] = 'I - Ingreso';
+	translation['TRANSACTION_TYPE_CREDIT_MEMO_PDF'] = 'E - Egreso';
+	translation['TRANSACTION_TYPE_PAYMENT_PDF'] = 'P - Pago';
+	translation['TRANSACTION_TYPE_ITEM_FULFILMENT_PDF'] = 'T - Traslado';
+	translation['FOOTER_PDF'] = 'このドキュメントはCFDIの内容を印刷したものです';
+	translation['RECOVERABILITY_PAGE_NAME'] = 'Mexico Localization コンポーネント';
+	translation['RECOVERABILITY_FIELD_COMPONENT'] = 'コンポーネント名';
+	translation['RECOVERABILITY_FIELD_STATUS'] = 'ステータス';
+	translation['RECOVERABILITY_FIELD_UPDATED_DATE'] = '最終更新日';
+	translation['RECOVERABILITY_FIELD_UPDATED_BY'] = '最終更新者';
+	translation['RECOVERABILITY_ACTION'] = 'アクション';
+	translation['RECOVERABILITY_REINSTALL'] = '再インストール';
+	translation['RECOVERABILITY_DETAILS'] = '詳細';
+	translation['RECOVERABILITY_CONFIRM'] = '確認';
+	translation['RECOVERABILITY_CONFIRM_REINSTALL'] = '{COMPONENTNAME}を再インストールしますか？';
+	translation['RECOVERABILITY_INSTALLED'] = 'コンポーネントが正常にインストールされました。';
+	translation['RECOVERABILITY_REQUEST_FAILED'] = 'リクエストは失敗しました';
+	translation['RECOVERABILITY_REINSTALL_REQUEST_FAILED'] = '再インストールのリクエストは失敗しました。';
+	translation['RECOVERABILITY_NOT_SUPPORTED'] = '再インストールのリクエストは失敗しました。目的のSuiteApp{SUITEAPPNAME}は、サポートされていません。';
+	translation['RECOVERABILITY_NO_SHAREDMODULE'] = '共有モジュールが見つかりません。';
+	translation['OPERATION_TYPE_PROFESSIONAL_SERVICES'] = 'プロフェッショナルサービス';
+	translation['OPERATION_TYPE_REAL_ESTATE_LEASING'] = '不動産賃貸';
+	translation['OPERATION_TYPE_OTHERS'] = 'その他';
+	translation['OPERATION_TYPE_DEPRECATED'] = 'オペレーションの種類（廃止）';
+
+	return translation;
+});
+

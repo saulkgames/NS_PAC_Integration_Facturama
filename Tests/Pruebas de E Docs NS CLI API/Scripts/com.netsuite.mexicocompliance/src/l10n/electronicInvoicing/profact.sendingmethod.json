@@ -1,0 +1,11 @@
+{
+    "name":"ProFact Sending Method",
+    "edocDescription": "This e-document package includes the e-document templates and sending methods that let you integrate with ProFact for your transactions in Mexico.",
+    "edocPackage":"ProFact E-Document Package",    
+    "eDocPluginImpl": "customscript_pi_mx_pac_certify",
+    "sendingChannel": "SOAP",
+    "transactionType":["5","7","9","10","32"],
+    "isForCertification": false,
+    "isInactive": true,
+    "subsidiary" :[]
+}
