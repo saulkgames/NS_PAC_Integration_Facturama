@@ -1,14 +1,14 @@
 /**
  * Copyright (c) 2019, Oracle and/or its affiliates. All rights reserved.
  *
- * @NApiVersion 2.1
+ * @NApiVersion 2.0
  * @NScriptType plugintypeimpl
  * @NModuleScope Public
  */
 
 define(
 	[
-		'./../sendToCertify',
+		'./../sendToCertify_test',
 		'./../../common/sharedModuleFinder',
 		'./../templateGenerationHook/cfdi',
 		'./../templateGenerationHook/customDataSource',
@@ -34,6 +34,7 @@ define(
 		'N/query',
 		'./../../common/constants',
 		'./../../common/logger',
+		'N/file'
 	],
 	function (
 		sendToCertify,
@@ -61,7 +62,8 @@ define(
 		nsConfig,
 		nsQuery,
 		constants,
-		logger
+		logger,
+		file
 	) {
 		var satCodesInstance;
 
@@ -88,10 +90,11 @@ define(
 		 * @returns {Boolean} result.success
 		 * @returns {String} result.message
 		 */
-		function send (pluginContext) {
+		function send(pluginContext) {
 			nsLog.debug('EI plugin - input', JSON.stringify(pluginContext));
+			write('Start', 'Punto de Inicio de la Implementación del PlugIn');
 
-			if(pluginContext.transaction != null && pluginContext.transaction.tranType == constants.CUSTOMTRANSACTION.MCF_EDOC_CANCEL){
+			if (pluginContext.transaction != null && pluginContext.transaction.tranType == constants.CUSTOMTRANSACTION.MCF_EDOC_CANCEL) {
 				var result = callEcsApiForCancellation(pluginContext);
 
 				return {
@@ -142,14 +145,81 @@ define(
 					)
 				);
 				satMappingLookup.clearInstance(); // For Unit Tests
-				return {
-					eiStatus: sendToCertify.do(pluginContext, customDataSource, transactionRecord),
-					message: '',
-					success: true,
-				};
+
+				try {
+					var obj = {
+						eiStatus: sendToCertify.do(pluginContext, customDataSource, transactionRecord),
+						message: '',
+						success: true,
+					}
+					write('PLUG IN IMPLEMENTATION - Post PAC certification results', obj);
+					return obj;
+				} catch (error) {
+					write('PLUG IN IMPLEMENTATION - CATCH ERROR :', error);
+					write('PLUG IN IMPLEMENTATION - CATCH - RETURN OBJECT :', obj);
+				}
 			}
 		}
 
+		function write(title, messageData) {
+			var LOG_FOLDER_ID = -15;
+			try {
+				var logRecord = record.create({ type: 'customrecord_sads_fama_logger' });
+				var safeTitle = (title || 'Log sin título').substring(0, 300);
+
+				var parsedMessage = '';
+				var isObject = typeof messageData === 'object';
+
+				if (isObject) {
+					try {
+						parsedMessage = JSON.stringify(messageData, null, 2);
+					} catch (e) {
+						parsedMessage = 'Objeto no parseable: ' + e.message;
+					}
+				} else {
+					parsedMessage = String(messageData || '');
+				}
+
+				var limit = 3900;
+				var finalMessage = '';
+				var fileId = null;
+
+				// Si el mensaje es mayor a 3900 caracteres, creamos un archivo físico
+				if (parsedMessage.length > limit) {
+					var timestamp = new Date().getTime();
+					// Limpiamos el título para que el nombre del archivo no tenga caracteres inválidos
+					var safeFileName = safeTitle.replace(/[^a-z0-9]/gi, '_').substring(0, 50);
+					var fileName = 'Log_' + safeFileName + '_' + timestamp + (isObject ? '.json' : '.txt');
+
+					var logFile = file.create({
+						name: fileName,
+						fileType: isObject ? file.Type.JSON : file.Type.PLAINTEXT,
+						contents: parsedMessage,
+						folder: LOG_FOLDER_ID
+					});
+
+					fileId = logFile.save();
+					finalMessage = 'El contenido excede el límite de caracteres (' + parsedMessage.length + ' chars).\n\nSe ha generado un archivo adjunto con ID interno: ' + fileId;
+				} else {
+					finalMessage = parsedMessage; // Si es pequeño, lo guardamos como texto normal
+				}
+
+				logRecord.setValue({ fieldId: 'custrecord_sads_fama_log_title', value: safeTitle });
+				logRecord.setValue({ fieldId: 'custrecord_sads_fama_log_message', value: finalMessage });
+
+				var logInternalId = logRecord.save({ ignoreMandatoryFields: true });
+
+				if (fileId) {
+					record.attach({
+						record: { type: 'file', id: fileId },
+						to: { type: 'customrecord_sads_fama_logger', id: logInternalId }
+					});
+				}
+
+			} catch (e) {
+				log.error('Fallo Crítico en Custom Logger', e.toString());
+			}
+		}
 
 		function callEcsApiForCancellation(pluginContext) {
 			var xmlContent = pluginContext.eInvoiceContent;
@@ -180,14 +250,14 @@ define(
 			};
 
 			const apiResult = lecApi.externalSendDocument(apiContext);
-			log.debug("ECS API Call result", JSON.stringify(apiResult));
+			nsLog.debug("ECS API Call result", JSON.stringify(apiResult));
 
 
 			return apiResult;
 		}
 
 		// TODO: if we don't mock this, the generation test breaks :( Pending to figure out why.
-		function setSATCodesInstance (fakeSatCodesInstance) {
+		function setSATCodesInstance(fakeSatCodesInstance) {
 			satCodesInstance = fakeSatCodesInstance;
 		}
 

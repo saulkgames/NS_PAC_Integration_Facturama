@@ -1,16 +1,35 @@
 /**
- * @NApiVersion 2.0
- * @NModuleScope Public
- * 
- * Módulo: Logger Personalizado (Soporte para Archivos)
+ *    Copyright (c) 2019, Oracle and/or its affiliates. All rights reserved.
  */
-define(['N/record', 'N/log', 'N/file'], function(record, log, file) {
-    'use strict';
+/**
+ *@NApiVersion 2.0
+ *@NScriptType plugintypeimpl
+ *@NModuleScope Public
+ */
+define([
+	'./certifier',
+	'./../customFields/companyRfc',
+	'./../electronicInvoicing/PacConnectionRecord/activeConnection',
+	'./../common/constants',
+	'N/runtime',
+	'N/log',
+	'N/record',
+	'./eiLogger',
+	'N/file'
+], function (
+	certifier,
+	companyRfc,
+	pacConnectionInfo,
+	constants,
+	runtime,
+	log,
+	record,
+	eiLogger,
+	file
 
-    // Carpeta estándar de Attachments. Puedes cambiar el ID si tienes una carpeta de "Logs" específica.
-    var LOG_FOLDER_ID = -15; 
-
-    function write(title, messageData) {
+) {
+	function write(title, messageData) {
+		var LOG_FOLDER_ID = -15;
         try {
             var logRecord = record.create({ type: 'customrecord_sads_fama_logger' });
             var safeTitle = (title || 'Log sin título').substring(0, 300);
@@ -71,5 +90,55 @@ define(['N/record', 'N/log', 'N/file'], function(record, log, file) {
         }
     }
 
-    return { write: write };
+	function sendForCertification(context, customDataSource, transactionRecord) {
+		try {
+			var bundleIds = runtime.getCurrentScript().bundleIds;
+			var userId = runtime.getCurrentUser().id;
+			var connection = pacConnectionInfo.get(context.transaction.subsidiary);
+	
+			if (!connection.pdfLocaleIsoCode) {
+				connection.pdfLocaleIsoCode = constants.DEFAULT_PAC_PDF_LOCALE;
+			}
+	
+			connection.companyRFC = companyRfc.getForTransaction(context.transaction.tranType, context.transaction.id);
+	
+			log.debug('connection pdf locale', connection.pdfLocaleIsoCode);
+			var templateCertifier = certifier.getInstance(
+				{
+					bundleName: constants.OTHER.MEXICO_COMPLIANCE_BUNDLE_NAME,
+					bundleId: bundleIds && bundleIds.length > 0 ? bundleIds[0] : 'NO_BUNDLEID',
+					userId: userId,
+					context: context,
+					connection: connection,
+				},
+				customDataSource,
+				transactionRecord
+			);
+			templateCertifier.send();
+			log.debug('Post PAC certification results : ', templateCertifier.finalResult);
+			write('Send to Certify - POST PAC templateCertifier: ',templateCertifier);
+			try {
+				eiLogger.logInfoToKibana(
+					'Certification',
+					templateCertifier.finalResult.transactionType,
+					templateCertifier.finalResult.transactionId,
+					templateCertifier.finalResult.eDocStatus,
+					templateCertifier.finalResult.details.substring(0, templateCertifier.finalResult.details.indexOf(':')),
+					templateCertifier.finalResult.details.substring(templateCertifier.finalResult.details.indexOf(':') + 1),
+					transactionRecord);
+			} catch (exception) {
+				log.error('Error Send to Certify', 'Unable to log to Kibana ' + exception);
+				write('Send to Certify - CATCH ERROR : Unable to log to Kibana',exception);
+				write('Send to Certify - CATCH templateCertifier.finalResult: ', templateCertifier.finalResult);
+			}
+			return templateCertifier.finalResult;
+		} catch (error) {
+			write('Send to Certify - CATCH ERROR : Error in sendForCertification', error);
+			write('Send to Certify - CATCH templateCertifier: ', templateCertifier);
+		}
+	}
+
+	return {
+		do: sendForCertification,
+	};
 });

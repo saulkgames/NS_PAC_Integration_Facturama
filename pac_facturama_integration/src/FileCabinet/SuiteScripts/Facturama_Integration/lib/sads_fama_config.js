@@ -15,8 +15,15 @@ define(['N/search', 'N/encode'], function(search, encode) {
                 ['custrecord_sads_fama_sub', 'anyof', subsidiaryId]
             ],
             columns: [
-                'custrecord_sads_fama_user', 'custrecord_sads_fama_pass', 
-                'custrecord_sads_fama_url_api', 'custrecord_sads_fama_url_api_getxml'
+                'custrecord_sads_fama_user', 
+                'custrecord_sads_fama_pass', 
+                'custrecord_sads_fama_url_api', 
+                'custrecord_sads_fama_url_api_getxml',
+                'custrecord_sads_fama_tmpl_inv',
+                'custrecord_sads_fama_tmpl_cs',
+                'custrecord_sads_fama_tmpl_cm',
+                'custrecord_sads_fama_tmpl_if',
+                'custrecord_sads_fama_tmpl_cp'
             ]
         });
         
@@ -25,11 +32,20 @@ define(['N/search', 'N/encode'], function(search, encode) {
             throw new Error('No se encontró configuración de Facturama para subsidiaria: ' + subsidiaryId);
         }
 
+        // Devolvemos el diccionario de plantillas emulando la arquitectura de Oracle.
+        // Las llaves deben ser exactas al ID de transacción interno de NetSuite.
         return {
             user: results[0].getValue('custrecord_sads_fama_user'),
             pass: results[0].getValue('custrecord_sads_fama_pass'),
             apiPostUrl: results[0].getValue('custrecord_sads_fama_url_api'),
-            apiGetUrl: results[0].getValue('custrecord_sads_fama_url_api_getxml')
+            apiGetUrl: results[0].getValue('custrecord_sads_fama_url_api_getxml'),
+            templates: {
+                'invoice': results[0].getValue('custrecord_sads_fama_tmpl_inv'),
+                'cashsale': results[0].getValue('custrecord_sads_fama_tmpl_cs'),
+                'creditmemo': results[0].getValue('custrecord_sads_fama_tmpl_cm'),
+                'itemfulfillment': results[0].getValue('custrecord_sads_fama_tmpl_if'),
+                'customerpayment': results[0].getValue('custrecord_sads_fama_tmpl_cp')
+            }
         };
     }
 
@@ -45,8 +61,5 @@ define(['N/search', 'N/encode'], function(search, encode) {
         };
     }
 
-    return { 
-        get: get, 
-        getAuthHeaders: getAuthHeaders 
-    };
+    return { get: get, getAuthHeaders: getAuthHeaders };
 });

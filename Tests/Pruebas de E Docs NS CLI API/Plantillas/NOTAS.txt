@@ -49,3 +49,59 @@ Falta Crear Solucion para El envio de Documento electronico (email)
 PRUEBAS DE VENTA DE CONTADO TIMBRADA:
     Seguramente encontrare alguna timbrara  con anticipo de clientes.
     Revisar: Como queda el timbre Actualmente solo se imprime el QR.
+
+
+RESULTADO DE PRUEBAS IMPRIMIENDO LOS LOGS NATIVOS DE LA SOLUCION DE MYSUITE (11/08/2026):
+    Muestra del objeto que el plug in implementation envia al plug in type:
+    {
+        "eiStatus":
+            {"transactionId":"2052075",
+            "transactionType":"cashsale",
+            "entity":"13096",
+            "eDocStatus":"21",
+            "eventType":"21",
+            "details":"SAT - 
+                PAC - 3087:El objeto solicitado no se encuentra en la base de datos.
+                StoredAccount: MX PFP810520JX0
+                
+                Descripción: El objeto solicitado no se encuentra en la base de datos.
+                
+                Sugerencia: 
+                
+                Evento: 2026-08-11 13:16:28 TEST-BACK03 CONVERT_NATIVE_XML 3087 STORED_OBJECT_NOT_FOUND PFP810520JX0 ASP 6649 b7f8a049-f5b4-4c91-96fa-7af56b0b3704",
+                "owner":9672,
+                "isUpdateFields":true,
+                "extraFieldsForUpdate":{
+                    "custbody_mx_cfdi_issue_datetime":"11/08/2026 1:16:27 pm"
+                },
+                "bundleId":"436209",
+                "bundleName":"Mexico Compliance"
+            },
+        "message":"",
+        "success":true
+    }
+
+    Muestra del objeto templateCertifier.finalResult extraido de la response del PAC, el cual se envia al plugIn implementation para agregarle mas elementos:
+    {
+        "transactionId":"2052075",
+        "transactionType":"cashsale",
+        "entity":"13096",
+        "eDocStatus":"21",
+        "eventType":"21",
+        "details":"SAT - 
+        PAC - 3087:El objeto solicitado no se encuentra en la base de datos.
+        StoredAccount: MX PFP810520JX0
+        
+        Descripción: El objeto solicitado no se encuentra en la base de datos.
+        
+        Sugerencia:
+        
+        Evento: 2026-08-11 13:16:28 TEST-BACK03 CONVERT_NATIVE_XML 3087 STORED_OBJECT_NOT_FOUND PFP810520JX0 ASP 6649 b7f8a049-f5b4-4c91-96fa-7af56b0b3704",
+        "owner":9672,
+        "isUpdateFields":true,
+        "extraFieldsForUpdate":{
+            "custbody_mx_cfdi_issue_datetime":"11/08/2026 1:16:27 pm"
+        },
+        "bundleId":"436209",
+        "bundleName":"Mexico Compliance"
+    }

@@ -8,40 +8,20 @@
 define([
     'N/search',
     'N/record',
+    'N/https',
     './lib/sads_fama_logger',
     './lib/sads_fama_config',
     './lib/sads_fama_api',
     './lib/sads_fama_files',
-    './lib/sads_fama_cfdi'
-], function (search, record, logger, configModule, apiModule, filesModule, cfdiModule) {
+    './lib/sads_fama_cfdi',
+    './lib/sads_fama_response_handler'
+], function (search, record, https, logger, configModule, apiModule, filesModule, cfdiModule, responseHandler) {
     'use strict';
 
-    /**
-     * Escribe directamente en el Historial de Auditoría Nativo de NetSuite
-     */
-    function writeNativeAuditTrail(txnId, customerId, userId, message, isError) {
-        try {
-            var auditRec = record.create({ type: 'customrecord_psg_ei_audit_trail' });
-            auditRec.setValue({ fieldId: 'custrecord_psg_ei_audit_transaction', value: txnId });
-            if (customerId) {
-                auditRec.setValue({ fieldId: 'custrecord_psg_ei_audit_entity', value: customerId });
-            }
-            // Tipo de Evento: 3 = Certificación de salida
-            auditRec.setValue({ fieldId: 'custrecord_psg_ei_audit_event', value: '3' });
-            auditRec.setValue({ fieldId: 'custrecord_psg_ei_audit_owner', value: userId });
-            auditRec.setValue({ fieldId: 'custrecord_psg_ei_audit_details', value: (isError ? '[ERROR] ' : '[ÉXITO] ') + message });
-            auditRec.save({ ignoreMandatoryFields: true });
-        } catch (e) {
-            logger.write('Error al crear Audit Trail Nativo', e.message);
-        }
-    }
-
     function send(plugInContext) {
-        logger.write('1. INICIO', 'Plug-in invocado para transacción ID: ' + (plugInContext.transaction ? plugInContext.transaction.id : 'N/A'));
         var txnId = plugInContext.transaction ? plugInContext.transaction.id : '';
-        var customerId = plugInContext.customer ? plugInContext.customer.id : '';
-        var userId = plugInContext.userId;
-
+        logger.write('1. INICIO', 'Plug-in invocado para transacción ID: ' + txnId);
+        
         try {
             var txnType = plugInContext.transaction.tranType || plugInContext.transaction.type;
             var rawPayload = plugInContext.eInvoiceContent;
@@ -54,79 +34,72 @@ define([
                 id: txnId,
                 columns: ['subsidiary', 'tranid']
             });
-            var subsidiaryId = txnLookup.subsidiary[0].value;
-            var tranIdText = txnLookup.tranid;
 
-            var configData = configModule.get(subsidiaryId);
+            var configData = configModule.get(txnLookup.subsidiary[0].value);
             var headers = configModule.getAuthHeaders(configData.user, configData.pass);
 
-            // POST Timbrado
-            var facturamaData = apiModule.postTimbrado(configData.apiPostUrl, headers, rawPayload);
+            var postResp = https.post({ url: configData.apiPostUrl, headers: headers, body: rawPayload });
+            var parsedBody = apiModule.safeParse(postResp.body);
+            
+            var statusAnalysis = responseHandler.analyzeResponse(postResp.code, parsedBody);
+
+            if (!statusAnalysis.success) {
+                logger.write('Fallo en PAC', statusAnalysis.details);
+                return _buildFrameworkReturn(plugInContext, statusAnalysis.eDocStatus, statusAnalysis.details, false, {});
+            }
+
+            var facturamaData = parsedBody;
             var cfdiId = facturamaData.Id;
             var uuid = facturamaData.Complement ? facturamaData.Complement.TaxStamp.Uuid : 'UUID_N/A';
 
-            // GET XML
             var xmlData = apiModule.getXml(configData.apiGetUrl, headers, cfdiId);
-
-            // Guardar Archivo Físico
             var xmlContent = xmlData.Content || 'XML_VACIO';
-            var xmlFileId = filesModule.saveXml('CFDI_' + tranIdText + '_' + uuid + '.xml', xmlContent);
-            logger.write('5. ARCHIVO GUARDADO', 'Internal ID: ' + xmlFileId);
-
-            // Obtenemos el objeto con todos los campos fiscales
-            var extraFields = cfdiModule.getFieldsToUpdate(originalPayload, facturamaData, xmlFileId, cfdiId, xmlContent);
+            var xmlFileId = filesModule.saveXml('CFDI_' + txnLookup.tranid + '_' + uuid + '.xml', xmlContent);
             
-            var successMessage = 'PAC - CFDI Timbrado exitosamente con Facturama (UUID: ' + uuid + ')';
+            var extraFields = cfdiModule.buildExtraFields(originalPayload, facturamaData, xmlFileId, cfdiId, xmlContent);
 
-            // 1. Forzamos la creación del Log en la tabla de Auditoría Nativa
-            writeNativeAuditTrail(txnId, customerId, userId, successMessage, false);
+            var txnRecordFull = record.load({ type: txnType, id: txnId });
+            var customerRecordFull = plugInContext.customer ? record.load({ type: 'customer', id: plugInContext.customer.id }) : null;
+            
+            var pdfTemplateId = configData.templates[txnType];
+            if (!pdfTemplateId) {
+                throw new Error('No hay plantilla PDF configurada para el tipo de transacción: ' + txnType);
+            }
+            
+            var pdfFileId = filesModule.generateCertifiedPdf(txnRecordFull, customerRecordFull, pdfTemplateId, extraFields, txnLookup.tranid + '_' + uuid + '.pdf');
+            
+            extraFields['custbody_edoc_generated_pdf'] = pdfFileId;
 
-            // 2. Retornamos el objeto para que NetSuite guarde los campos y regenere el PDF
-            var finalResult = {
-                transactionId: txnId,
-                transactionType: txnType,
-                entity: customerId || undefined,
-                eDocStatus: '1', // 1 = Para generación (Permite que se auto-genere el PDF)
-                eventType: '1',
-                details: successMessage,
-                owner: userId,
-                isUpdateFields: true, 
-                extraFieldsForUpdate: extraFields, 
-                bundleId: '',
-                bundleName: 'SADS Facturama Integration'
-            };
+            logger.write('FIN EXITOSO', 'Delegando guardado y bitácora al Framework Core.');
 
-            logger.write('6. FIN EXITOSO', 'Enviando finalResult al Framework Core.');
-
-            return {
-                success: true,
-                message: successMessage,
-                eiStatus: finalResult 
-            };
+            return _buildFrameworkReturn(plugInContext, statusAnalysis.eDocStatus, statusAnalysis.details, true, extraFields);
 
         } catch (ex) {
-            logger.write('ERROR CRÍTICO', ex.message + '\n' + (ex.stack || ''));
-            
-            // Forzamos el Log de Error en la tabla de Auditoría Nativa
-            writeNativeAuditTrail(txnId, customerId, userId, ex.message, true);
-
-            var errorResult = {
-                transactionId: txnId,
-                transactionType: plugInContext.transaction ? (plugInContext.transaction.tranType || plugInContext.transaction.type) : '',
-                eDocStatus: '4', // 4 = Error
-                eventType: '4',
-                details: 'Fallo al timbrar con Facturama: ' + ex.message,
-                owner: userId,
-                isUpdateFields: false,
-                extraFieldsForUpdate: {}
-            };
-
-            return {
-                success: false,
-                message: 'Excepción: ' + ex.message,
-                eiStatus: errorResult
-            };
+            logger.write('ERROR CRÍTICO', ex.message);
+            return _buildFrameworkReturn(plugInContext, '4', 'Excepción interna: ' + ex.message, false, {});
         }
+    }
+
+    function _buildFrameworkReturn(plugInContext, eDocStatus, detailsMsg, isSuccess, extraFields) {
+        var finalResult = {
+            transactionId: plugInContext.transaction ? plugInContext.transaction.id : '',
+            transactionType: plugInContext.transaction ? (plugInContext.transaction.tranType || plugInContext.transaction.type) : '',
+            entity: plugInContext.customer ? plugInContext.customer.id : undefined,
+            eDocStatus: eDocStatus,
+            eventType: eDocStatus, 
+            details: detailsMsg,
+            owner: plugInContext.userId,
+            isUpdateFields: isSuccess, 
+            extraFieldsForUpdate: extraFields,
+            bundleId: '436209',
+            bundleName: 'Mexico Compliance'
+        };
+
+        return {
+            success: isSuccess,
+            message: "", 
+            eiStatus: finalResult 
+        };
     }
 
     function getStatus(scriptContext) { return { success: true, message: 'Procesamiento síncrono.' }; }
