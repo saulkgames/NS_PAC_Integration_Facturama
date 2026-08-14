@@ -2,7 +2,7 @@
  * @NApiVersion 2.0
  * @NModuleScope Public
  * 
- * Módulo: Response Handler (Mapeo Oficial de Errores Facturama)
+ * Módulo: Response Handler (Mapeo Oficial y Resiliente)
  */
 define([], function() {
     'use strict';
@@ -14,13 +14,23 @@ define([], function() {
             details: ''
         };
 
-        if (httpCode === 200 || httpCode === 201) {
+        // 1. EVALUACIÓN RESILIENTE: Si hay UUID, es un éxito sin importar el código HTTP.
+        // Esto nos blinda contra el 208 Already Reported o futuros códigos no documentados.
+        var hasValidUUID = responseBody && 
+                           responseBody.Complement && 
+                           responseBody.Complement.TaxStamp && 
+                           responseBody.Complement.TaxStamp.Uuid;
+
+        if (httpCode === 200 || httpCode === 201 || httpCode === 208 || hasValidUUID) {
             statusObj.success = true;
             statusObj.eDocStatus = '3'; // 3 = Certificado
-            statusObj.details = 'Documento electrónico correctamente certificado';
+            statusObj.details = httpCode === 208 
+                ? 'Documento recuperado exitosamente del PAC (208 Already Reported)'
+                : 'Documento electrónico correctamente certificado';
             return statusObj;
         }
 
+        // 2. EVALUACIÓN DE ERRORES CONOCIDOS
         var errorDetail = _extractFacturamaError(responseBody);
 
         switch (httpCode) {
@@ -30,7 +40,7 @@ define([], function() {
                 break;
             case 401:
                 statusObj.eDocStatus = '4'; 
-                statusObj.details = 'PAC - 401 Unauthorized: Credenciales incorrectas. ' + errorDetail;
+                statusObj.details = 'PAC - 401 Unauthorized: Credenciales incorrectas o caducadas. ' + errorDetail;
                 break;
             case 403:
                 statusObj.eDocStatus = '4';
@@ -42,7 +52,7 @@ define([], function() {
                 break;
             case 500:
                 statusObj.eDocStatus = '4';
-                statusObj.details = 'PAC - 500 Internal Server Error: Error en Facturama. ' + errorDetail;
+                statusObj.details = 'PAC - 500 Internal Server Error: Error interno en Facturama. ' + errorDetail;
                 break;
             case 503:
                 statusObj.eDocStatus = '4';
