@@ -23,6 +23,7 @@ define([
         logger.write('1. INICIO', 'Plug-in invocado para transacción ID: ' + txnId);
 
         try {
+            var objReturn = {};
             var txnType = plugInContext.transaction.tranType || plugInContext.transaction.type;
             var rawPayload = plugInContext.eInvoiceContent;
 
@@ -37,7 +38,7 @@ define([
 
             var configData = configModule.get(txnLookup.subsidiary[0].value);
             var headers = configModule.getAuthHeaders(configData.user, configData.pass);
-
+            // Envio de Payload al PAC (Facturama)
             var postResp = https.post({ url: configData.apiPostUrl, headers: headers, body: rawPayload });
             var parsedBody = apiModule.safeParse(postResp.body);
 
@@ -45,7 +46,8 @@ define([
 
             if (!statusAnalysis.success) {
                 logger.write('Fallo en PAC', statusAnalysis.details);
-                return _buildFrameworkReturn(plugInContext, statusAnalysis.eDocStatus, statusAnalysis.details, false, {});
+                objReturn = _buildFrameworkReturn(plugInContext, statusAnalysis.eDocStatus, statusAnalysis.details, false, {});
+                return objReturn;
             }
 
             var facturamaData = parsedBody;
@@ -70,12 +72,12 @@ define([
 
             extraFields['custbody_edoc_generated_pdf'] = pdfFileId;
 
-            var objReturn = _buildFrameworkReturn(plugInContext, statusAnalysis.eDocStatus, statusAnalysis.details, true, extraFields);
+            objReturn = _buildFrameworkReturn(plugInContext, statusAnalysis.eDocStatus, statusAnalysis.details, true, extraFields);
             logger.write('FIN EXITOSO', objReturn);
             return objReturn;
 
         } catch (ex) {
-            var objReturn = {
+            objReturn = {
                 name: ex.name || 'Error desconocido',
                 message: ex.message || 'No se proporcionó mensaje de error.',
                 stack: ex.stack || 'No hay stack trace disponible.',
