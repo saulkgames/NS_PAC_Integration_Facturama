@@ -4,7 +4,7 @@
  * 
  * Módulo: Constructor de Campos Fiscales
  */
-define(['N/encode', 'N/xml', './sads_fama_logger'], function(encode, xml, logger) {
+define(['N/encode', 'N/xml', './sads_fama_logger'], function (encode, xml, logger) {
     'use strict';
 
     // ==========================================
@@ -28,25 +28,37 @@ define(['N/encode', 'N/xml', './sads_fama_logger'], function(encode, xml, logger
     // ==========================================
     // 2. API PÚBLICA (Hexagonal Architecture: Puertos)
     // ==========================================
+    /**
+     * Funcion principal del modulo CFDI. Construye un objeto que sera enviado al plugIn Type para concluir con el proceso de actualizacion de campos 
+     *  que corresponden al CFDI timbrado.
+     * @param {Object} originalPayload - PlugInContext || Transaccion Record Data
+     * @param {Object} facturamaData - PAC Response Body Parsed
+     * @param {Number} xmlFileId - El id interno del archivo XML guardado en el File Cabinet
+     * @param {Number} cfdiId - El id interno de la transacción en el servidor del PAC
+     * @param {String} xmlContent - El contenido del archivo XML en Base64 (opcional, solo si se requiere extraer el NoCertificado)
+     * @returns {object} - Un objeto con los campos fiscales listos para actualizar en la transacción
+     * 
+     * Nota: Se implementa un control de retorno seguro. Si ocurre un error en la construcción de los campos, se loguea el error y se devuelve lo que se haya podido mapear.
+     */
     function buildExtraFields(originalPayload, facturamaData, xmlFileId, cfdiId, xmlContent) {
-        logger.write('Iniciando construccion de campos extra', { cfdiId: cfdiId });
-        
+        logger.write('Funcion buildExtraFields en ejecucion', { cfdiId: cfdiId });
+
         // Inicializamos fields desde el principio. Si algo falla a la mitad, 
         // devolveremos lo que hayamos logrado construir (Cumpliendo tu requerimiento de retorno)
         var fields = {};
-        
+
         try {
             fields[FIELDS.EDOC_CERTIFIED] = xmlFileId;
 
             // Validación defensiva anidada (ES5 no tiene Optional Chaining ?.)
             if (facturamaData && facturamaData.Complement && facturamaData.Complement.TaxStamp) {
                 var taxStamp = facturamaData.Complement.TaxStamp;
-                
+
                 fields[FIELDS.UUID] = taxStamp.Uuid;
-                fields[FIELDS.CERTIFY_TIMESTAMP] = taxStamp.Date; 
+                fields[FIELDS.CERTIFY_TIMESTAMP] = taxStamp.Date;
                 fields[FIELDS.SAT_SERIAL] = taxStamp.SatCertNumber;
                 fields[FIELDS.SAT_SIGNATURE] = taxStamp.SatSign;
-                fields[FIELDS.CFDI_SIGNATURE] = taxStamp.CfdiSign; 
+                fields[FIELDS.CFDI_SIGNATURE] = taxStamp.CfdiSign;
 
                 if (facturamaData.OriginalString) {
                     fields[FIELDS.ORIGINAL_STRING] = facturamaData.OriginalString;
@@ -54,29 +66,23 @@ define(['N/encode', 'N/xml', './sads_fama_logger'], function(encode, xml, logger
 
                 if (originalPayload && originalPayload.Issuer && originalPayload.Receiver) {
                     var last8Sello = taxStamp.CfdiSign.substring(taxStamp.CfdiSign.length - 8);
-                    var qrUrl = 'https://verificacfdi.facturaelectronica.sat.gob.mx/default.aspx?id=' + 
-                                taxStamp.Uuid + '&re=' + originalPayload.Issuer.Rfc + 
-                                '&rr=' + originalPayload.Receiver.Rfc + 
-                                '&tt=' + originalPayload.Total + '&fe=' + last8Sello;
+                    var qrUrl = 'https://verificacfdi.facturaelectronica.sat.gob.mx/default.aspx?id=' +
+                        taxStamp.Uuid + '&re=' + originalPayload.Issuer.Rfc +
+                        '&rr=' + originalPayload.Receiver.Rfc +
+                        '&tt=' + originalPayload.Total + '&fe=' + last8Sello;
                     fields[FIELDS.QR_CODE] = qrUrl;
                 }
             }
 
-            if (originalPayload) {
-                if (originalPayload.Folio) fields[FIELDS.FOLIO] = originalPayload.Folio;
-                if (originalPayload.Serie) fields[FIELDS.SERIE] = originalPayload.Serie;
-                
-                if (originalPayload.Date) {
-                    // Try/Catch aislado para que un fallo en la fecha no destruya el resto de la factura
-                    try {
-                        var parts = originalPayload.Date.split('T');
-                        var dateParts = parts[0].split('-'); 
-                        var timeParts = parts[1].split(':'); 
-                        fields[FIELDS.ISSUE_DATETIME] = new Date(dateParts[0], parseInt(dateParts[1], 10) - 1, dateParts[2], timeParts[0], timeParts[1], timeParts[2]);
-                    } catch (dateError) {
-                        logError('Error parseando fecha', dateError, { rawDate: originalPayload.Date, cfdiId: cfdiId });
-                    }
-                }
+            if (originalPayload && originalPayload.Issuer && originalPayload.Receiver) {
+                var last8Sello = taxStamp.CfdiSign.substring(taxStamp.CfdiSign.length - 8);
+
+                var qrUrl = 'https://verificacfdi.facturaelectronica.sat.gob.mx/default.aspx?id=' +
+                    taxStamp.Uuid + '&amp;re=' + originalPayload.Issuer.Rfc +
+                    '&amp;rr=' + originalPayload.Receiver.Rfc +
+                    '&amp;tt=' + originalPayload.Total + '&amp;fe=' + last8Sello;
+
+                fields[FIELDS.QR_CODE] = qrUrl;
             }
 
             // Extracción del número de certificado
@@ -85,12 +91,13 @@ define(['N/encode', 'N/xml', './sads_fama_logger'], function(encode, xml, logger
             } else if (xmlContent) {
                 try {
                     var xmlString = encode.convert({ string: xmlContent, inputEncoding: encode.Encoding.BASE_64, outputEncoding: encode.Encoding.UTF_8 });
-                    
+
                     var xmlDocument = xml.Parser.fromString({ text: xmlString });
                     var comprobanteNode = xmlDocument.getElementsByTagName({ tagName: 'cfdi:Comprobante' })[0];
                     if (comprobanteNode) {
                         fields[FIELDS.ISSUER_SERIAL] = comprobanteNode.getAttribute({ name: 'NoCertificado' });
                     }
+                    logger.write('Funcion buildExtraFields en ejecucion, Campos construidos:', fields)
                 } catch (xmlError) {
                     logError('Error extrayendo certificado del XML', xmlError, { cfdiId: cfdiId });
                 }
@@ -102,7 +109,7 @@ define(['N/encode', 'N/xml', './sads_fama_logger'], function(encode, xml, logger
             // Manejador centralizado de la función principal
             logError('CRITICO: Fallo al construir campos extra', mainError, { cfdiId: cfdiId });
             // Devolvemos lo que se haya logrado mapear para no interrumpir el flujo del caller
-            return fields; 
+            return fields;
         }
     }
 
@@ -113,6 +120,7 @@ define(['N/encode', 'N/xml', './sads_fama_logger'], function(encode, xml, logger
     /**
      * Factory Pattern para estandarizar el registro de errores.
      * Analiza si es un error nativo de JS o un SuiteScript Error.
+     * *@private
      * @param {string} customMessage - Mensaje contextual
      * @param {Error} e - El objeto de error capturado
      * @param {Object} contextData - Datos adicionales para reproducir el fallo
@@ -134,8 +142,8 @@ define(['N/encode', 'N/xml', './sads_fama_logger'], function(encode, xml, logger
         logger.write('ERROR: ' + customMessage, errorDetails);
     }
 
-    return { 
-        buildExtraFields: buildExtraFields 
+    return {
+        buildExtraFields: buildExtraFields
     };
 });
 //Camibio de uso de REGEX POR N/XML PARA MANIPULAR DE MEJOR MANERA EL XML Y OBTENER EL NUMERO DE CERTIFICADO DEL EMISOR.
