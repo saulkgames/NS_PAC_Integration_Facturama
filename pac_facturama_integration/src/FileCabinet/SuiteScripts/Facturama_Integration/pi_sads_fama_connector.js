@@ -101,10 +101,11 @@ define([
 
             var pdfFileId = filesModule.generateCertifiedPdf(txnRecordFull, customerRecordFull, configData.templates[txnType], extraFields, filePrefix + '.pdf');
             extraFields['custbody_edoc_generated_pdf'] = pdfFileId;
+            extraFields['custbody_sads_fama_cfdi_resp_id'] = cfdiId;
 
             // -- Paso 6: Retorno Exitoso --
             var finalReturn = _buildFrameworkReturn(plugInContext, statusAnalysis.eDocStatus, statusAnalysis.details, true, extraFields);
-            logger.write('FIN EXITOSO', { transactionId: txnId, uuid: uuid });
+            logger.write('FIN EXITOSO'+ JSON.stringify({ transactionId: txnId, uuid: uuid }), finalReturn);
             
             return finalReturn;
 
@@ -151,6 +152,8 @@ define([
             bundleId: CONSTANTS.BUNDLE_ID,
             bundleName: CONSTANTS.BUNDLE_NAME
         };
+
+        logger.write('Funcion _buildFrameworkReturn ejecutada, resultado construido para el framework', finalResult);
 
         return {
             eiStatus: finalResult,
