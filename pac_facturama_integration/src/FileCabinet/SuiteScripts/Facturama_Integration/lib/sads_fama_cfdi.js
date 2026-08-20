@@ -23,6 +23,7 @@ define(['N/encode', 'N/xml', './sads_fama_logger'], function (encode, xml, logge
         SERIE: 'custbody_mx_cfdi_serie',
         ISSUE_DATETIME: 'custbody_mx_cfdi_issue_datetime',
         ISSUER_SERIAL: 'custbody_mx_cfdi_issuer_serial'
+        
     };
 
     // ==========================================

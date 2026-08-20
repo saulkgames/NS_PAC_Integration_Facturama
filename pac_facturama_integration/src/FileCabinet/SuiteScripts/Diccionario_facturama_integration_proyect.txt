@@ -4,8 +4,7 @@ File: sads_fama_api.js
 /**
  * @NApiVersion 2.0
  * @NModuleScope Public
- * 
- * Módulo: Comunicación HTTP (Adaptador de Infraestructura PAC)
+ * * Módulo: Comunicación HTTP (Adaptador de Infraestructura PAC)
  */
 define(['N/https', './sads_fama_logger'], function (https, logger) {
     'use strict';
@@ -16,7 +15,12 @@ define(['N/https', './sads_fama_logger'], function (https, logger) {
 
     /**
      * Factory Pattern para estandarizar el registro de errores HTTP.
-     * Captura la pila completa, el response y los códigos de error.
+     * Captura la pila completa, la respuesta y los códigos de error delegando al logger central.
+     * * @private
+     * @param {string} customMessage - Mensaje descriptivo sobre el momento en que ocurrió el fallo.
+     * @param {Error|Object} e - Objeto de error nativo de JS o de SuiteScript.
+     * @param {Object} [contextData] - Datos adicionales para facilitar la auditoría y reproducción del error.
+     * @returns {void}
      */
     function logHttpError(customMessage, e, contextData) {
         var errorDetails = {
@@ -37,30 +41,42 @@ define(['N/https', './sads_fama_logger'], function (https, logger) {
         logger.write('ERROR COMUNICACION: ' + customMessage, errorDetails);
     }
 
-    /**
-     * Parsea de forma segura el JSON.
-     * Nota (Clean Code): Al ser una utilidad de este adaptador,
-     * no debería exportarse al exterior a menos que sea estrictamente necesario.
-     */
-    function safeParse(jsonString) {
-        if (!jsonString) return null;
-        try { 
-            return JSON.parse(jsonString); 
-        } catch (e) { 
-            // Si el PAC devuelve un error 500 en formato HTML, el parse fallará.
-            return jsonString; 
-        }
-    }
-
     // ==========================================
     // 2. API PÚBLICA (Puertos de salida)
     // ==========================================
 
+    /**
+     * Parsea de forma segura una cadena JSON.
+     * Actúa como un escudo contra fallos de `JSON.parse` cuando el servidor devuelve HTML u otros formatos inválidos.
+     * * @param {string} jsonString - La cadena de texto a convertir.
+     * @returns {Object|string|null} Retorna el objeto parseado, la cadena original si falla el parseo, o null si la entrada está vacía.
+     */
+    function safeParse(jsonString) {
+        if (!jsonString) return null;
+        try { 
+            // Corrección: El logger debe ir ANTES del return para que sea alcanzable.
+            var parsedObj = JSON.parse(jsonString);
+            logger.write('Funcion safeParse Ejecutada, Retorno de Funcion:', jsonString);
+            return parsedObj; 
+        } catch (e) { 
+            return jsonString; 
+        } 
+    }
+
+    /**
+     * Envía el payload de la factura al PAC (Facturama) para su certificación/timbrado.
+     * Posee degradación elegante en caso de fallos catastróficos de red.
+     * * @param {string} url - El endpoint POST de timbrado.
+     * @param {Object} headers - Cabeceras HTTP de autorización y tipo de contenido.
+     * @param {string} payload - El contenido JSON en cadena que representa el CFDI.
+     * @returns {Object} El cuerpo de la respuesta del PAC o un objeto estandarizado de error de red.
+     */
     function postTimbrado(url, headers, payload) {
         var resp = null; // Declaración en nivel superior (Hoisting)
         
         try {
             resp = https.post({ url: url, headers: headers, body: payload });
+            logger.write('Funcion postTimbrado Ejecutada, Retorno de Funcion:', resp);
             return safeParse(resp.body); // El Response Handler evaluará el contenido
             
         } catch (networkError) {
@@ -81,6 +97,13 @@ define(['N/https', './sads_fama_logger'], function (https, logger) {
         }
     }
 
+    /**
+     * Descarga el archivo XML certificado desde el PAC.
+     * * @param {string} baseUrl - La URL base para la descarga, debe contener el token '{id}'.
+     * @param {Object} headers - Cabeceras HTTP de autorización.
+     * @param {string} cfdiId - El identificador único del CFDI en el sistema del PAC.
+     * @returns {Object|null} El JSON representativo del XML o null en caso de fallo absoluto de red.
+     */
     function getXml(baseUrl, headers, cfdiId) {
         var resp = null; // Lo declaramos aquí para garantizar su acceso en el bloque catch
         var finalUrl = baseUrl.replace('{id}', cfdiId);
@@ -91,11 +114,11 @@ define(['N/https', './sads_fama_logger'], function (https, logger) {
             if (resp.code !== 200) {
                 var getErrorBody = safeParse(resp.body);
                 var errorMsg = typeof getErrorBody === 'string' ? getErrorBody : JSON.stringify(getErrorBody);
-                
                 // Lanzamos el error intencionalmente para que caiga en nuestro manejador unificado
                 throw new Error('El PAC rechazó la descarga XML. Body: ' + errorMsg);
             }
             
+            logger.write('Funcion getXml Ejecutada, Retorno de Funcion:', resp);
             return safeParse(resp.body);
 
         } catch (error) {
@@ -131,23 +154,15 @@ define(['N/https', './sads_fama_logger'], function (https, logger) {
 /**
  * TITULO: refactor(http-adapter): blindar adaptador HTTP del PAC y estandarizar manejo de errores
  * Se refactorizó el módulo sads_fama_api.js para actuar como un verdadero Adaptador Secundario (Hexagonal Architecture), protegiendo al ERP de fallos de infraestructura externa. Se aplicaron principios de Clean Code y Fail-Safe Defaults con los siguientes cambios críticos:
-
-🛡️ Tolerancia a Fallos y Estado Predecible (Saltzer & Schroeder):
-
-Se corrigió el scope de la variable resp mediante Hoisting (var resp = null; al inicio). Esto asegura que el bloque catch siempre tenga un contexto de evaluación seguro si la conexión se corta antes de recibir respuesta, eliminando las validaciones frágiles de tipo (typeof resp !== 'undefined').
-
-Se agregó un escudo protector (try/catch) en postTimbrado. Los errores catastróficos de red (timeouts, DNS) ahora son capturados y devuelven un objeto de error estructurado para que el Response Handler externo los procese sin que colapse el hilo principal de ejecución de NetSuite.
-
-🧹 Clean Code y DRY (Robert C. Martin):
-
-Corrección Crítica (Bugfix): Se eliminó el uso de JSON.stringify(error). Los objetos Error en JS no son enumerables y devolvían un objeto vacío ({}).
-
-Se implementó el método Factory privado logHttpError para centralizar la captura del error. Ahora el sistema extrae inteligentemente el stack trace estándar de JS (e.stack) o el nativo de SuiteScript (e.getStackTrace()), garantizando el principio de Compromise Recording en el logger.
-
-🏛️ Arquitectura de Límite (Alistair Cockburn):
-
-El módulo ahora respeta su naturaleza de "frontera". Inspecciona y sanitiza el estado del mundo exterior (el servicio del PAC). Devuelve siempre datos controlados (null, objetos JSON o trazas detalladas) hacia el Core del negocio, evitando filtraciones de excepciones no controladas.
- * 
+ * * 🛡️ Tolerancia a Fallos y Estado Predecible (Saltzer & Schroeder):
+ * * Se corrigió el scope de la variable resp mediante Hoisting (var resp = null; al inicio). Esto asegura que el bloque catch siempre tenga un contexto de evaluación seguro si la conexión se corta antes de recibir respuesta, eliminando las validaciones frágiles de tipo (typeof resp !== 'undefined').
+ * Se agregaron logs de auditoria en escenarios de exito.
+ * Se agregó un escudo protector (try/catch) en postTimbrado. Los errores catastróficos de red (timeouts, DNS) ahora son capturados y devuelven un objeto de error estructurado para que el Response Handler externo los procese sin que colapse el hilo principal de ejecución de NetSuite.
+ * * 🧹 Clean Code y DRY (Robert C. Martin):
+ * * Corrección Crítica (Bugfix): Se eliminó el uso de JSON.stringify(error). Los objetos Error en JS no son enumerables y devolvían un objeto vacío ({}).
+ * Se implementó el método Factory privado logHttpError para centralizar la captura del error. Ahora el sistema extrae inteligentemente el stack trace estándar de JS (e.stack) o el nativo de SuiteScript (e.getStackTrace()), garantizando el principio de Compromise Recording en el logger.
+ * * 🏛️ Arquitectura de Límite (Alistair Cockburn):
+ * * El módulo ahora respeta su naturaleza de "frontera". Inspecciona y sanitiza el estado del mundo exterior (el servicio del PAC). Devuelve siempre datos controlados (null, objetos JSON o trazas detalladas) hacia el Core del negocio, evitando filtraciones de excepciones no controladas.
  */
 
 ===================
@@ -159,7 +174,7 @@ File: sads_fama_cfdi.js
  * 
  * Módulo: Constructor de Campos Fiscales
  */
-define(['N/encode', 'N/xml', './sads_fama_logger'], function(encode, xml, logger) {
+define(['N/encode', 'N/xml', './sads_fama_logger'], function (encode, xml, logger) {
     'use strict';
 
     // ==========================================
@@ -178,63 +193,67 @@ define(['N/encode', 'N/xml', './sads_fama_logger'], function(encode, xml, logger
         SERIE: 'custbody_mx_cfdi_serie',
         ISSUE_DATETIME: 'custbody_mx_cfdi_issue_datetime',
         ISSUER_SERIAL: 'custbody_mx_cfdi_issuer_serial'
+        
     };
 
     // ==========================================
     // 2. API PÚBLICA (Hexagonal Architecture: Puertos)
     // ==========================================
+    /**
+     * Funcion principal del modulo CFDI. Construye un objeto que sera enviado al plugIn Type para concluir con el proceso de actualizacion de campos 
+     *  que corresponden al CFDI timbrado.
+     * @param {Object} originalPayload - PlugInContext || Transaccion Record Data
+     * @param {Object} facturamaData - PAC Response Body Parsed
+     * @param {Number} xmlFileId - El id interno del archivo XML guardado en el File Cabinet
+     * @param {Number} cfdiId - El id interno de la transacción en el servidor del PAC
+     * @param {String} xmlContent - El contenido del archivo XML en Base64 (opcional, solo si se requiere extraer el NoCertificado)
+     * @returns {object} - Un objeto con los campos fiscales listos para actualizar en la transacción
+     * 
+     * Nota: Se implementa un control de retorno seguro. Si ocurre un error en la construcción de los campos, se loguea el error y se devuelve lo que se haya podido mapear.
+     */
     function buildExtraFields(originalPayload, facturamaData, xmlFileId, cfdiId, xmlContent) {
-        logger.write('Iniciando construccion de campos extra', { cfdiId: cfdiId });
-        
+        logger.write('Funcion buildExtraFields en ejecucion', { cfdiId: cfdiId });
+
         // Inicializamos fields desde el principio. Si algo falla a la mitad, 
         // devolveremos lo que hayamos logrado construir (Cumpliendo tu requerimiento de retorno)
         var fields = {};
-        
+
         try {
             fields[FIELDS.EDOC_CERTIFIED] = xmlFileId;
 
             // Validación defensiva anidada (ES5 no tiene Optional Chaining ?.)
             if (facturamaData && facturamaData.Complement && facturamaData.Complement.TaxStamp) {
                 var taxStamp = facturamaData.Complement.TaxStamp;
-                
+
                 fields[FIELDS.UUID] = taxStamp.Uuid;
-                fields[FIELDS.CERTIFY_TIMESTAMP] = taxStamp.Date; 
+                fields[FIELDS.CERTIFY_TIMESTAMP] = taxStamp.Date;
                 fields[FIELDS.SAT_SERIAL] = taxStamp.SatCertNumber;
                 fields[FIELDS.SAT_SIGNATURE] = taxStamp.SatSign;
-                fields[FIELDS.CFDI_SIGNATURE] = taxStamp.CfdiSign; 
+                fields[FIELDS.CFDI_SIGNATURE] = taxStamp.CfdiSign;
 
                 if (facturamaData.OriginalString) {
                     fields[FIELDS.ORIGINAL_STRING] = facturamaData.OriginalString;
                 }
 
-               if (originalPayload && originalPayload.Issuer && originalPayload.Receiver) {
+                if (originalPayload && originalPayload.Issuer && originalPayload.Receiver) {
                     var last8Sello = taxStamp.CfdiSign.substring(taxStamp.CfdiSign.length - 8);
-    
-    
-                    var qrUrl = 'https://verificacfdi.facturaelectronica.sat.gob.mx/default.aspx?id=' + 
-                        taxStamp.Uuid + '&amp;re=' + originalPayload.Issuer.Rfc + 
-                        '&amp;rr=' + originalPayload.Receiver.Rfc + 
-                        '&amp;tt=' + originalPayload.Total + '&amp;fe=' + last8Sello;
-                
+                    var qrUrl = 'https://verificacfdi.facturaelectronica.sat.gob.mx/default.aspx?id=' +
+                        taxStamp.Uuid + '&re=' + originalPayload.Issuer.Rfc +
+                        '&rr=' + originalPayload.Receiver.Rfc +
+                        '&tt=' + originalPayload.Total + '&fe=' + last8Sello;
                     fields[FIELDS.QR_CODE] = qrUrl;
                 }
             }
 
-            if (originalPayload) {
-                if (originalPayload.Folio) fields[FIELDS.FOLIO] = originalPayload.Folio;
-                if (originalPayload.Serie) fields[FIELDS.SERIE] = originalPayload.Serie;
-                
-                if (originalPayload.Date) {
-                    // Try/Catch aislado para que un fallo en la fecha no destruya el resto de la factura
-                    try {
-                        var parts = originalPayload.Date.split('T');
-                        var dateParts = parts[0].split('-'); 
-                        var timeParts = parts[1].split(':'); 
-                        fields[FIELDS.ISSUE_DATETIME] = new Date(dateParts[0], parseInt(dateParts[1], 10) - 1, dateParts[2], timeParts[0], timeParts[1], timeParts[2]);
-                    } catch (dateError) {
-                        logError('Error parseando fecha', dateError, { rawDate: originalPayload.Date, cfdiId: cfdiId });
-                    }
-                }
+            if (originalPayload && originalPayload.Issuer && originalPayload.Receiver) {
+                var last8Sello = taxStamp.CfdiSign.substring(taxStamp.CfdiSign.length - 8);
+
+                var qrUrl = 'https://verificacfdi.facturaelectronica.sat.gob.mx/default.aspx?id=' +
+                    taxStamp.Uuid + '&amp;re=' + originalPayload.Issuer.Rfc +
+                    '&amp;rr=' + originalPayload.Receiver.Rfc +
+                    '&amp;tt=' + originalPayload.Total + '&amp;fe=' + last8Sello;
+
+                fields[FIELDS.QR_CODE] = qrUrl;
             }
 
             // Extracción del número de certificado
@@ -243,12 +262,13 @@ define(['N/encode', 'N/xml', './sads_fama_logger'], function(encode, xml, logger
             } else if (xmlContent) {
                 try {
                     var xmlString = encode.convert({ string: xmlContent, inputEncoding: encode.Encoding.BASE_64, outputEncoding: encode.Encoding.UTF_8 });
-                    
+
                     var xmlDocument = xml.Parser.fromString({ text: xmlString });
                     var comprobanteNode = xmlDocument.getElementsByTagName({ tagName: 'cfdi:Comprobante' })[0];
                     if (comprobanteNode) {
                         fields[FIELDS.ISSUER_SERIAL] = comprobanteNode.getAttribute({ name: 'NoCertificado' });
                     }
+                    logger.write('Funcion buildExtraFields en ejecucion, Campos construidos:', fields)
                 } catch (xmlError) {
                     logError('Error extrayendo certificado del XML', xmlError, { cfdiId: cfdiId });
                 }
@@ -260,7 +280,7 @@ define(['N/encode', 'N/xml', './sads_fama_logger'], function(encode, xml, logger
             // Manejador centralizado de la función principal
             logError('CRITICO: Fallo al construir campos extra', mainError, { cfdiId: cfdiId });
             // Devolvemos lo que se haya logrado mapear para no interrumpir el flujo del caller
-            return fields; 
+            return fields;
         }
     }
 
@@ -271,6 +291,7 @@ define(['N/encode', 'N/xml', './sads_fama_logger'], function(encode, xml, logger
     /**
      * Factory Pattern para estandarizar el registro de errores.
      * Analiza si es un error nativo de JS o un SuiteScript Error.
+     * *@private
      * @param {string} customMessage - Mensaje contextual
      * @param {Error} e - El objeto de error capturado
      * @param {Object} contextData - Datos adicionales para reproducir el fallo
@@ -292,8 +313,8 @@ define(['N/encode', 'N/xml', './sads_fama_logger'], function(encode, xml, logger
         logger.write('ERROR: ' + customMessage, errorDetails);
     }
 
-    return { 
-        buildExtraFields: buildExtraFields 
+    return {
+        buildExtraFields: buildExtraFields
     };
 });
 //Camibio de uso de REGEX POR N/XML PARA MANIPULAR DE MEJOR MANERA EL XML Y OBTENER EL NUMERO DE CERTIFICADO DEL EMISOR.
@@ -306,14 +327,13 @@ File: sads_fama_config.js
 /**
  * @NApiVersion 2.0
  * @NModuleScope Public
- * 
- * Módulo: Configuración y Autenticación (Repository Pattern / Infrastructure Adapter)
+ * * Módulo: Configuración y Autenticación (Repository Pattern / Infrastructure Adapter)
  */
 define(['N/search', 'N/encode'], function(search, encode) {
     'use strict';
 
     // ==========================================
-    // 1. CONSTANTES (Clean Code: Evitar Magic Strings y DRY)
+    // 1. CONSTANTES 
     // ==========================================
     var REC_TYPE = 'customrecord_sads_fama_config';
     
@@ -333,6 +353,14 @@ define(['N/search', 'N/encode'], function(search, encode) {
     // ==========================================
     // 2. API PÚBLICA (Repositorio)
     // ==========================================
+    
+    /**
+     * Obtiene la configuración de Facturama desde la base de datos (NetSuite Custom Record) 
+     * para una subsidiaria específica.
+     * * @param {number|string} subsidiaryId - El ID interno de la subsidiaria.
+     * @returns {Object} Un objeto con las credenciales, URLs de API y mapeo de plantillas PDF.
+     * @throws {Error} Si no se proporciona el subsidiaryId, si no se encuentra un registro activo, o si faltan datos críticos.
+     */
     function get(subsidiaryId) {
         // Guard Clause (Falla rápido si el orquestador no envía subsidiaria)
         if (!subsidiaryId) {
@@ -380,6 +408,13 @@ define(['N/search', 'N/encode'], function(search, encode) {
         return configData;
     }
 
+    /**
+     * Genera las cabeceras HTTP de autorización (Basic Auth) requeridas para las peticiones a la API del PAC.
+     * * @param {string} user - El nombre de usuario de la cuenta de Facturama.
+     * @param {string} pass - La contraseña de la cuenta de Facturama.
+     * @returns {Object} Un objeto con las cabeceras 'Authorization' y 'Content-Type'.
+     * @throws {Error} Si las credenciales proporcionadas son nulas o indefinidas.
+     */
     function getAuthHeaders(user, pass) {
         // Prevención de inyección de valores 'undefined' en la codificación Base64
         if (!user || !pass) {
@@ -403,8 +438,12 @@ define(['N/search', 'N/encode'], function(search, encode) {
     // ==========================================
     
     /**
-     * Asegura que los campos vitales existan antes de entregar el objeto de configuración.
-     * Si falta algo, lanza un error con detalle exacto.
+     * Asegura que el objeto de configuración extraído contenga todos los campos vitales 
+     * para operar correctamente antes de entregarlo al orquestador.
+     * * @private
+     * @param {Object} config - El objeto de configuración mapeado desde la búsqueda de NetSuite.
+     * @param {number|string} subId - El ID de la subsidiaria (usado para inyectar contexto en el error).
+     * @throws {Error} Si falta algún campo requerido (user, pass, apiPostUrl, apiGetUrl).
      */
     function _validateCriticalConfig(config, subId) {
         var missing = [];
@@ -425,17 +464,6 @@ define(['N/search', 'N/encode'], function(search, encode) {
         getAuthHeaders: getAuthHeaders 
     };
 });
-/**
- * refactor(config-repository): centralizar identificadores y aplicar validaciones fail-safe
- * Descripción (Body):
-Se refactorizó el módulo sads_fama_config.js responsable de abstraer el acceso a la base de datos de configuraciones de NetSuite:
-
-🛡️ Fail-Safe Defaults & Guard Clauses: Se implementó la función de validación estricta _validateCriticalConfig. Ahora el sistema aborta de inmediato (Fail Fast) si el registro existe en base de datos pero omite información crítica (Credenciales o URLs), evitando errores de red tardíos o la generación de cabeceras de autorización corruptas.
-
-🧹 Clean Code (DRY Principle): Se extrajeron todos los "Magic Strings" (IDs de campos de NetSuite) hacia un diccionario constante FLD. Esto elimina la duplicidad, previene errores de tipeo en las columnas de búsqueda y centraliza el mantenimiento ante futuros cambios en el esquema de la base de datos.
-
-🔒 Validación de Parámetros: Se blindó el generador de cabeceras getAuthHeaders impidiendo la concatenación silenciosa de valores nulos o indefinidos al momento de cifrar en Base64.
- */
 
 ===================
 File: sads_fama_files.js
@@ -443,8 +471,7 @@ File: sads_fama_files.js
 /**
  * @NApiVersion 2.0
  * @NModuleScope Public
- * 
- * Módulo: Gestor de Archivos y Renderizado (File System Adapter)
+ * * Módulo: Gestor de Archivos y Renderizado (File System Adapter)
  */
 define(['N/file', 'N/encode', 'N/render', './sads_fama_logger'], function(file, encode, render, logger) {
     'use strict';
@@ -464,8 +491,12 @@ define(['N/file', 'N/encode', 'N/render', './sads_fama_logger'], function(file, 
     // ==========================================
 
     /**
-     * Decodifica y guarda el XML en el File Cabinet.
-     * Patrón de Seguridad: Fail-Safe Defaults (Falla rápido si los datos son inválidos)
+     * Decodifica una cadena Base64 a UTF-8 y guarda el resultado como un archivo XML en el File Cabinet.
+     * Implementa un Patrón de Seguridad Fail-Safe Defaults (Falla rápido si los datos son inválidos o corruptos).
+     * * @param {string} fileName - El nombre que se le asignará al archivo XML en NetSuite.
+     * @param {string} base64Content - El contenido del XML codificado en formato Base64.
+     * @returns {number} El ID interno (internalid) del archivo guardado en el File Cabinet.
+     * @throws {Error} Si el contenido Base64 está vacío o si falla la decodificación nativa del motor de NetSuite.
      */
     function saveXml(fileName, base64Content) {
         var decodedXml = '';
@@ -503,7 +534,14 @@ define(['N/file', 'N/encode', 'N/render', './sads_fama_logger'], function(file, 
     }
 
     /**
-     * Renderiza el PDF de la transacción uniendo datos nativos y datos del PAC.
+     * Renderiza un PDF de la transacción uniendo los datos estándar de NetSuite y los datos fiscales del PAC.
+     * * @param {Object} txnRecord - El objeto record de la transacción principal cargada (ej. Invoice).
+     * @param {Object|null} customerRecord - El objeto record del cliente cargado (opcional).
+     * @param {number|string} pdfTemplateId - El ID interno de la plantilla avanzada de PDF/HTML (FreeMarker/BFO).
+     * @param {Object} extraFields - Objeto con la metadata extraída del XML (UUID, cadena original, sellos, etc.).
+     * @param {string} fileName - El nombre que se le asignará al archivo PDF generado.
+     * @returns {number} El ID interno (internalid) del archivo PDF guardado en el File Cabinet.
+     * @throws {Error} Si faltan parámetros obligatorios o si el motor de renderizado falla por plantillas mal formadas.
      */
     function generateCertifiedPdf(txnRecord, customerRecord, pdfTemplateId, extraFields, fileName) {
         try {
@@ -536,6 +574,7 @@ define(['N/file', 'N/encode', 'N/render', './sads_fama_logger'], function(file, 
             pdfFile.name = fileName;
             pdfFile.folder = CONSTANTS.TARGET_FOLDER_ID;
             
+            logger.write('Funcion generateCertifiedPdf ejecutada, Retorno de Archivo PDF:', pdfFile.name);
             return pdfFile.save();
 
         } catch (error) {
@@ -555,6 +594,11 @@ define(['N/file', 'N/encode', 'N/render', './sads_fama_logger'], function(file, 
 
     /**
      * Estandariza la captura de errores delegando al Logger Central (Compromise Recording).
+     * * @private
+     * @param {string} customMessage - Mensaje contextual indicando en qué paso falló el sistema.
+     * @param {Error|Object} e - El objeto de error interceptado.
+     * @param {Object} [contextData] - Datos adicionales de contexto para facilitar el rastro de la auditoría.
+     * @returns {void}
      */
     function logError(customMessage, e, contextData) {
         var errorDetails = {
@@ -572,15 +616,13 @@ define(['N/file', 'N/encode', 'N/render', './sads_fama_logger'], function(file, 
     };
 });
 /**
- * refactor(file-adapter): aplicar fail-safe defaults y blindar renderizado de PDF
+ * refactor(file-adapter): aplicar fail-safe defaults, blindar renderizado de PDF y agregar JSDoc
  * Descripción (Body):
-Se refactorizó el adaptador de infraestructura sads_fama_files.js para interactuar de forma segura con el File Cabinet y el motor de renderizado:
-
-🛡️ Fail-Safe Defaults: Se eliminó un comportamiento peligroso en saveXml que permitía guardar cadenas Base64 crudas con extensión .xml en caso de fallar la decodificación UTF-8. Ahora aborta la operación y propaga el error (Fail Fast).
-
-🩺 Compromise Recording: Se integró el módulo central de logging (sads_fama_logger.js). Se añadieron bloques try/catch a la generación del PDF para atrapar excepciones del motor FreeMarker, registrando el ID de la plantilla y de la transacción para facilitar auditorías.
-
-🧹 Clean Code: Se encapsularon los "Magic Numbers/Strings" (IDs de carpetas y alias de plantillas) en un diccionario CONSTANTS para documentar la intención de las variables.
+ * Se refactorizó el adaptador de infraestructura sads_fama_files.js para interactuar de forma segura con el File Cabinet y el motor de renderizado:
+ * * 🛡️ Fail-Safe Defaults: Se eliminó un comportamiento peligroso en saveXml que permitía guardar cadenas Base64 crudas con extensión .xml en caso de fallar la decodificación UTF-8. Ahora aborta la operación y propaga el error (Fail Fast).
+ * * 🩺 Compromise Recording: Se integró el módulo central de logging (sads_fama_logger.js). Se añadieron bloques try/catch a la generación del PDF para atrapar excepciones del motor FreeMarker, registrando el ID de la plantilla y de la transacción para facilitar auditorías.
+ * * 🧹 Clean Code: Se encapsularon los "Magic Numbers/Strings" (IDs de carpetas y alias de plantillas) en un diccionario CONSTANTS para documentar la intención de las variables.
+ * * 📚 Documentación (JSDoc): Se incorporaron firmas de funciones estandarizadas en JSDoc para facilitar la lectura del código por otros desarrolladores e inicializar el soporte de IntelliSense en los IDEs, documentando parámetros esperados y tipos de retorno para las operaciones del sistema de archivos.
  */
 
 ===================
@@ -589,8 +631,7 @@ File: sads_fama_logger.js
 /**
  * @NApiVersion 2.0
  * @NModuleScope Public
- * 
- * Módulo: Logger Personalizado (Infraestructura / Adapter)
+ * * Módulo: Logger Personalizado (Infraestructura / Adapter)
  * Patrones: Factory, Strategy (Serialización segura)
  */
 define(['N/record', 'N/log', 'N/file'], function(record, log, file) {
@@ -610,6 +651,14 @@ define(['N/record', 'N/log', 'N/file'], function(record, log, file) {
     // ==========================================
     // 2. API PÚBLICA (El Puerto de Entrada)
     // ==========================================
+    
+    /**
+     * Función principal de registro (logging) para depuración y auditoría de scripts.
+     * Intercepta mensajes largos y los convierte automáticamente en archivos adjuntos.
+     * * @param {string} title - El título del log (se truncará a 300 caracteres si excede el límite).
+     * @param {string|Object|null} messageData - El contenido a registrar. Puede ser una cadena de texto o un objeto complejo.
+     * @returns {void}
+     */
     function write(title, messageData) {
         try {
             var safeTitle = _sanitizeTitle(title);
@@ -649,12 +698,22 @@ define(['N/record', 'N/log', 'N/file'], function(record, log, file) {
     // 3. FUNCIONES PRIVADAS (Principio de Responsabilidad Única - SRP)
     // ==========================================
 
+    /**
+     * Sanitiza el título del log para asegurar que cumpla con los límites de la base de datos.
+     * * @private
+     * @param {string} title - El título original enviado al logger.
+     * @returns {string} El título sanitizado y truncado a un máximo de 300 caracteres.
+     */
     function _sanitizeTitle(title) {
         return (title || 'Log sin título').substring(0, 300);
     }
 
     /**
-     * Serializador Seguro: Previene colapsos por Referencias Circulares en JS.
+     * Serializador Seguro: Previene colapsos (TypeError) causados por Referencias Circulares 
+     * comunes en objetos nativos de JS o NetSuite.
+     * * @private
+     * @param {*} data - Cualquier tipo de dato que se intente registrar.
+     * @returns {string} Una representación segura en cadena del dato proporcionado.
      */
     function _safeStringify(data) {
         if (data === null) return 'null';
@@ -682,6 +741,14 @@ define(['N/record', 'N/log', 'N/file'], function(record, log, file) {
         }
     }
 
+    /**
+     * Crea un archivo físico en el File Cabinet de NetSuite cuando el log excede el límite de texto.
+     * * @private
+     * @param {string} title - El título base para nombrar el archivo.
+     * @param {string} content - El contenido extenso a guardar.
+     * @param {boolean} isJson - Indica si el contenido debe guardarse con extensión .json o .txt.
+     * @returns {number} El ID interno del archivo generado.
+     */
     function _createLogAttachment(title, content, isJson) {
         var timestamp = new Date().getTime();
         var safeFileName = title.replace(/[^a-z0-9]/gi, '_').substring(0, 50);
@@ -698,6 +765,13 @@ define(['N/record', 'N/log', 'N/file'], function(record, log, file) {
         return logFile.save();
     }
 
+    /**
+     * Genera el registro personalizado en la base de datos de NetSuite para indexar el log.
+     * * @private
+     * @param {string} title - El título sanitizado del log.
+     * @param {string} message - El mensaje o el aviso de desbordamiento (overflow).
+     * @returns {number} El ID interno del Custom Record creado.
+     */
     function _createCustomRecord(title, message) {
         var logRecord = record.create({ type: CONSTANTS.RECORD_TYPE });
         logRecord.setValue({ fieldId: CONSTANTS.FLD_TITLE, value: title });
@@ -706,6 +780,13 @@ define(['N/record', 'N/log', 'N/file'], function(record, log, file) {
         return logRecord.save({ ignoreMandatoryFields: true });
     }
 
+    /**
+     * Vincula (attach) un archivo del File Cabinet al registro personalizado del log para fácil acceso.
+     * * @private
+     * @param {number} fileId - El ID interno del archivo generado.
+     * @param {number} logId - El ID interno del registro personalizado (Custom Record).
+     * @returns {void}
+     */
     function _attachFile(fileId, logId) {
         record.attach({
             record: { type: 'file', id: fileId },
@@ -716,15 +797,13 @@ define(['N/record', 'N/log', 'N/file'], function(record, log, file) {
     return { write: write };
 });
 /**
- * refactor(logger): aplicar SRP e implementar serialización a prueba de referencias circulares
+ * refactor(logger): aplicar SRP, serialización segura y agregar documentación JSDoc
  * Descripción (Body):
-Se refactorizó el adaptador de infraestructura sads_fama_logger.js para incrementar su robustez y mantenibilidad, aplicando principios SOLID y de diseño seguro:
-
-🛡️ Diseño Fail-Safe (_safeStringify): Se mitigó un riesgo crítico donde JSON.stringify causaba un colapso del sistema al intentar serializar objetos con referencias circulares. Se implementó una caché interna que neutraliza el error registrando un [Referencia Circular Detectada].
-
-🧹 Clean Code (SRP): Se descompuso la función write en métodos privados atómicos (_createLogAttachment, _createCustomRecord, _attachFile), aislando las responsabilidades (File System vs. Database Records).
-
-⚙️ Mejora del Fallback: En caso de fallo total del custom logger (ej. límite de cuota en el File Cabinet), la excepción delegada al sistema nativo (log.error) ahora captura correctamente el stack trace y contexto para evitar la pérdida del Compromise Recording.
+ * Se refactorizó el adaptador de infraestructura sads_fama_logger.js para incrementar su robustez y mantenibilidad, aplicando principios SOLID y de diseño seguro:
+ * * 🛡️ Diseño Fail-Safe (_safeStringify): Se mitigó un riesgo crítico donde JSON.stringify causaba un colapso del sistema al intentar serializar objetos con referencias circulares. Se implementó una caché interna que neutraliza el error registrando un [Referencia Circular Detectada].
+ * * 🧹 Clean Code (SRP): Se descompuso la función write en métodos privados atómicos (_createLogAttachment, _createCustomRecord, _attachFile), aislando las responsabilidades (File System vs. Database Records).
+ * * ⚙️ Mejora del Fallback: En caso de fallo total del custom logger (ej. límite de cuota en el File Cabinet), la excepción delegada al sistema nativo (log.error) ahora captura correctamente el stack trace y contexto para evitar la pérdida del Compromise Recording.
+ * * 📚 Documentación (JSDoc): Se añadieron etiquetas de documentación estándar JSDoc a todas las funciones de la API pública y soporte interno, definiendo tipos, parámetros, y retornos esperados, facilitando el mantenimiento y habilitando el IntelliSense en los IDEs.
  */
 
 ===================
@@ -733,8 +812,7 @@ File: sads_fama_response_handler.js
 /**
  * @NApiVersion 2.0
  * @NModuleScope Public
- * 
- * Módulo: Response Handler (Capa Anticorrupción / Translator)
+ * * Módulo: Response Handler (Capa Anticorrupción / Translator)
  */
 define([], function() {
     'use strict';
@@ -765,6 +843,14 @@ define([], function() {
     // ==========================================
     // 3. API PÚBLICA (Lógica de Mapeo)
     // ==========================================
+    
+    /**
+     * Evalúa la respuesta HTTP del PAC y la traduce a los estados estandarizados de NetSuite (eDocStatus).
+     * Funciona como una Capa Anticorrupción (ACL) para proteger el núcleo de la aplicación de cambios en la API externa.
+     * * @param {number|string} httpCode - El código de estado HTTP devuelto por la petición al PAC.
+     * @param {Object|string|null} responseBody - El cuerpo de la respuesta (payload) entregado por el PAC.
+     * @returns {Object} Objeto estructurado que contiene el éxito de la operación (success), el código de estado para NetSuite (eDocStatus) y un mensaje detallado (details).
+     */
     function analyzeResponse(httpCode, responseBody) {
         // 1. EVALUACIÓN RESILIENTE: 
         // Excelente práctica. Nos protegemos de códigos HTTP incorrectos si el UUID ya existe.
@@ -802,6 +888,14 @@ define([], function() {
     // ==========================================
     // 4. FUNCIONES DE SOPORTE (Privadas)
     // ==========================================
+    
+    /**
+     * Extrae de forma segura el mensaje de error del payload enviado por Facturama.
+     * Implementa defensas contra valores nulos y errores de serialización (Fail-Safe Defaults).
+     * * @private
+     * @param {Object|string|null} responseBody - El cuerpo de la respuesta del PAC que contiene el detalle del error.
+     * @returns {string} El mensaje de error extraído, concatenado de forma segura, o un mensaje genérico de fallback.
+     */
     function _extractFacturamaError(responseBody) {
         // BUGFIX CRÍTICO: typeof null === 'object'. Agregamos validación estricta !== null.
         if (responseBody !== null && typeof responseBody === 'object') {
@@ -839,15 +933,13 @@ define([], function() {
     return { analyzeResponse: analyzeResponse };
 });
 /**
- * refactor(response-handler): aplicar patron diccionario y prevenir bugs nativos de tipo null
+ * refactor(response-handler): aplicar patron diccionario, prevenir bugs de null y agregar JSDoc
  * Descripción (Body):
-Se refactorizó la Capa Anticorrupción (ACL) encargada de interpretar las respuestas del PAC hacia NetSuite:
-
-🐛 Prevención de Errores (JS Quirks): Se corrigió una vulnerabilidad lógica en la extracción de errores donde typeof null === 'object' podía ocasionar un TypeError fatal en el ERP si el responseBody llegaba nulo. Se implementó un Fail-Safe para serializaciones complejas.
-
-🏗️ Clean Code (Open/Closed Principle): Se eliminó el bloque switch verboso reemplazándolo por el patrón ERROR_MAP (Diccionario/Estrategia). Esto reduce la complejidad ciclomática y permite agregar nuevos códigos HTTP en el futuro sin modificar la lógica principal.
-
-🏷️ Remoción de Magic Strings: Se centralizaron los códigos de NetSuite (3, 4, 21) en un objeto constante EDOC_STATUS para documentar la intención del dominio y mejorar la mantenibilidad.
+ * Se refactorizó la Capa Anticorrupción (ACL) encargada de interpretar las respuestas del PAC hacia NetSuite:
+ * * 🐛 Prevención de Errores (JS Quirks): Se corrigió una vulnerabilidad lógica en la extracción de errores donde typeof null === 'object' podía ocasionar un TypeError fatal en el ERP si el responseBody llegaba nulo. Se implementó un Fail-Safe para serializaciones complejas.
+ * * 🏗️ Clean Code (Open/Closed Principle): Se eliminó el bloque switch verboso reemplazándolo por el patrón ERROR_MAP (Diccionario/Estrategia). Esto reduce la complejidad ciclomática y permite agregar nuevos códigos HTTP en el futuro sin modificar la lógica principal.
+ * * 🏷️ Remoción de Magic Strings: Se centralizaron los códigos de NetSuite (3, 4, 21) en un objeto constante EDOC_STATUS para documentar la intención del dominio y mejorar la mantenibilidad.
+ * * 📚 Documentación (JSDoc): Se incorporaron firmas de funciones estandarizadas en JSDoc para la API pública y funciones privadas, documentando los parámetros esperados, tipos de datos devueltos y protegiendo el contrato de la capa anticorrupción para habilitar IntelliSense en los IDEs.
  */
 
 ===================
@@ -857,8 +949,7 @@ File: pi_sads_fama_connector.js
  * @NApiVersion 2.0
  * @NScriptType plugintypeimpl
  * @NModuleScope Public
- * 
- * SADS Facturama - Orquestador Principal (Mediator Pattern)
+ * * SADS Facturama - Orquestador Principal (Mediator Pattern)
  */
 define([
     'N/search',
@@ -885,6 +976,18 @@ define([
     // ==========================================
     // 2. CASO DE USO PRINCIPAL (Clean Architecture)
     // ==========================================
+    
+    /**
+     * Punto de entrada principal del Plug-in de Facturación Electrónica de NetSuite.
+     * Orquesta el flujo completo: validación, obtención de configuración, timbrado en PAC, 
+     * análisis de respuesta, y generación de XML/PDF.
+     * * @param {Object} plugInContext - El contexto inyectado por el framework de NetSuite.
+     * @param {Object} plugInContext.transaction - Información básica de la transacción (id, type, tranType).
+     * @param {Object} [plugInContext.customer] - Información del cliente asociado (id).
+     * @param {string} plugInContext.eInvoiceContent - El payload JSON/XML generado por el estándar de NetSuite.
+     * @param {number|string} plugInContext.userId - El ID del usuario ejecutando la acción.
+     * @returns {Object} Objeto de respuesta estandarizado requerido por el EI Framework (eiStatus, message, success).
+     */
     function send(plugInContext) {
         var txnId = (plugInContext.transaction && plugInContext.transaction.id) ? plugInContext.transaction.id : 'DESCONOCIDO';
         logger.write('1. INICIO FLUJO ORQUESTADOR', 'Plug-in invocado para transacción ID: ' + txnId);
@@ -945,10 +1048,11 @@ define([
 
             var pdfFileId = filesModule.generateCertifiedPdf(txnRecordFull, customerRecordFull, configData.templates[txnType], extraFields, filePrefix + '.pdf');
             extraFields['custbody_edoc_generated_pdf'] = pdfFileId;
+            extraFields['custbody_sads_fama_cfdi_resp_id'] = cfdiId;
 
             // -- Paso 6: Retorno Exitoso --
             var finalReturn = _buildFrameworkReturn(plugInContext, statusAnalysis.eDocStatus, statusAnalysis.details, true, extraFields);
-            logger.write('FIN EXITOSO', { transactionId: txnId, uuid: uuid });
+            logger.write('FIN EXITOSO'+ JSON.stringify({ transactionId: txnId, uuid: uuid }), finalReturn);
             
             return finalReturn;
 
@@ -966,8 +1070,16 @@ define([
     // ==========================================
 
     /**
-     * Construye el objeto estandarizado que requiere el framework de NetSuite.
+     * Construye el objeto estandarizado que requiere el framework de NetSuite para actualizar 
+     * los registros tras un intento de envío.
      * Refactorizado: Se eliminó el try/catch redundante usando inicialización segura (Fail-Safe Defaults).
+     * * @private
+     * @param {Object} plugInContext - Contexto original inyectado por NetSuite.
+     * @param {string} eDocStatus - Estado final del documento (ej. '3' certificado, '4' error).
+     * @param {string} detailsMsg - Mensaje descriptivo del resultado de la operación.
+     * @param {boolean} isSuccess - Determina si la transacción fue exitosa para permitir la actualización de campos.
+     * @param {Object} extraFields - Diccionario de IDs de campos custom a actualizar en la transacción.
+     * @returns {Object} La estructura exacta requerida por `app_einvoice_sending_manager.js`.
      */
     function _buildFrameworkReturn(plugInContext, eDocStatus, detailsMsg, isSuccess, extraFields) {
         // Uso de operadores OR lógicos para evitar accesos a propiedades indefinidas
@@ -988,6 +1100,8 @@ define([
             bundleName: CONSTANTS.BUNDLE_NAME
         };
 
+        logger.write('Funcion _buildFrameworkReturn ejecutada, resultado construido para el framework', finalResult);
+
         return {
             eiStatus: finalResult,
             message: isSuccess ? '' : detailsMsg, // El framework usa message para los errores
@@ -996,7 +1110,12 @@ define([
     }
 
     /**
-     * Fábrica de errores estandarizada. (Compromise Recording)
+     * Fábrica de errores estandarizada (Compromise Recording).
+     * * @private
+     * @param {string} customMessage - Mensaje de contexto sobre dónde ocurrió el fallo general.
+     * @param {Error|Object} e - Excepción capturada.
+     * @param {Object} contextData - Variables de estado para recrear el escenario del error.
+     * @returns {void}
      */
     function logError(customMessage, e, contextData) {
         var errorDetails = {
@@ -1008,8 +1127,20 @@ define([
         logger.write(customMessage, errorDetails);
     }
 
-    // Funciones requeridas por el plugin
-    function getStatus(scriptContext) { return { success: true, message: 'Procesamiento síncrono.' }; }
+    /**
+     * Devuelve el estado y las capacidades actuales del plugin al framework de EI.
+     * * @param {Object} scriptContext - Contexto base de ejecución.
+     * @returns {Object} Objeto de estado indicando soporte de procesamiento síncrono.
+     */
+    function getStatus(scriptContext) { 
+        return { success: true, message: 'Procesamiento síncrono.' }; 
+    }
+
+    /**
+     * Método requerido por la interfaz del plug-in (No implementado/delegado).
+     * * @param {Object} fakeSatCodesInstance - Instancia ficticia o base enviada por NetSuite.
+     * @returns {void}
+     */
     function setSATCodesInstance(fakeSatCodesInstance) { }
 
     return { 
@@ -1018,4 +1149,14 @@ define([
         setSATCodesInstance: setSATCodesInstance 
     };
 });
+/**
+ * refactor(orchestrator): aplicar clean architecture, mediator pattern y documentacion JSDoc
+ * Descripción (Body):
+ * Se refactorizó el orquestador principal (pi_sads_fama_connector.js) que actúa como el Mediator central del framework de facturación electrónica de NetSuite:
+ * * 🏗️ Clean Architecture (Mediator Pattern): Se aisló la lógica de negocio delegando las responsabilidades de infraestructura a adaptadores específicos (apiModule, filesModule, configModule, cfdiModule). El orquestador ahora se lee como una secuencia lineal de alto nivel (Casos de Uso) sin preocuparse por los detalles de implementación de bajo nivel.
+ * * 🛡️ Fail-Safe Defaults & Guard Clauses: Se implementó la validación temprana (Fail Fast) para el payload y la subsidiaria. Se eliminó el riesgo de excepciones no controladas causadas por el acceso a propiedades indefinidas mediante el uso de operadores OR lógicos (`||`) al construir la respuesta (`_buildFrameworkReturn`).
+ * * 🧹 Clean Code (DRY Principle): Se eliminó el bloque `try/catch` anidado y redundante en la función de construcción del retorno. Las constantes críticas como el BUNDLE_ID y el STATUS_ERROR se extrajeron a un diccionario central para evitar el uso de Magic Strings.
+ * * 🩺 Compromise Recording (Degradación Elegante): Si ocurre un fallo catastrófico no controlado en cualquier punto del flujo, el bloque `catch` principal captura el *stack trace*, lo registra a través del logger centralizado, y devuelve una estructura de fallo estandarizada ("4") para evitar que la aplicación NetSuite colapse abruptamente.
+ * * 📚 Documentación (JSDoc): Se documentaron todas las funciones públicas y privadas, especificando el contrato estricto del framework `plugInContext` para facilitar el mantenimiento y la comprensión de la arquitectura de inyección de dependencias a futuros desarrolladores.
+ */
 
