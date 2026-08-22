@@ -28,9 +28,9 @@ define(['N/file', 'N/encode', 'N/render', './sads_fama_logger'], function(file, 
      * @returns {number} El ID interno (internalid) del archivo guardado en el File Cabinet.
      * @throws {Error} Si el contenido Base64 está vacío o si falla la decodificación nativa del motor de NetSuite.
      */
-    function saveXml(fileName, base64Content) {
+    function saveXml(fileName, base64Content, targetFolderId) {
         var decodedXml = '';
-        
+        var finalFolderId = targetFolderId || CONSTANTS.TARGET_FOLDER_ID;
         try {
             // Validamos que venga contenido antes de intentar procesar
             if (!base64Content) {
@@ -52,7 +52,7 @@ define(['N/file', 'N/encode', 'N/render', './sads_fama_logger'], function(file, 
                 name: fileName, 
                 fileType: file.Type.XMLDOC, 
                 contents: decodedXml, 
-                folder: CONSTANTS.TARGET_FOLDER_ID 
+                folder: finalFolderId 
             });
             
             return xmlFile.save();
@@ -73,7 +73,7 @@ define(['N/file', 'N/encode', 'N/render', './sads_fama_logger'], function(file, 
      * @returns {number} El ID interno (internalid) del archivo PDF guardado en el File Cabinet.
      * @throws {Error} Si faltan parámetros obligatorios o si el motor de renderizado falla por plantillas mal formadas.
      */
-    function generateCertifiedPdf(txnRecord, customerRecord, pdfTemplateId, extraFields, fileName) {
+    function generateCertifiedPdf(txnRecord, customerRecord, pdfTemplateId, extraFields, fileName, targetFolderId) {
         try {
             if (!txnRecord || !pdfTemplateId) {
                 throw new Error('Faltan parámetros obligatorios (txnRecord o pdfTemplateId) para generar el PDF.');
@@ -102,7 +102,7 @@ define(['N/file', 'N/encode', 'N/render', './sads_fama_logger'], function(file, 
 
             var pdfFile = renderer.renderAsPdf();
             pdfFile.name = fileName;
-            pdfFile.folder = CONSTANTS.TARGET_FOLDER_ID;
+            pdfFile.folder = targetFolderId || CONSTANTS.TARGET_FOLDER_ID;
             
             logger.write('Funcion generateCertifiedPdf ejecutada, Retorno de Archivo PDF:', pdfFile.name);
             return pdfFile.save();
