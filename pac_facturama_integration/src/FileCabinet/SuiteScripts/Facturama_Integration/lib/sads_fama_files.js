@@ -3,7 +3,7 @@
  * @NModuleScope Public
  * * Módulo: Gestor de Archivos y Renderizado (File System Adapter)
  */
-define(['N/file', 'N/encode', 'N/render', './sads_fama_logger'], function(file, encode, render, logger) {
+define(['N/file', 'N/encode', 'N/render', './sads_fama_logger'], function (file, encode, render, logger) {
     'use strict';
 
     // ==========================================
@@ -13,7 +13,8 @@ define(['N/file', 'N/encode', 'N/render', './sads_fama_logger'], function(file, 
         TARGET_FOLDER_ID: -15, // Carpeta de Attachments por defecto
         DATA_SOURCE_ALIAS: 'custom',
         TEMPLATE_RECORD: 'record',
-        TEMPLATE_CUSTOMER: 'customer'
+        TEMPLATE_CUSTOMER: 'customer',
+
     };
 
     // ==========================================
@@ -28,37 +29,47 @@ define(['N/file', 'N/encode', 'N/render', './sads_fama_logger'], function(file, 
      * @returns {number} El ID interno (internalid) del archivo guardado en el File Cabinet.
      * @throws {Error} Si el contenido Base64 está vacío o si falla la decodificación nativa del motor de NetSuite.
      */
-    function saveXml(fileName, base64Content, targetFolderId) {
-        var decodedXml = '';
+    function saveFile(fileName, base64Content, targetFolderId) {
+        var nsFileType;
+        var fileContent = '';
         var finalFolderId = targetFolderId || CONSTANTS.TARGET_FOLDER_ID;
+        var isPDF = fileName.toLowerCase().indexOf('.pdf') !== -1;
+
         try {
             // Validamos que venga contenido antes de intentar procesar
             if (!base64Content) {
                 throw new Error('El contenido Base64 del XML está vacío.');
             }
 
-            try {
-                decodedXml = encode.convert({ 
-                    string: base64Content, 
-                    inputEncoding: encode.Encoding.BASE_64, 
-                    outputEncoding: encode.Encoding.UTF_8 
-                });
-            } catch (decodeError) {
-                // FAIL-SAFE: No guardamos basura. Si no se puede decodificar, abortamos.
-                throw new Error('Fallo al decodificar el XML Base64 a UTF-8: ' + decodeError.message);
+            if (isPDF) {
+                fileContent = base64Content; // Para PDF, no decodificamos, lo guardamos tal cual
+                nsFileType = file.Type.PDF;
+            } else {
+
+                try {
+                    fileContents = encode.convert({
+                        string: base64Content,
+                        inputEncoding: encode.Encoding.BASE_64,
+                        outputEncoding: encode.Encoding.UTF_8
+                    });
+                    nsFileType = file.Type.XMLDOC;
+                } catch (decodeError) {
+                    throw new Error('Fallo al decodificar el archivo Base64 a UTF-8: ' + decodeError.message);
+                }
+
             }
 
-            var xmlFile = file.create({ 
-                name: fileName, 
-                fileType: file.Type.XMLDOC, 
-                contents: decodedXml, 
-                folder: finalFolderId 
-            });
-            
-            return xmlFile.save();
 
+            var newFile = file.create({
+                name: fileName,
+                fileType: nsFileType,
+                contents: fileContents,
+                folder: finalFolderId
+            });
+
+            return newFile.save();
         } catch (error) {
-            logError('Fallo al guardar archivo XML', error, { fileName: fileName });
+            logError('Fallo al guardar docuemnto', error, { fileName: fileName });
             throw error; // Propagamos al orquestador para que aborte la transacción
         }
     }
@@ -81,10 +92,10 @@ define(['N/file', 'N/encode', 'N/render', './sads_fama_logger'], function(file, 
 
             var renderer = render.create();
             renderer.setTemplateById({ id: pdfTemplateId });
-            
+
             // Inyección de registros estándar de NetSuite
             renderer.addRecord({ templateName: CONSTANTS.TEMPLATE_RECORD, record: txnRecord });
-            
+
             if (customerRecord) {
                 renderer.addRecord({ templateName: CONSTANTS.TEMPLATE_CUSTOMER, record: customerRecord });
             }
@@ -93,7 +104,7 @@ define(['N/file', 'N/encode', 'N/render', './sads_fama_logger'], function(file, 
             var customData = {
                 certData: extraFields || {}
             };
-            
+
             renderer.addCustomDataSource({
                 format: render.DataSource.OBJECT,
                 alias: CONSTANTS.DATA_SOURCE_ALIAS,
@@ -103,14 +114,14 @@ define(['N/file', 'N/encode', 'N/render', './sads_fama_logger'], function(file, 
             var pdfFile = renderer.renderAsPdf();
             pdfFile.name = fileName;
             pdfFile.folder = targetFolderId || CONSTANTS.TARGET_FOLDER_ID;
-            
+
             logger.write('Funcion generateCertifiedPdf ejecutada, Retorno de Archivo PDF:', pdfFile.name);
             return pdfFile.save();
 
         } catch (error) {
             // Compromise Recording: Guardamos el contexto exacto de qué plantilla y registro falló
-            logError('Fallo al generar PDF Certificado', error, { 
-                fileName: fileName, 
+            logError('Fallo al generar PDF Certificado', error, {
+                fileName: fileName,
                 templateId: pdfTemplateId,
                 transactionId: txnRecord ? txnRecord.id : 'N/A'
             });
@@ -140,16 +151,16 @@ define(['N/file', 'N/encode', 'N/render', './sads_fama_logger'], function(file, 
         logger.write('ERROR FILES: ' + customMessage, errorDetails);
     }
 
-    return { 
-        saveXml: saveXml, 
-        generateCertifiedPdf: generateCertifiedPdf 
+    return {
+        saveFile: saveFile,
+        generateCertifiedPdf: generateCertifiedPdf
     };
 });
 /**
  * refactor(file-adapter): aplicar fail-safe defaults, blindar renderizado de PDF y agregar JSDoc
  * Descripción (Body):
  * Se refactorizó el adaptador de infraestructura sads_fama_files.js para interactuar de forma segura con el File Cabinet y el motor de renderizado:
- * * 🛡️ Fail-Safe Defaults: Se eliminó un comportamiento peligroso en saveXml que permitía guardar cadenas Base64 crudas con extensión .xml en caso de fallar la decodificación UTF-8. Ahora aborta la operación y propaga el error (Fail Fast).
+ * * 🛡️ Fail-Safe Defaults: Se eliminó un comportamiento peligroso en saveFile que permitía guardar cadenas Base64 crudas con extensión .xml en caso de fallar la decodificación UTF-8. Ahora aborta la operación y propaga el error (Fail Fast).
  * * 🩺 Compromise Recording: Se integró el módulo central de logging (sads_fama_logger.js). Se añadieron bloques try/catch a la generación del PDF para atrapar excepciones del motor FreeMarker, registrando el ID de la plantilla y de la transacción para facilitar auditorías.
  * * 🧹 Clean Code: Se encapsularon los "Magic Numbers/Strings" (IDs de carpetas y alias de plantillas) en un diccionario CONSTANTS para documentar la intención de las variables.
  * * 📚 Documentación (JSDoc): Se incorporaron firmas de funciones estandarizadas en JSDoc para facilitar la lectura del código por otros desarrolladores e inicializar el soporte de IntelliSense en los IDEs, documentando parámetros esperados y tipos de retorno para las operaciones del sistema de archivos.

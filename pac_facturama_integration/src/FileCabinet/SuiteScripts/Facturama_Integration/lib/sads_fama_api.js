@@ -99,11 +99,12 @@ define(['N/https', './sads_fama_logger'], function (https, logger) {
      * * @param {string} baseUrl - La URL base para la descarga, debe contener el token '{id}'.
      * @param {Object} headers - Cabeceras HTTP de autorización.
      * @param {string} cfdiId - El identificador único del CFDI en el sistema del PAC.
+     * @param {string} type - Tipo de documento a descargar (ej. 'xml').
      * @returns {Object|null} El JSON representativo del XML o null en caso de fallo absoluto de red.
      */
-    function getXml(baseUrl, headers, cfdiId) {
+    function getFile(baseUrl, headers, cfdiId, type) {
         var resp = null; // Lo declaramos aquí para garantizar su acceso en el bloque catch
-        var finalUrl = baseUrl.replace('{id}', cfdiId);
+        var finalUrl = baseUrl.replace('{id}', cfdiId).replace('{type}', type);
 
         try {
             resp = https.get({ url: finalUrl, headers: headers });
@@ -115,7 +116,7 @@ define(['N/https', './sads_fama_logger'], function (https, logger) {
                 throw new Error('El PAC rechazó la descarga XML. Body: ' + errorMsg);
             }
             
-            logger.write('Funcion getXml Ejecutada, Retorno de Funcion:', resp);
+            logger.write('Funcion getFile Ejecutada, Retorno de Funcion:', resp);
             return safeParse(resp.body);
 
         } catch (error) {
@@ -145,7 +146,7 @@ define(['N/https', './sads_fama_logger'], function (https, logger) {
         // Si nadie fuera de este archivo llama a safeParse, elimínalo de aquí abajo.
         safeParse: safeParse, 
         postTimbrado: postTimbrado,
-        getXml: getXml
+        getFile: getFile
     };
 });
 /**

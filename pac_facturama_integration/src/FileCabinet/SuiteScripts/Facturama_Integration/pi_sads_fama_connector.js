@@ -86,9 +86,9 @@ define([
             var uuid = facturamaData.Complement && facturamaData.Complement.TaxStamp ? facturamaData.Complement.TaxStamp.Uuid : 'UUID_N/A';
             var filePrefix = txnLookup.tranid + '_' + uuid;
 
-            var xmlData = apiModule.getXml(configData.apiGetUrl, headers, cfdiId);
+            var xmlData = apiModule.getFile(configData.apiGetUrl, headers, cfdiId, 'xml');
             var xmlContent = (xmlData && xmlData.Content) ? xmlData.Content : 'XML_VACIO';
-            var xmlFileId = filesModule.saveXml('CFDI_' + filePrefix + '.xml', xmlContent);
+            var xmlFileId = filesModule.saveFile('CFDI_' + filePrefix + '.xml', xmlContent);
 
             var extraFields = cfdiModule.buildExtraFields(originalPayload, facturamaData, xmlFileId, cfdiId, xmlContent);
 

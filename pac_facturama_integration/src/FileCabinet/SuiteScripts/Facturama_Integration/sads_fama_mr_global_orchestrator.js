@@ -146,13 +146,13 @@ define([
             var uuid = apiResponse.Complement.TaxStamp.Uuid;
 
             // 6. Descarga y Generación de Archivos Físicos
-            var xmlData = api.getXml(configData.apiGetUrl, headers, cfdiId);
+            var xmlData = api.getFile(configData.apiGetUrl, headers, cfdiId, 'xml');
             var fileNamePrefix = 'FacturaGlobal_' + uuid;
 
             // Resolvemos la carpeta dinámicamente
             var targetFolderId = _getDestinationFolderId(subsidiaryId);
 
-            var xmlId = filesAdapter.saveXml(fileNamePrefix + '.xml', xmlData.Content, targetFolderId);
+            var xmlId = filesAdapter.saveFile(fileNamePrefix + '.xml', xmlData.Content, targetFolderId);
             var templateId = currentScript.getParameter({ name: CONSTANTS.PARAM_TEMPLATE_ID });
 
             var templateId = currentScript.getParameter({ name: CONSTANTS.PARAM_TEMPLATE_ID });

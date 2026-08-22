@@ -16,7 +16,7 @@ define(['N/search', 'N/encode'], function(search, encode) {
         USER: 'custrecord_sads_fama_user',
         PASS: 'custrecord_sads_fama_pass',
         URL_API: 'custrecord_sads_fama_url_api',
-        URL_GET: 'custrecord_sads_fama_url_api_getxml',
+        URL_GET: 'custrecord_sads_fama_url_api_getfile',
         TMPL_INV: 'custrecord_sads_fama_tmpl_inv',
         TMPL_CS: 'custrecord_sads_fama_tmpl_cs',
         TMPL_CM: 'custrecord_sads_fama_tmpl_cm',
