@@ -47,7 +47,7 @@ define(['N/file', 'N/encode', 'N/render', './sads_fama_logger'], function (file,
             } else {
 
                 try {
-                    fileContents = encode.convert({
+                    fileContent = encode.convert({
                         string: base64Content,
                         inputEncoding: encode.Encoding.BASE_64,
                         outputEncoding: encode.Encoding.UTF_8
@@ -59,11 +59,10 @@ define(['N/file', 'N/encode', 'N/render', './sads_fama_logger'], function (file,
 
             }
 
-
             var newFile = file.create({
                 name: fileName,
                 fileType: nsFileType,
-                contents: fileContents,
+                contents: fileContent,
                 folder: finalFolderId
             });
 

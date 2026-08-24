@@ -145,23 +145,23 @@ define([
             var cfdiId = apiResponse.Id;
             var uuid = apiResponse.Complement.TaxStamp.Uuid;
 
-            // 6. Descarga y Generación de Archivos Físicos
-            var xmlData = api.getFile(configData.apiGetUrl, headers, cfdiId, 'xml');
+            // 6. Descarga y Generación de Archivos Físicos (Delegación al PAC)
+            var targetFolderId = _getDestinationFolderId(subsidiaryId);
             var fileNamePrefix = 'FacturaGlobal_' + uuid;
 
-            // Resolvemos la carpeta dinámicamente
-            var targetFolderId = _getDestinationFolderId(subsidiaryId);
+            // 6.1 Obtener y guardar XML
+            var xmlData = api.getFile(configData.apiGetUrl, headers, cfdiId, 'xml');
+            var xmlContent = (xmlData && xmlData.Content) ? xmlData.Content : null;
+            if (!xmlContent) throw new Error('Facturama no devolvió el contenido Base64 del XML.');
 
-            var xmlId = filesAdapter.saveFile(fileNamePrefix + '.xml', xmlData.Content, targetFolderId);
-            var templateId = currentScript.getParameter({ name: CONSTANTS.PARAM_TEMPLATE_ID });
+            var xmlId = filesAdapter.saveFile(fileNamePrefix + '.xml', xmlContent, targetFolderId);
 
-            var templateId = currentScript.getParameter({ name: CONSTANTS.PARAM_TEMPLATE_ID });
-            if (!templateId) {
-                throw new Error('No se ha configurado el parámetro de Plantilla PDF en el despliegue del script.');
-            }
+            // 6.2 Obtener y guardar PDF directamente del PAC
+            var pdfData = api.getFile(configData.apiGetUrl, headers, cfdiId, 'pdf');
+            var pdfContent = (pdfData && pdfData.Content) ? pdfData.Content : null;
+            if (!pdfContent) throw new Error('Facturama no devolvió el contenido Base64 del PDF.');
 
-            var dummyRecord = record.load({ type: 'customrecord_drt_reg_facturacion_interco', id: regId });
-            var pdfId = filesAdapter.generateCertifiedPdf(dummyRecord, null, templateId, { custbody_mx_cfdi_uuid: uuid }, fileNamePrefix + '.pdf', targetFolderId);
+            var pdfId = filesAdapter.saveFile(fileNamePrefix + '.pdf', pdfContent, targetFolderId);
 
             // 7. El Puente (Mediator): Despachar tareas atómicas a la fase Reduce
             var successData = {

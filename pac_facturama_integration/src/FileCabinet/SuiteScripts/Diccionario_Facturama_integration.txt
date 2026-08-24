@@ -1,0 +1,2501 @@
+===================
+File: fama_global_invoice_client.js
+===================
+/******************************************************************
+ * * DisrupTT * DisrupTT Developers *
+ * ****************************************************************
+ * Date: 2021
+ * Script name: Global Invoice Client
+ * Script id: customscript_global_invoice_client
+ * Deployment id: customdeploy_global_invoice_suitelet
+ * Applied to:
+ * File: global_invoice_client.js
+ ******************************************************************/
+/**
+ * @NApiVersion 2.x
+ * @NScriptType ClientScript
+ * @NModuleScope Public
+ */
+define(['N/currentRecord', 'N/url', 'N/format', 'N/ui/message', 'N/log'],
+
+	function (currentRecord, url, format, message, log) {
+
+		function pageInit() {}
+
+		function saveRecord(context) {
+			var rec = currentRecord.get();
+
+			if (!rec.getValue('custpage_usecfdi')) {
+				showMessage('Capture el valor para el campo Uso de CFDI.');
+				return false;
+			}
+
+			if (!rec.getValue('custpage_paymhetod')) {
+				showMessage('Capture el valor para el campo Methodo de pago.');
+				return false;
+			}
+
+			if (!rec.getValue('custpage_payform')) {
+				showMessage('Capture el valor para el campo Forma de Pago.');
+				return false;
+			}
+
+			if (!rec.getValue('custpage_dateini')) {
+				showMessage('Capture el valor para el campo Fecha.');
+				return false;
+			}
+
+			if (!rec.getValue('custpage_dateinie')) {
+				showMessage('Capture el valor para el campo Fecha.');
+				return false;
+			}
+
+			var sublistName = 'custpage_transactions';
+			var rows = rec.getLineCount({
+				sublistId: sublistName
+			});
+
+			if (rows == 0) {
+				showMessage('No hay registros a Procesar.');
+				return false;
+			}
+			return true;
+		}
+		/**
+		 * [reloadForm description]
+		 * @param  {[type]} scId [description]
+		 * @param  {[type]} dpId [description]
+		 * @return {[type]}      [description]
+		 */
+		function reloadForm(scId, dpId) {
+			debugger;
+			var rec = currentRecord.get();
+			// mando los parametros al suitelet
+			var trandate = '';
+			if (rec.getValue('custpage_dateini')) {
+				trandate = format.format({
+					value: rec.getValue('custpage_dateini'),
+					type: format.Type.DATE
+				}) || '';
+			}
+			var endDate = '';
+			if (rec.getValue('custpage_dateinie')) {
+				endDate = format.format({
+					value: rec.getValue('custpage_dateinie'),
+					type: format.Type.DATE
+				}) || '';
+			}
+			var created = '';
+			/*if (rec.getValue('custpage_createdate')) {
+				created = format.format({
+					value: rec.getValue('custpage_createdate'),
+					type: format.Type.DATE
+				}) || '';
+			}*/
+			if (rec.getValue('custpage_createdate')) {
+				created = rec.getText('custpage_createdate');
+			}
+			var subsidiary = rec.getValue('custpage_subsidiary') || null;
+			var ucfdi = rec.getValue('custpage_usecfdi') || null;
+			var paymethod = rec.getValue('custpage_paymhetod') || null;
+			var payformat = rec.getValue('custpage_payform') || null;
+			var customer = rec.getValue('custpage_customer') || null;
+			var periodicidad = rec.getValue('custpage_periodicidad') || null;
+			var meses = rec.getValue('custpage_meses') || null;
+			var anio = rec.getValue('custpage_anio');
+
+			var script = url.resolveScript({
+				scriptId: scId,
+				deploymentId: dpId,
+				returnExternalUrl: false,
+				params: {
+					subsidiary: subsidiary,
+					pde: endDate,
+					pds: trandate,
+					pdc: created,
+					ucfdi: ucfdi,
+					pm: paymethod,
+					pf: payformat,
+					cus: customer,
+					per: periodicidad,
+					mes: meses,
+					ani: anio,
+				}
+			});
+			// refresco la pantalla
+			window.onbeforeunload = false;
+			window.location.href = script;
+		}
+		/**
+		 * [showMessage description]
+		 * @param  {[type]} msg [description]
+		 * @return {[type]}     [description]
+		 */
+		function showMessage(msg, time) {
+			if (!msg) {
+				return;
+			}
+			if (!time) {
+				time = 3000;
+			}
+			var myMessage = message.create({
+				title: 'WARNING',
+				message: msg,
+				type: message.Type.WARNING
+			});
+			myMessage.show({
+				duration: time
+			});
+		}
+
+		function fieldChanged(context) {
+			var currentRecord = context.currentRecord;
+			var sublistName = context.sublistId;
+			var sublistFieldName = context.fieldId;
+			var totalSuma = 0;
+			var counter = 0;
+			var idInternoFacturas = [];
+
+			if (sublistName === 'custpage_transactions' && sublistFieldName === 'custpage_validar'){
+				var lineasTotal = currentRecord.getLineCount("custpage_transactions");
+
+				for (var i = 0; i < lineasTotal; i++){
+					if(currentRecord.getSublistValue({sublistId: 'custpage_transactions', fieldId: 'custpage_validar', line: i }) === true){
+
+						var total = currentRecord.getSublistValue({sublistId: 'custpage_transactions', fieldId: 'custpage_fxamount', line: i });
+
+						var idFactura = currentRecord.getSublistValue({sublistId: 'custpage_transactions', fieldId: 'custpage_internalid', line: i });
+
+						totalSuma += total;
+
+						currentRecord.setValue({
+							fieldId: 'custpage_importe',
+							value: totalSuma.toFixed(2)
+						});
+
+						idInternoFacturas.push(idFactura);
+
+						currentRecord.setValue({
+							fieldId: 'custpage_arreglo',
+							value: idInternoFacturas
+						});
+						
+						counter = counter + 1;
+
+					}
+				}
+
+				if(counter == 0){
+					currentRecord.setValue({
+						fieldId: 'custpage_importe',
+						value: counter
+					});
+
+					currentRecord.setValue({
+						fieldId: 'custpage_arreglo',
+						value: ""
+					});
+				}
+			}
+		}
+		   
+
+		return {
+			pageInit: pageInit,
+			saveRecord: saveRecord,
+			reloadForm: reloadForm,
+			fieldChanged: fieldChanged
+		};
+	});
+
+===================
+File: fama_global_invoice_library.js
+===================
+/******************************************************************
+ * * DisrupTT * DisrupTT Developers *
+ * ****************************************************************
+ * Date: 2021
+ * Script name:
+ * Script id:
+ * Deployment id:
+ * Applied to:
+ * File: global_invoice_library.js
+ ******************************************************************/
+/**
+ * @NApiVersion 2.x
+ */
+ define(['N/search', 'N/config', 'N/record', 'N/log'],
+
+ function (search, config, record, log) {
+	 const CONST_SUBSIDIARY = 9;
+
+	 /**
+	  * [getAllTransaction description]
+	  * @param  {[type]} params [description]
+	  * @return {[type]}        [description]
+	  */
+	 function getAllTransaction(params) {
+		 var resultSearch = [];
+		 var rangini = 0;
+		 var rangend = 1000;
+
+		 log.debug("params lib", params);
+
+		 if (!params.datesearche || params.datesearche === '') {
+			 return resultSearch;
+		 }
+
+		 if (!params.datesearch || params.datesearch === '') {
+			 return resultSearch;
+		 }
+
+		 try {
+			 //BÚSQUEDA GUARDADA: Facturación Global - Library
+			 var afilters = [];
+			 afilters.push(['mainline', search.Operator.IS, true]);
+			 afilters.push('AND');
+			 afilters.push(['type', search.Operator.ANYOF, "CashSale"]);
+			 afilters.push('AND');
+			 afilters.push(['custbody_mx_cfdi_uuid', search.Operator.ISEMPTY, '']);
+			 afilters.push('AND');
+			 afilters.push(['subsidiary', search.Operator.IS, parseInt(params.subsidiary).toFixed(0)]);
+			 afilters.push('AND');
+			 afilters.push(['voided', search.Operator.IS, false]);
+			 afilters.push('AND');
+			 afilters.push(['trandate', search.Operator.WITHIN, params.datesearch, params.datesearche]);
+			 afilters.push('AND');
+			 //afilters.push(["custbody_drt_nc_intercompania", search.Operator.IS, true]);
+			 //afilters.push('AND');
+			 afilters.push(['name', search.Operator.ANYOF, params.customer]);
+            // El campo estándar en la transacción para el método de pago es 'paymentmethod'.
+            // El parámetro que viene del Suitelet es 'params.paymentm'.
+             if (params.paymentm && params.paymentm !== '0') { 
+                afilters.push('AND');
+                afilters.push(['custbody_mx_txn_sat_payment_method', search.Operator.ANYOF, params.paymentm]);
+             }
+
+			 log.audit({
+				 title: 'afilters',
+				 details: JSON.stringify(afilters)
+			 });
+			 var acolumns = [
+				'tranid',
+				'trandate',
+				'entity',
+				'fxamount',
+				'createdby',
+			];
+			 log.audit({
+				 title: 'acolumns',
+				 details: JSON.stringify(acolumns)
+			 });
+
+			 var schRecord = search.create({
+				 type: search.Type.TRANSACTION,
+				 filters: afilters,
+				 columns: acolumns,
+			 });
+			 log.audit({
+				 title: 'schRecord',
+				 details: JSON.stringify(schRecord)
+			 });
+			 var searchResultCount = schRecord.runPaged().count;
+			 schRecord.run().each(function (row) {
+				 resultSearch.push({
+					 id: row.id,
+					 type: row.type,
+					 trandate: row.getValue('trandate'),
+					 tranid: row.getValue('tranid'),
+					 fxamount: row.getValue('fxamount'),
+					 name: row.getText('entity'),
+					 createdby: row.getText('createdby') || "S/I",
+				 });
+				 return true;
+			 });
+
+
+		 } catch (err) {
+			 log.error('Error resultSearch', err);
+		 }
+		 log.audit({
+			 title: 'resultSearch',
+			 details: JSON.stringify(resultSearch)
+		 });
+		 return resultSearch;
+	 }
+	 /**
+	  * [getFilebyName description]
+	  * @param  {[type]} filename [description]
+	  * @return {[type]}          [description]
+	  */
+	 function getFilebyName(filename) {
+		 var fileId = null;
+		 var afilters = [{
+			 name: 'name',
+			 operator: search.Operator.IS,
+			 values: filename
+		 }];
+		 var acolumns = ['folder'];
+
+		 search.create({
+			 type: 'file',
+			 columns: acolumns,
+			 filters: afilters
+		 }).run().each(function (r) {
+			 fileId = r.id;
+		 });
+		 return fileId;
+	 }
+	 /**
+	  * [getTranslate description]
+	  * @return {[type]} [description]
+	  */
+	 function getTranslate() {
+		 var userPrefer = config.load({
+			 type: config.Type.USER_PREFERENCES
+		 });
+		 var defaultHelpE = 'This is a custom field created for your account. Contact your administrator for details.';
+		 var defaultHelpS = 'Este es un campo personalizado creado para su cuenta. Comuníquese con su administrador para obtener más detalles.';
+		 var expreg = /es/;
+		 var strlang = expreg.test(userPrefer.getValue('LANGUAGE'));
+		 var label = {
+			 form: strlang == true ? 'Facturación Global' : 'Invoice Massive',
+			 label1: strlang == true ? 'Fecha Emision XML' : 'XML Issue Date',
+			 label2: strlang == true ? 'Uso CFDI' : 'CFDI Usage',
+			 label3: strlang == true ? 'Metodo de Pago SAT' : 'SAT Payment Method',
+			 label4: strlang == true ? 'Forma de Pago SAT' : 'SAT Payment Term',
+			 label5: strlang == true ? 'Fecha Inicio' : 'Star Date',
+			 labe18: strlang == true ? 'Fecha Fin' : 'End Date',
+			 label6: strlang == true ? 'Registros' : 'Records',
+			 label7: strlang == true ? 'Subsidiaria' : 'Subsidiary',
+			 label8: strlang == true ? 'Cliente:Trabajo' : 'Cliente:Trabajo',
+			 label9: strlang == true ? 'Importe' : 'Amount',
+			 label10: strlang == true ? 'Arreglo' : 'Array',
+			 label11: strlang == true ? 'Periodicidad' : 'Periodicidad',
+			 label12: strlang == true ? 'Meses' : 'Meses',
+			 label13: strlang == true ? 'Año' : 'Año',
+			 sublist: strlang == true ? 'Transacciones' : 'Transaction',
+			 column1: strlang == true ? 'Selecciona' : 'Select',
+			 column2: strlang == true ? 'Documento' : 'Document',
+			 column3: strlang == true ? 'Fecha' : 'Date',
+			 column4: strlang == true ? 'Nombre' : 'Name',
+			 column5: strlang == true ? 'Importe' : 'Amount',
+			 column7: strlang == true ? 'Creado por' : 'Created by',
+			 column6: strlang == true ? 'Confirmar' : 'Confirm',
+			 help1: strlang == true ? defaultHelpS : defaultHelpE,
+			 help2: strlang == true ? defaultHelpS : defaultHelpE,
+			 help3: strlang == true ? defaultHelpS : defaultHelpE,
+			 help4: strlang == true ? defaultHelpS : defaultHelpE,
+			 help5: strlang == true ? defaultHelpS : defaultHelpE,
+			 help6: strlang == true ? defaultHelpS : defaultHelpE,
+			 help7: strlang == true ? defaultHelpS : defaultHelpE,
+			 help8: strlang == true ? defaultHelpS : defaultHelpE,
+			 message1: strlang == true ? 'El proceso se ha ejecutado, la actualización puede tardar algunos minutos. Registro creado: ' : 'The process has run, the update may take some minutes. Record created: ',
+			 message2: strlang == true ? 'Por favor, seleccionar facturas' : 'Please, select invoices',
+			 button1: strlang == true ? 'Buscar' : 'Search',
+			 button2: strlang == true ? 'Generar Documento Electrónico' : 'Generate Electronic Document',
+			 button3: strlang == true ? 'Certificar Documento Electrónico' : 'Certify Electronic Document',
+			 button4: strlang == true ? 'Enviar' : 'Send'
+		 };
+		 return label;
+	 }
+
+	 return {
+		 getAllTransaction: getAllTransaction,
+		 getFilebyName: getFilebyName,
+		 getTranslate: getTranslate,
+	 };
+ });
+
+===================
+File: fama_global_invoice_suitelet.js
+===================
+/**
+ * @NApiVersion 2.x
+ * @NScriptType Suitelet
+ * @NModuleScope Public
+ * 
+ * SADS Facturama - Adaptador de Entrada (Driving Adapter / UI)
+ * 
+ * Arquitectura: Hexagonal (Ports and Adapters)
+ * Descripción: Interfaz de usuario para la Facturación Global. Recolecta la intención 
+ * del usuario, persiste los datos en un DTO (Custom Record) y delega la ejecución 
+ * asíncrona al Orquestador (Map/Reduce) cumpliendo el Principio de Responsabilidad Única.
+ */
+define([
+    'N/ui/serverWidget', 
+    'N/runtime', 
+    'N/error', 
+    'N/task', 
+    'N/redirect', 
+    'N/ui/message', 
+    'N/record', 
+    'N/search',
+    './fama_global_invoice_library'
+], function (ui, runtime, error, task, redirect, message, record, search, lib) {
+    'use strict';
+
+    // ==========================================
+    // 1. CONSTANTES DEL SISTEMA (Clean Code)
+    // ==========================================
+    var CONSTANTS = {
+        RECORDS: {
+            CFDI_USAGE: 'customrecord_mx_sat_cfdi_usage',
+            PAYMENT_METHOD: 'customrecord_mx_mapper_values',
+            PAYMENT_TERM: 'customrecord_mx_sat_payment_term',
+            PERIODICITY: 'customrecord_mcf_sat_recurrence',
+            MONTHS: 'customrecord_mcf_sat_months',
+            INTERCO_INVOICE: 'customrecord_drt_reg_facturacion_interco'
+        },
+        ORCHESTRATOR: {
+            SCRIPT_ID: 'customscript_sads_fama_mr_global_orch',
+            DEPLOY_ID: 'customdeploy_sads_fama_mr_global_orch'
+        }
+    };
+
+    // ==========================================
+    // 2. MÉTODOS DE LA INTERFAZ DE USUARIO
+    // ==========================================
+
+    /**
+     * Construye y renderiza el formulario visual para el usuario (Fase GET).
+     * @param {Object} context - El contexto inyectado por el framework de NetSuite.
+     */
+    function createForm(context) {
+        var oScript = context.request.parameters;
+        var idRegistroFacturacion = oScript.registroFacturacion;
+        var oLabels = lib.getTranslate();
+        
+        var form = ui.createForm({
+            title: oLabels.form
+        });
+
+        // 1. Manejo de Mensajes de Estado (UX)
+        if (oScript.custparam_message === 'processed') {
+            form.addPageInitMessage({
+                type: message.Type.INFORMATION,
+                message: oLabels.message1 + (idRegistroFacturacion || ''),
+                duration: 10000
+            });
+        } else if (oScript.custparam_message === 'error') {
+            form.addPageInitMessage({
+                type: message.Type.WARNING,
+                message: oLabels.message2,
+                duration: 5000
+            });
+        }
+
+        // 2. Enlace al Script de Cliente (Client Script)
+        var scriptId = lib.getFilebyName('fama_global_invoice_client.js');
+        if (scriptId) {
+            form.clientScriptFileId = scriptId;
+        }
+
+        // 3. Construcción de Campos del Formulario
+        _buildFormFields(form, oScript, oLabels);
+
+        // 4. Construcción y Llenado de la Sublista de Transacciones
+        var sublist = _buildSublist(form, oLabels);
+        _populateSublist(sublist, oScript);
+
+        // 5. Botones de Acción
+        var strFuncName = 'reloadForm("' + (oScript.script || '') + '","' + (oScript.deploy || '') + '")';
+        form.addButton({
+            id: 'custpage_search',
+            label: oLabels.button1,
+            functionName: strFuncName
+        });
+
+        form.addSubmitButton({
+            label: oLabels.button4
+        });
+
+        context.response.writePage(form);
+    }
+
+    // ==========================================
+    // 3. CONTROLADOR DE PETICIONES (API Entry Point)
+    // ==========================================
+
+    /**
+     * Punto de entrada principal del Suitelet. Enruta la petición según el verbo HTTP.
+     * @param {Object} context - Objeto de contexto de la petición y respuesta.
+     */
+    function onRequest(context) {
+        if (context.request.method === 'GET') {
+            createForm(context);
+        } else if (context.request.method === 'POST') {
+            _handlePostRequest(context.request.parameters);
+        }
+    }
+
+    // ==========================================
+    // 4. FUNCIONES PRIVADAS (Responsabilidad Única - SRP)
+    // ==========================================
+
+    /**
+     * Procesa el envío del formulario, guarda el estado y dispara el Orquestador.
+     * @private
+     * @param {Object} obj - Los parámetros capturados desde la petición POST.
+     */
+    function _handlePostRequest(obj) {
+        var recIdFacturacion = null;
+
+        try {
+            // 1. Validar y Persistir la intención del usuario (Crear el Custom Record)
+            if (obj.custpage_arreglo) {
+                var customRecFacturacion = record.create({
+                    type: CONSTANTS.RECORDS.INTERCO_INVOICE,
+                    isDynamic: true
+                });
+                
+                customRecFacturacion.setValue("custrecord_drt_start_date", obj.custpage_dateini);
+                customRecFacturacion.setValue("custrecord_drt_end_date", obj.custpage_dateinie);
+                customRecFacturacion.setText("custrecord_drt_xml_issue_date", obj.custpage_createdate);
+                customRecFacturacion.setValue("custrecord_drt_subsidiary", obj.custpage_subsidiary);
+                customRecFacturacion.setValue("custrecord_drt_customer", obj.custpage_customer);
+                customRecFacturacion.setValue("custrecord_drt_cfdi_usage", obj.custpage_usecfdi);
+                customRecFacturacion.setValue("custrecord_drt_sat_payment_method", obj.custpage_paymhetod);
+                customRecFacturacion.setValue("custrecord_drt_sat_payment_term", obj.custpage_payform);
+                customRecFacturacion.setValue("custrecord_drt_facturas", obj.custpage_arreglo);
+                customRecFacturacion.setValue("custrecord_drt_periodicidad", obj.custpage_periodicidad);
+                customRecFacturacion.setValue("custrecord_drt_meses", obj.custpage_meses);
+                customRecFacturacion.setValue("custrecord_drt_anio", obj.custpage_anio);
+                customRecFacturacion.setValue("custrecord_drt_status", "PROCESANDO");
+
+                recIdFacturacion = customRecFacturacion.save();
+                log.audit("Registro Pivote Creado", "ID: " + recIdFacturacion);
+            }
+
+            // 2. Invocar el Orquestador (Mediator) mediante Arquitectura Desacoplada (KISS)
+            var scriptTask = task.create({
+                taskType: task.TaskType.MAP_REDUCE
+            });
+
+            scriptTask.scriptId = CONSTANTS.ORCHESTRATOR.SCRIPT_ID;
+            scriptTask.deploymentId = CONSTANTS.ORCHESTRATOR.DEPLOY_ID;
+            
+            // Inyección exclusiva de la "Llave Maestra" al Orquestador
+            scriptTask.params = {
+                'custscript_sads_fama_reg_fact_id': recIdFacturacion
+            };
+
+            var scriptTaskId = scriptTask.submit();
+            log.audit("Orquestador Invocado Exitosamente", "Task ID: " + scriptTaskId);
+
+            // 3. Redirección y Notificación al Usuario
+            if (recIdFacturacion) {
+                redirect.toSuitelet({
+                    scriptId: 'customscript_fama_global_invoice_sl',
+                    deploymentId: 'customdeploy_fama_global_invoice_sl',
+                    parameters: {
+                        'custparam_message': 'processed',
+                        'registroFacturacion': recIdFacturacion
+                    }
+                });
+            } else {
+                redirect.toSuitelet({
+                    scriptId: 'customscript_fama_global_invoice_sl',
+                    deploymentId: 'customdeploy_fama_global_invoice_sl',
+                    parameters: { 'custparam_message': 'error' }
+                });
+            }
+
+        } catch (err) {
+            // 🛡️ Compromise Recording: Extracción segura de errores y prevención de objetos vacíos
+            var errorDetails = err.stack ? err.stack : (err.message || err.toString());
+            log.error({ title: 'Fallo al invocar Map/Reduce', details: errorDetails });
+            throw error.create({ 
+                name: err.name || 'TASK_SUBMISSION_ERROR', 
+                message: err.message || 'Error desconocido al invocar el proceso en segundo plano.' 
+            });
+        }
+    }
+
+    /**
+     * Construye dinámicamente los campos del formulario.
+     * @private
+     */
+    function _buildFormFields(form, params, oLabels) {
+        form.addField({ id: 'custpage_dateini', type: ui.FieldType.DATE, label: oLabels.label5 })
+            .updateDisplayType({ displayType: ui.FieldDisplayType.NORMAL })
+            .defaultValue = params.pds || '';
+
+        form.addField({ id: 'custpage_dateinie', type: ui.FieldType.DATE, label: oLabels.labe18 })
+            .defaultValue = params.pde || '';
+
+        form.addField({ id: 'custpage_createdate', type: ui.FieldType.DATETIMETZ, label: oLabels.label1 })
+            .defaultValue = params.pdc || '';
+
+        form.addField({ id: 'custpage_subsidiary', type: ui.FieldType.SELECT, label: oLabels.label7, source: 'subsidiary' })
+            .updateBreakType({ breakType: ui.FieldBreakType.STARTCOL })
+            .defaultValue = params.subsidiary || '';
+
+        form.addField({ id: 'custpage_customer', type: ui.FieldType.SELECT, label: oLabels.label8, source: 'customer' })
+            .defaultValue = params.cus || '';
+
+        form.addField({ id: 'custpage_importe', type: ui.FieldType.CURRENCY, label: oLabels.label9 })
+            .updateDisplayType({ displayType: ui.FieldDisplayType.INLINE });
+
+        form.addField({ id: 'custpage_arreglo', type: ui.FieldType.TEXT, label: oLabels.label10 })
+            .updateDisplayType({ displayType: ui.FieldDisplayType.HIDDEN });
+
+        form.addField({ id: 'custpage_usecfdi', type: ui.FieldType.SELECT, label: oLabels.label2, source: CONSTANTS.RECORDS.CFDI_USAGE })
+            .updateBreakType({ breakType: ui.FieldBreakType.STARTCOL })
+            .defaultValue = params.ucfdi || 1;
+
+        form.addField({ id: 'custpage_paymhetod', type: ui.FieldType.SELECT, label: oLabels.label3, source: CONSTANTS.RECORDS.PAYMENT_METHOD })
+            .defaultValue = params.pm || 1;
+
+        form.addField({ id: 'custpage_payform', type: ui.FieldType.SELECT, label: oLabels.label4, source: CONSTANTS.RECORDS.PAYMENT_TERM })
+            .defaultValue = params.pf || 3;
+
+        form.addField({ id: 'custpage_periodicidad', type: ui.FieldType.SELECT, label: oLabels.label11, source: CONSTANTS.RECORDS.PERIODICITY })
+            .updateBreakType({ breakType: ui.FieldBreakType.STARTCOL })
+            .defaultValue = params.per || 1;
+
+        form.addField({ id: 'custpage_meses', type: ui.FieldType.SELECT, label: oLabels.label12, source: CONSTANTS.RECORDS.MONTHS })
+            .defaultValue = params.mes || 1;
+
+        form.addField({ id: 'custpage_anio', type: ui.FieldType.TEXT, label: oLabels.label13 })
+            .defaultValue = params.ani || '';
+
+        var fieldRows = form.addField({ id: 'custpage_rows', type: ui.FieldType.INTEGER, label: oLabels.label6 });
+        fieldRows.updateDisplayType({ displayType: ui.FieldDisplayType.INLINE });
+        fieldRows.updateBreakType({ breakType: ui.FieldBreakType.STARTCOL });
+    }
+
+    /**
+     * Define la estructura de columnas de la sublista.
+     * @private
+     */
+    function _buildSublist(form, oLabels) {
+        var sublist = form.addSublist({
+            id: 'custpage_transactions',
+            type: ui.SublistType.LIST,
+            label: oLabels.sublist
+        });
+
+        sublist.addMarkAllButtons();
+        sublist.addField({ id: 'custpage_tranid', type: ui.FieldType.TEXT, label: oLabels.column2 });
+        sublist.addField({ id: 'custpage_validar', type: ui.FieldType.CHECKBOX, label: oLabels.column6 });
+        sublist.addField({ id: 'custpage_trandate', type: ui.FieldType.TEXT, label: oLabels.column3 });
+        sublist.addField({ id: 'custpage_name', type: ui.FieldType.TEXT, label: oLabels.column4 });
+        sublist.addField({ id: 'custpage_fxamount', type: ui.FieldType.CURRENCY, label: oLabels.column5 });
+        sublist.addField({ id: 'custpage_createdby', type: ui.FieldType.TEXT, label: oLabels.column7 });
+        
+        sublist.addField({ id: 'custpage_internalid', type: ui.FieldType.TEXT, label: 'Internalid' })
+               .updateDisplayType({ displayType: ui.FieldDisplayType.HIDDEN });
+
+        return sublist;
+    }
+
+    /**
+     * Extrae los datos desde la librería y los inyecta en la sublista.
+     * @private
+     */
+    function _populateSublist(sublist, params) {
+        try {
+            var libParams = {
+                subsidiary: params.subsidiary,
+                datesearch: params.pds,
+                datesearche: params.pde,
+                customer: params.cus,
+                paymentm: params.pm
+            };
+
+            var getTransaction = lib.getAllTransaction(libParams);
+            
+            if (getTransaction && getTransaction.length > 0) {
+                for (var i = 0; i < getTransaction.length; i++) {
+                    var recordLine = getTransaction[i];
+                    sublist.setSublistValue({ id: 'custpage_trandate', line: i, value: recordLine.trandate });
+                    sublist.setSublistValue({ id: 'custpage_tranid', line: i, value: recordLine.tranid });
+                    sublist.setSublistValue({ id: 'custpage_name', line: i, value: recordLine.name });
+                    sublist.setSublistValue({ id: 'custpage_fxamount', line: i, value: recordLine.fxamount });
+                    sublist.setSublistValue({ id: 'custpage_createdby', line: i, value: recordLine.createdby });
+                    sublist.setSublistValue({ id: 'custpage_internalid', line: i, value: recordLine.id });
+                }
+            }
+        } catch (err) {
+            log.error({ title: 'Error al llenar sublista', details: JSON.stringify(err) });
+        }
+    }
+
+    return {
+        onRequest: onRequest
+    };
+});
+/**
+ * refactor(ui-adapter): optimizar legibilidad, erradicar código muerto e integrar orquestador map/reduce
+ * Descripción (Body):
+ * Se reestructuró el adaptador de entrada (Suitelet) aplicando principios de Clean Code y Hexagonal Architecture:
+ * * 🧹 Erradicación de Deuda Técnica: Se eliminaron extensos bloques de código comentado y constantes huérfanas de despliegues obsoletos (DRY y KISS), mejorando drásticamente la legibilidad del archivo.
+ * * 🏗️ Modularización SRP: Se descompuso la función monolítica `createForm` en submétodos semánticos privados (`_buildFormFields`, `_buildSublist`, `_populateSublist`), delegando las responsabilidades de construcción visual y extracción de datos.
+ * * 🛡️ Inversión de Control (IoC): Se sustituyó el obsoleto enrutamiento al `Scheduled Script` por la instanciación de la nueva topología `Map/Reduce`, reduciendo el acoplamiento al transmitir una única llave pivote (`custscript_sads_fama_reg_fact_id`).
+ * * 🩺 Fail-Safe Logging: Se blindó la captura de excepciones en el bloque POST, garantizando la extracción del `stack trace` nativo del entorno para prevenir silenciamientos por fallos de serialización de objetos de error vacíos.
+ */
+
+===================
+File: sads_fama_api.js
+===================
+/**
+ * @NApiVersion 2.0
+ * @NModuleScope Public
+ * * Módulo: Comunicación HTTP (Adaptador de Infraestructura PAC)
+ */
+define(['N/https', './sads_fama_logger'], function (https, logger) {
+    'use strict';
+
+    // ==========================================
+    // 1. FUNCIONES PRIVADAS (Clean Architecture)
+    // ==========================================
+
+    /**
+     * Factory Pattern para estandarizar el registro de errores HTTP.
+     * Captura la pila completa, la respuesta y los códigos de error delegando al logger central.
+     * * @private
+     * @param {string} customMessage - Mensaje descriptivo sobre el momento en que ocurrió el fallo.
+     * @param {Error|Object} e - Objeto de error nativo de JS o de SuiteScript.
+     * @param {Object} [contextData] - Datos adicionales para facilitar la auditoría y reproducción del error.
+     * @returns {void}
+     */
+    function logHttpError(customMessage, e, contextData) {
+        var errorDetails = {
+            name: e.name || 'HTTP_NETWORK_ERROR',
+            message: e.message || e.toString(),
+            stack: 'Stack trace no disponible',
+            context: contextData || {}
+        };
+
+        // Extracción del Stack Trace (Nativo JS o SuiteScript)
+        if (e.stack) {
+            errorDetails.stack = e.stack;
+        } else if (typeof e.getStackTrace === 'function') {
+            errorDetails.stack = e.getStackTrace().join('\n');
+        }
+
+        // Compromise Recording: Guardamos TODO el contexto para auditoría
+        logger.write('ERROR COMUNICACION: ' + customMessage, errorDetails);
+    }
+
+    // ==========================================
+    // 2. API PÚBLICA (Puertos de salida)
+    // ==========================================
+
+    /**
+     * Parsea de forma segura una cadena JSON.
+     * Actúa como un escudo contra fallos de `JSON.parse` cuando el servidor devuelve HTML u otros formatos inválidos.
+     * * @param {string} jsonString - La cadena de texto a convertir.
+     * @returns {Object|string|null} Retorna el objeto parseado, la cadena original si falla el parseo, o null si la entrada está vacía.
+     */
+    function safeParse(jsonString) {
+        if (!jsonString) return null;
+        try { 
+            // Corrección: El logger debe ir ANTES del return para que sea alcanzable.
+            var parsedObj = JSON.parse(jsonString);
+            logger.write('Funcion safeParse Ejecutada, Retorno de Funcion:', jsonString);
+            return parsedObj; 
+        } catch (e) { 
+            return jsonString; 
+        } 
+    }
+
+    /**
+     * Envía el payload de la factura al PAC (Facturama) para su certificación/timbrado.
+     * Posee degradación elegante en caso de fallos catastróficos de red.
+     * * @param {string} url - El endpoint POST de timbrado.
+     * @param {Object} headers - Cabeceras HTTP de autorización y tipo de contenido.
+     * @param {string} payload - El contenido JSON en cadena que representa el CFDI.
+     * @returns {Object} El cuerpo de la respuesta del PAC o un objeto estandarizado de error de red.
+     */
+    function postTimbrado(url, headers, payload) {
+        var resp = null; // Declaración en nivel superior (Hoisting)
+        
+        try {
+            resp = https.post({ url: url, headers: headers, body: payload });
+            logger.write('Funcion postTimbrado Ejecutada, Retorno de Funcion:', resp);
+            return safeParse(resp.body); // El Response Handler evaluará el contenido
+            
+        } catch (networkError) {
+            // Este catch atrapa Timeouts, DNS failures, o bloqueos de red de NetSuite.
+            // Protegemos la ejecución para que el "Response Handler" no explote.
+            logHttpError('Fallo catastrófico de red en postTimbrado', networkError, {
+                url: url,
+                // NOTA DE SEGURIDAD: Nunca loguees el 'payload' completo si contiene contraseñas o tokens.
+                httpCode: resp ? resp.code : 'Sin conexión',
+            });
+            
+            // Retorno seguro simulado para tu Response Handler
+            return {
+                error_interno: true,
+                mensaje: 'Excepción de red al contactar al PAC',
+                detalle: networkError.message
+            };
+        }
+    }
+
+    /**
+     * Descarga el archivo XML certificado desde el PAC.
+     * * @param {string} baseUrl - La URL base para la descarga, debe contener el token '{id}'.
+     * @param {Object} headers - Cabeceras HTTP de autorización.
+     * @param {string} cfdiId - El identificador único del CFDI en el sistema del PAC.
+     * @param {string} type - Tipo de documento a descargar (ej. 'xml').
+     * @returns {Object|null} El JSON representativo del XML o null en caso de fallo absoluto de red.
+     */
+    function getFile(baseUrl, headers, cfdiId, type) {
+        var resp = null; // Lo declaramos aquí para garantizar su acceso en el bloque catch
+        var finalUrl = baseUrl.replace('{id}', cfdiId).replace('{type}', type);
+
+        try {
+            resp = https.get({ url: finalUrl, headers: headers });
+
+            if (resp.code !== 200) {
+                var getErrorBody = safeParse(resp.body);
+                var errorMsg = typeof getErrorBody === 'string' ? getErrorBody : JSON.stringify(getErrorBody);
+                // Lanzamos el error intencionalmente para que caiga en nuestro manejador unificado
+                throw new Error('El PAC rechazó la descarga XML. Body: ' + errorMsg);
+            }
+            
+            logger.write('Funcion getFile Ejecutada, Retorno de Funcion:', resp);
+            return safeParse(resp.body);
+
+        } catch (error) {
+            // Centralizamos toda la recopilación forense de datos
+            var contextData = {
+                cfdiId: cfdiId,
+                url: finalUrl,
+                httpCode: resp ? resp.code : 'N/A',
+                responseBody: resp && resp.body ? resp.body : 'Sin respuesta del servidor'
+            };
+
+            logHttpError('Fallo al descargar XML del PAC', error, contextData);
+
+            // Criterio de negocio: Retorno seguro con degradación elegante.
+            // Si hubo respuesta pero el código no era 200, devolvemos el cuerpo para análisis.
+            if (resp && resp.body) {
+                return safeParse(resp.body);
+            }
+
+            // Si fue un fallo de red absoluto, devolvemos null para no romper flujos posteriores
+            return null; 
+        }
+    }
+
+    return {
+        // En Clean Architecture, intentamos minimizar la API pública. 
+        // Si nadie fuera de este archivo llama a safeParse, elimínalo de aquí abajo.
+        safeParse: safeParse, 
+        postTimbrado: postTimbrado,
+        getFile: getFile
+    };
+});
+/**
+ * TITULO: refactor(http-adapter): blindar adaptador HTTP del PAC y estandarizar manejo de errores
+ * Se refactorizó el módulo sads_fama_api.js para actuar como un verdadero Adaptador Secundario (Hexagonal Architecture), protegiendo al ERP de fallos de infraestructura externa. Se aplicaron principios de Clean Code y Fail-Safe Defaults con los siguientes cambios críticos:
+ * * 🛡️ Tolerancia a Fallos y Estado Predecible (Saltzer & Schroeder):
+ * * Se corrigió el scope de la variable resp mediante Hoisting (var resp = null; al inicio). Esto asegura que el bloque catch siempre tenga un contexto de evaluación seguro si la conexión se corta antes de recibir respuesta, eliminando las validaciones frágiles de tipo (typeof resp !== 'undefined').
+ * Se agregaron logs de auditoria en escenarios de exito.
+ * Se agregó un escudo protector (try/catch) en postTimbrado. Los errores catastróficos de red (timeouts, DNS) ahora son capturados y devuelven un objeto de error estructurado para que el Response Handler externo los procese sin que colapse el hilo principal de ejecución de NetSuite.
+ * * 🧹 Clean Code y DRY (Robert C. Martin):
+ * * Corrección Crítica (Bugfix): Se eliminó el uso de JSON.stringify(error). Los objetos Error en JS no son enumerables y devolvían un objeto vacío ({}).
+ * Se implementó el método Factory privado logHttpError para centralizar la captura del error. Ahora el sistema extrae inteligentemente el stack trace estándar de JS (e.stack) o el nativo de SuiteScript (e.getStackTrace()), garantizando el principio de Compromise Recording en el logger.
+ * * 🏛️ Arquitectura de Límite (Alistair Cockburn):
+ * * El módulo ahora respeta su naturaleza de "frontera". Inspecciona y sanitiza el estado del mundo exterior (el servicio del PAC). Devuelve siempre datos controlados (null, objetos JSON o trazas detalladas) hacia el Core del negocio, evitando filtraciones de excepciones no controladas.
+ */
+
+===================
+File: sads_fama_cfdi.js
+===================
+/**
+ * @NApiVersion 2.0
+ * @NModuleScope Public
+ * 
+ * Módulo: Constructor de Campos Fiscales
+ */
+define(['N/encode', 'N/xml', './sads_fama_logger'], function (encode, xml, logger) {
+    'use strict';
+
+    // ==========================================
+    // 1. CONSTANTES (Evitar Magic Strings - Clean Code)
+    // ==========================================
+    var FIELDS = {
+        EDOC_CERTIFIED: 'custbody_psg_ei_certified_edoc',
+        UUID: 'custbody_mx_cfdi_uuid',
+        CERTIFY_TIMESTAMP: 'custbody_mx_cfdi_certify_timestamp',
+        SAT_SERIAL: 'custbody_mx_cfdi_sat_serial',
+        SAT_SIGNATURE: 'custbody_mx_cfdi_sat_signature',
+        CFDI_SIGNATURE: 'custbody_mx_cfdi_signature',
+        ORIGINAL_STRING: 'custbody_mx_cfdi_cadena_original',
+        QR_CODE: 'custbody_mx_cfdi_qr_code',
+        FOLIO: 'custbody_mx_cfdi_folio',
+        SERIE: 'custbody_mx_cfdi_serie',
+        ISSUE_DATETIME: 'custbody_mx_cfdi_issue_datetime',
+        ISSUER_SERIAL: 'custbody_mx_cfdi_issuer_serial'
+        
+    };
+
+    // ==========================================
+    // 2. API PÚBLICA (Hexagonal Architecture: Puertos)
+    // ==========================================
+    /**
+     * Funcion principal del modulo CFDI. Construye un objeto que sera enviado al plugIn Type para concluir con el proceso de actualizacion de campos 
+     *  que corresponden al CFDI timbrado.
+     * @param {Object} originalPayload - PlugInContext || Transaccion Record Data
+     * @param {Object} facturamaData - PAC Response Body Parsed
+     * @param {Number} xmlFileId - El id interno del archivo XML guardado en el File Cabinet
+     * @param {Number} cfdiId - El id interno de la transacción en el servidor del PAC
+     * @param {String} xmlContent - El contenido del archivo XML en Base64 (opcional, solo si se requiere extraer el NoCertificado)
+     * @returns {object} - Un objeto con los campos fiscales listos para actualizar en la transacción
+     * 
+     * Nota: Se implementa un control de retorno seguro. Si ocurre un error en la construcción de los campos, se loguea el error y se devuelve lo que se haya podido mapear.
+     */
+    function buildExtraFields(originalPayload, facturamaData, xmlFileId, cfdiId, xmlContent) {
+        logger.write('Funcion buildExtraFields en ejecucion', { cfdiId: cfdiId });
+
+        // Inicializamos fields desde el principio. Si algo falla a la mitad, 
+        // devolveremos lo que hayamos logrado construir (Cumpliendo tu requerimiento de retorno)
+        var fields = {};
+
+        try {
+            fields[FIELDS.EDOC_CERTIFIED] = xmlFileId;
+
+            // Validación defensiva anidada (ES5 no tiene Optional Chaining ?.)
+            if (facturamaData && facturamaData.Complement && facturamaData.Complement.TaxStamp) {
+                var taxStamp = facturamaData.Complement.TaxStamp;
+
+                fields[FIELDS.UUID] = taxStamp.Uuid;
+                fields[FIELDS.CERTIFY_TIMESTAMP] = taxStamp.Date;
+                fields[FIELDS.SAT_SERIAL] = taxStamp.SatCertNumber;
+                fields[FIELDS.SAT_SIGNATURE] = taxStamp.SatSign;
+                fields[FIELDS.CFDI_SIGNATURE] = taxStamp.CfdiSign;
+
+                if (facturamaData.OriginalString) {
+                    fields[FIELDS.ORIGINAL_STRING] = facturamaData.OriginalString;
+                }
+
+                if (originalPayload && originalPayload.Issuer && originalPayload.Receiver) {
+                    var last8Sello = taxStamp.CfdiSign.substring(taxStamp.CfdiSign.length - 8);
+                    var qrUrl = 'https://verificacfdi.facturaelectronica.sat.gob.mx/default.aspx?id=' +
+                        taxStamp.Uuid + '&re=' + originalPayload.Issuer.Rfc +
+                        '&rr=' + originalPayload.Receiver.Rfc +
+                        '&tt=' + originalPayload.Total + '&fe=' + last8Sello;
+                    fields[FIELDS.QR_CODE] = qrUrl;
+                }
+            }
+
+            if (originalPayload && originalPayload.Issuer && originalPayload.Receiver) {
+                var last8Sello = taxStamp.CfdiSign.substring(taxStamp.CfdiSign.length - 8);
+
+                var qrUrl = 'https://verificacfdi.facturaelectronica.sat.gob.mx/default.aspx?id=' +
+                    taxStamp.Uuid + '&amp;re=' + originalPayload.Issuer.Rfc +
+                    '&amp;rr=' + originalPayload.Receiver.Rfc +
+                    '&amp;tt=' + originalPayload.Total + '&amp;fe=' + last8Sello;
+
+                fields[FIELDS.QR_CODE] = qrUrl;
+            }
+
+            // Extracción del número de certificado
+            if (facturamaData && facturamaData.Issuer && facturamaData.Issuer.SerialNumber) {
+                fields[FIELDS.ISSUER_SERIAL] = facturamaData.Issuer.SerialNumber;
+            } else if (xmlContent) {
+                try {
+                    var xmlString = encode.convert({ string: xmlContent, inputEncoding: encode.Encoding.BASE_64, outputEncoding: encode.Encoding.UTF_8 });
+
+                    var xmlDocument = xml.Parser.fromString({ text: xmlString });
+                    var comprobanteNode = xmlDocument.getElementsByTagName({ tagName: 'cfdi:Comprobante' })[0];
+                    if (comprobanteNode) {
+                        fields[FIELDS.ISSUER_SERIAL] = comprobanteNode.getAttribute({ name: 'NoCertificado' });
+                    }
+                    logger.write('Funcion buildExtraFields en ejecucion, Campos construidos:', fields)
+                } catch (xmlError) {
+                    logError('Error extrayendo certificado del XML', xmlError, { cfdiId: cfdiId });
+                }
+            }
+
+            return fields;
+
+        } catch (mainError) {
+            // Manejador centralizado de la función principal
+            logError('CRITICO: Fallo al construir campos extra', mainError, { cfdiId: cfdiId });
+            // Devolvemos lo que se haya logrado mapear para no interrumpir el flujo del caller
+            return fields;
+        }
+    }
+
+    // ==========================================
+    // 3. FUNCIONES PRIVADAS (Clean Architecture)
+    // ==========================================
+
+    /**
+     * Factory Pattern para estandarizar el registro de errores.
+     * Analiza si es un error nativo de JS o un SuiteScript Error.
+     * *@private
+     * @param {string} customMessage - Mensaje contextual
+     * @param {Error} e - El objeto de error capturado
+     * @param {Object} contextData - Datos adicionales para reproducir el fallo
+     */
+    function logError(customMessage, e, contextData) {
+        var errorDetails = {
+            name: e.name || 'UNEXPECTED_ERROR',
+            message: e.message || e.toString(),
+            stack: 'No stack trace available',
+            context: contextData || {}
+        };
+
+        if (e.stack) {
+            errorDetails.stack = e.stack;
+        } else if (typeof e.getStackTrace === 'function') {
+            errorDetails.stack = e.getStackTrace().join('\n');
+        }
+
+        logger.write('ERROR: ' + customMessage, errorDetails);
+    }
+
+    return {
+        buildExtraFields: buildExtraFields
+    };
+});
+//Camibio de uso de REGEX POR N/XML PARA MANIPULAR DE MEJOR MANERA EL XML Y OBTENER EL NUMERO DE CERTIFICADO DEL EMISOR.
+//Agregado un control de retorno seguro y un logger.write para capturar toda la pila de ejecucion, response, mensaje y codigo de error. Esto es para poder capturar errores de comunicación con el PAC y poder analizarlos posteriormente.
+//MODULARIZACION DE FUNCIONES PARA MEJORAR LA LECTURA Y MANTENIMIENTO DEL CODIGO.
+
+===================
+File: sads_fama_config.js
+===================
+/**
+ * @NApiVersion 2.0
+ * @NModuleScope Public
+ * * Módulo: Configuración y Autenticación (Repository Pattern / Infrastructure Adapter)
+ */
+define(['N/search', 'N/encode'], function(search, encode) {
+    'use strict';
+
+    // ==========================================
+    // 1. CONSTANTES 
+    // ==========================================
+    var REC_TYPE = 'customrecord_sads_fama_config';
+    
+    var FLD = {
+        SUB: 'custrecord_sads_fama_sub',
+        USER: 'custrecord_sads_fama_user',
+        PASS: 'custrecord_sads_fama_pass',
+        URL_API: 'custrecord_sads_fama_url_api',
+        URL_GET: 'custrecord_sads_fama_url_api_getfile',
+        TMPL_INV: 'custrecord_sads_fama_tmpl_inv',
+        TMPL_CS: 'custrecord_sads_fama_tmpl_cs',
+        TMPL_CM: 'custrecord_sads_fama_tmpl_cm',
+        TMPL_IF: 'custrecord_sads_fama_tmpl_if',
+        TMPL_CP: 'custrecord_sads_fama_tmpl_cp'
+    };
+
+    // ==========================================
+    // 2. API PÚBLICA (Repositorio)
+    // ==========================================
+    
+    /**
+     * Obtiene la configuración de Facturama desde la base de datos (NetSuite Custom Record) 
+     * para una subsidiaria específica.
+     * * @param {number|string} subsidiaryId - El ID interno de la subsidiaria.
+     * @returns {Object} Un objeto con las credenciales, URLs de API y mapeo de plantillas PDF.
+     * @throws {Error} Si no se proporciona el subsidiaryId, si no se encuentra un registro activo, o si faltan datos críticos.
+     */
+    function get(subsidiaryId) {
+        // Guard Clause (Falla rápido si el orquestador no envía subsidiaria)
+        if (!subsidiaryId) {
+            throw new Error('SubsidiaryId es obligatorio para obtener la configuración.');
+        }
+
+        var configSearch = search.create({
+            type: REC_TYPE,
+            filters: [
+                ['isinactive', 'is', 'F'], 'AND',
+                [FLD.SUB, 'anyof', subsidiaryId]
+            ],
+            columns: [
+                FLD.USER, FLD.PASS, FLD.URL_API, FLD.URL_GET,
+                FLD.TMPL_INV, FLD.TMPL_CS, FLD.TMPL_CM, FLD.TMPL_IF, FLD.TMPL_CP
+            ]
+        });
+        
+        var results = configSearch.run().getRange({ start: 0, end: 1 });
+        
+        if (results.length === 0) {
+            throw new Error('No se encontró configuración activa de Facturama para la subsidiaria ID: ' + subsidiaryId);
+        }
+
+        var row = results[0];
+
+        // Extracción limpia usando nuestro diccionario de constantes
+        var configData = {
+            user: row.getValue(FLD.USER),
+            pass: row.getValue(FLD.PASS),
+            apiPostUrl: row.getValue(FLD.URL_API),
+            apiGetUrl: row.getValue(FLD.URL_GET),
+            templates: {
+                'invoice': row.getValue(FLD.TMPL_INV),
+                'cashsale': row.getValue(FLD.TMPL_CS),
+                'creditmemo': row.getValue(FLD.TMPL_CM),
+                'itemfulfillment': row.getValue(FLD.TMPL_IF),
+                'customerpayment': row.getValue(FLD.TMPL_CP)
+            }
+        };
+
+        // Fail-Safe Defaults: Validamos que los datos extraídos no sean un cascarón vacío
+        _validateCriticalConfig(configData, subsidiaryId);
+
+        return configData;
+    }
+
+    /**
+     * Genera las cabeceras HTTP de autorización (Basic Auth) requeridas para las peticiones a la API del PAC.
+     * * @param {string} user - El nombre de usuario de la cuenta de Facturama.
+     * @param {string} pass - La contraseña de la cuenta de Facturama.
+     * @returns {Object} Un objeto con las cabeceras 'Authorization' y 'Content-Type'.
+     * @throws {Error} Si las credenciales proporcionadas son nulas o indefinidas.
+     */
+    function getAuthHeaders(user, pass) {
+        // Prevención de inyección de valores 'undefined' en la codificación Base64
+        if (!user || !pass) {
+            throw new Error('Credenciales incompletas. Imposible generar cabeceras de autorización HTTP.');
+        }
+
+        var base64Encoded = encode.convert({
+            string: user + ':' + pass,
+            inputEncoding: encode.Encoding.UTF_8,
+            outputEncoding: encode.Encoding.BASE_64
+        });
+        
+        return {
+            'Authorization': 'Basic ' + base64Encoded,
+            'Content-Type': 'application/json'
+        };
+    }
+
+    // ==========================================
+    // 3. FUNCIONES PRIVADAS (Reglas de Negocio / Validaciones)
+    // ==========================================
+    
+    /**
+     * Asegura que el objeto de configuración extraído contenga todos los campos vitales 
+     * para operar correctamente antes de entregarlo al orquestador.
+     * * @private
+     * @param {Object} config - El objeto de configuración mapeado desde la búsqueda de NetSuite.
+     * @param {number|string} subId - El ID de la subsidiaria (usado para inyectar contexto en el error).
+     * @throws {Error} Si falta algún campo requerido (user, pass, apiPostUrl, apiGetUrl).
+     */
+    function _validateCriticalConfig(config, subId) {
+        var missing = [];
+        
+        if (!config.user) missing.push('Usuario');
+        if (!config.pass) missing.push('Contraseña');
+        if (!config.apiPostUrl) missing.push('URL API Timbrado');
+        if (!config.apiGetUrl) missing.push('URL API Descarga XML');
+
+        if (missing.length > 0) {
+            // Se propaga un error descriptivo que el orquestador registrará fácilmente
+            throw new Error('La configuración para la subsidiaria (' + subId + ') está incompleta. Faltan los campos vitales: ' + missing.join(', '));
+        }
+    }
+
+    return { 
+        get: get, 
+        getAuthHeaders: getAuthHeaders 
+    };
+});
+
+===================
+File: sads_fama_files.js
+===================
+/**
+ * @NApiVersion 2.0
+ * @NModuleScope Public
+ * * Módulo: Gestor de Archivos y Renderizado (File System Adapter)
+ */
+define(['N/file', 'N/encode', 'N/render', './sads_fama_logger'], function (file, encode, render, logger) {
+    'use strict';
+
+    // ==========================================
+    // 1. CONSTANTES (Clean Code: Evitar Magic Numbers)
+    // ==========================================
+    var CONSTANTS = {
+        TARGET_FOLDER_ID: -15, // Carpeta de Attachments por defecto
+        DATA_SOURCE_ALIAS: 'custom',
+        TEMPLATE_RECORD: 'record',
+        TEMPLATE_CUSTOMER: 'customer',
+
+    };
+
+    // ==========================================
+    // 2. API PÚBLICA (Puertos de Salida)
+    // ==========================================
+
+    /**
+     * Decodifica una cadena Base64 a UTF-8 y guarda el resultado como un archivo XML en el File Cabinet.
+     * Implementa un Patrón de Seguridad Fail-Safe Defaults (Falla rápido si los datos son inválidos o corruptos).
+     * * @param {string} fileName - El nombre que se le asignará al archivo XML en NetSuite.
+     * @param {string} base64Content - El contenido del XML codificado en formato Base64.
+     * @returns {number} El ID interno (internalid) del archivo guardado en el File Cabinet.
+     * @throws {Error} Si el contenido Base64 está vacío o si falla la decodificación nativa del motor de NetSuite.
+     */
+    function saveFile(fileName, base64Content, targetFolderId) {
+        var nsFileType;
+        var fileContent = '';
+        var finalFolderId = targetFolderId || CONSTANTS.TARGET_FOLDER_ID;
+        var isPDF = fileName.toLowerCase().indexOf('.pdf') !== -1;
+
+        try {
+            // Validamos que venga contenido antes de intentar procesar
+            if (!base64Content) {
+                throw new Error('El contenido Base64 del XML está vacío.');
+            }
+
+            if (isPDF) {
+                fileContent = base64Content; // Para PDF, no decodificamos, lo guardamos tal cual
+                nsFileType = file.Type.PDF;
+            } else {
+
+                try {
+                    fileContents = encode.convert({
+                        string: base64Content,
+                        inputEncoding: encode.Encoding.BASE_64,
+                        outputEncoding: encode.Encoding.UTF_8
+                    });
+                    nsFileType = file.Type.XMLDOC;
+                } catch (decodeError) {
+                    throw new Error('Fallo al decodificar el archivo Base64 a UTF-8: ' + decodeError.message);
+                }
+
+            }
+
+
+            var newFile = file.create({
+                name: fileName,
+                fileType: nsFileType,
+                contents: fileContents,
+                folder: finalFolderId
+            });
+
+            return newFile.save();
+        } catch (error) {
+            logError('Fallo al guardar docuemnto', error, { fileName: fileName });
+            throw error; // Propagamos al orquestador para que aborte la transacción
+        }
+    }
+
+    /**
+     * Renderiza un PDF de la transacción uniendo los datos estándar de NetSuite y los datos fiscales del PAC.
+     * * @param {Object} txnRecord - El objeto record de la transacción principal cargada (ej. Invoice).
+     * @param {Object|null} customerRecord - El objeto record del cliente cargado (opcional).
+     * @param {number|string} pdfTemplateId - El ID interno de la plantilla avanzada de PDF/HTML (FreeMarker/BFO).
+     * @param {Object} extraFields - Objeto con la metadata extraída del XML (UUID, cadena original, sellos, etc.).
+     * @param {string} fileName - El nombre que se le asignará al archivo PDF generado.
+     * @returns {number} El ID interno (internalid) del archivo PDF guardado en el File Cabinet.
+     * @throws {Error} Si faltan parámetros obligatorios o si el motor de renderizado falla por plantillas mal formadas.
+     */
+    function generateCertifiedPdf(txnRecord, customerRecord, pdfTemplateId, extraFields, fileName, targetFolderId) {
+        try {
+            if (!txnRecord || !pdfTemplateId) {
+                throw new Error('Faltan parámetros obligatorios (txnRecord o pdfTemplateId) para generar el PDF.');
+            }
+
+            var renderer = render.create();
+            renderer.setTemplateById({ id: pdfTemplateId });
+
+            // Inyección de registros estándar de NetSuite
+            renderer.addRecord({ templateName: CONSTANTS.TEMPLATE_RECORD, record: txnRecord });
+
+            if (customerRecord) {
+                renderer.addRecord({ templateName: CONSTANTS.TEMPLATE_CUSTOMER, record: customerRecord });
+            }
+
+            // Inyección de Datos Custom (Datos del PAC / CFDI)
+            var customData = {
+                certData: extraFields || {}
+            };
+
+            renderer.addCustomDataSource({
+                format: render.DataSource.OBJECT,
+                alias: CONSTANTS.DATA_SOURCE_ALIAS,
+                data: customData
+            });
+
+            var pdfFile = renderer.renderAsPdf();
+            pdfFile.name = fileName;
+            pdfFile.folder = targetFolderId || CONSTANTS.TARGET_FOLDER_ID;
+
+            logger.write('Funcion generateCertifiedPdf ejecutada, Retorno de Archivo PDF:', pdfFile.name);
+            return pdfFile.save();
+
+        } catch (error) {
+            // Compromise Recording: Guardamos el contexto exacto de qué plantilla y registro falló
+            logError('Fallo al generar PDF Certificado', error, {
+                fileName: fileName,
+                templateId: pdfTemplateId,
+                transactionId: txnRecord ? txnRecord.id : 'N/A'
+            });
+            throw error; // Propagamos al orquestador
+        }
+    }
+
+    // ==========================================
+    // 3. FUNCIONES PRIVADAS (Soporte)
+    // ==========================================
+
+    /**
+     * Estandariza la captura de errores delegando al Logger Central (Compromise Recording).
+     * * @private
+     * @param {string} customMessage - Mensaje contextual indicando en qué paso falló el sistema.
+     * @param {Error|Object} e - El objeto de error interceptado.
+     * @param {Object} [contextData] - Datos adicionales de contexto para facilitar el rastro de la auditoría.
+     * @returns {void}
+     */
+    function logError(customMessage, e, contextData) {
+        var errorDetails = {
+            name: e.name || 'FILE_SYSTEM_ERROR',
+            message: e.message || e.toString(),
+            stack: e.stack || (typeof e.getStackTrace === 'function' ? e.getStackTrace().join('\n') : 'No stack trace'),
+            context: contextData || {}
+        };
+        logger.write('ERROR FILES: ' + customMessage, errorDetails);
+    }
+
+    return {
+        saveFile: saveFile,
+        generateCertifiedPdf: generateCertifiedPdf
+    };
+});
+/**
+ * refactor(file-adapter): aplicar fail-safe defaults, blindar renderizado de PDF y agregar JSDoc
+ * Descripción (Body):
+ * Se refactorizó el adaptador de infraestructura sads_fama_files.js para interactuar de forma segura con el File Cabinet y el motor de renderizado:
+ * * 🛡️ Fail-Safe Defaults: Se eliminó un comportamiento peligroso en saveFile que permitía guardar cadenas Base64 crudas con extensión .xml en caso de fallar la decodificación UTF-8. Ahora aborta la operación y propaga el error (Fail Fast).
+ * * 🩺 Compromise Recording: Se integró el módulo central de logging (sads_fama_logger.js). Se añadieron bloques try/catch a la generación del PDF para atrapar excepciones del motor FreeMarker, registrando el ID de la plantilla y de la transacción para facilitar auditorías.
+ * * 🧹 Clean Code: Se encapsularon los "Magic Numbers/Strings" (IDs de carpetas y alias de plantillas) en un diccionario CONSTANTS para documentar la intención de las variables.
+ * * 📚 Documentación (JSDoc): Se incorporaron firmas de funciones estandarizadas en JSDoc para facilitar la lectura del código por otros desarrolladores e inicializar el soporte de IntelliSense en los IDEs, documentando parámetros esperados y tipos de retorno para las operaciones del sistema de archivos.
+ */
+
+===================
+File: sads_fama_global_mapper.js
+===================
+/**
+ * @NApiVersion 2.0
+ * @NModuleScope Public
+ * 
+ * Módulo: Mapeador de Factura Global (Domain Layer / Core)
+ * Responsabilidad: Construir el payload JSON exacto para Facturama CFDI 4.0 Global
+ */
+define([], function() {
+    'use strict';
+
+    // ==========================================
+    // 1. CONSTANTES DEL DOMINIO SAT (Globales 4.0)
+    // ==========================================
+    var SAT_GLOBAL = {
+        RFC: 'XAXX010101000',
+        NAME: 'PUBLICO EN GENERAL',
+        USE_CFDI: 'S01',
+        REGIME: '616'
+    };
+
+    // ==========================================
+    // 2. API PÚBLICA
+    // ==========================================
+
+    /**
+     * Construye el JSON final para enviar a Facturama respetando estrictamente su esquema.
+     * @param {Object} ctx - Metadatos de la cabecera (Periodicidad, Meses, Año, Configuración de Subsidiaria).
+     * @param {Array} rawItems - Arreglo de líneas/tickets obtenidos de NetSuite.
+     * @returns {Object} Payload JSON listo para la petición HTTP.
+     */
+    function buildFacturamaPayload(ctx, rawItems) {
+        if (!ctx || !rawItems || rawItems.length === 0) {
+            throw new Error('Datos insuficientes para construir el payload de la Factura Global.');
+        }
+
+        var payload = {
+            "NameId": 1, 
+            "CfdiType": "I",
+            "Folio": ctx.folioSolicitado || "GLOBAL",
+            "Date": ctx.fechaEmision, 
+            "PaymentForm": ctx.formaPago,
+            "PaymentMethod": ctx.metodoPago,
+            "Currency": "MXN", 
+            "CurrencyExchangeRate": 1,
+            "ExpeditionPlace": ctx.issuerZipCode,
+            "Exportation": ctx.exportation || "01",
+            // Nodo exclusivo y obligatorio para Factura Global CFDI 4.0
+            "GlobalInformation": {
+                "Periodicity": ctx.periodicidad,
+                "Months": ctx.meses,
+                "Year": ctx.anio
+            },
+            "Issuer": {
+                "FiscalRegime": ctx.issuerRegime,
+                "Rfc": ctx.issuerRfc,
+                "Name": ctx.issuerName
+            },
+            "Receiver": {
+                "Rfc": SAT_GLOBAL.RFC,
+                "Name": SAT_GLOBAL.NAME,
+                "TaxZipCode": ctx.issuerZipCode, 
+                "FiscalRegime": SAT_GLOBAL.REGIME,
+                "CfdiUse": SAT_GLOBAL.USE_CFDI
+            },
+            "Items": _buildItems(rawItems)
+        };
+
+        return payload;
+    }
+
+    // ==========================================
+    // 3. FUNCIONES PRIVADAS (Transformación de Datos)
+    // ==========================================
+
+    /**
+     * Transforma las líneas de NetSuite en el arreglo 'Items' esperado por Facturama.
+     * @param {Array} rawItems - Arreglo de líneas/tickets obtenidos de NetSuite.
+     * @returns {Array} Arreglo de objetos 'Item' listos para el payload.
+     * @private
+     */
+    function _buildItems(rawItems) {
+        var items = [];
+        
+        for (var i = 0; i < rawItems.length; i++) {
+            var row = rawItems[i];
+        
+            // Aseguramos que los valores matemáticos jamás sean NaN o indefinidos.
+            var qty = parseFloat(row.quantity) || 1;
+            var amount = parseFloat(row.amount) || 0;
+            var taxRate = parseFloat(row.taxrate) || 0;
+            var taxAmount = parseFloat(row.taxamt) || 0;
+            var discount = parseFloat(row.discount) || 0;
+            var unitPrice = amount / qty;
+
+            var itemNode = {               
+                "ProductCode": "01010101", 
+                "IdentificationNumber": row.ticketNumber || "TICKET",
+                "Description": "Venta",
+                "Unit": "ACT",
+                "UnitCode": "ACT",
+                "UnitPrice": _round(unitPrice, 6), 
+                "Quantity": qty, 
+                "Subtotal": _round(amount, 2), 
+                "Discount": _round(discount, 2), 
+                "Total": _round((amount - discount) + taxAmount, 2), 
+                "TaxObject": "02",
+                "Taxes": [
+                    {
+                        "Name": "IVA",
+                        "Base": _round(amount - discount, 2),
+                        "Rate": _round(taxRate, 6),
+                        "Total": _round(taxAmount, 2),
+                        "IsRetention": false,
+                        "IsQuota": false
+                    }
+                ]
+            };
+            
+            items.push(itemNode);
+        }
+        
+        return items;
+    }
+
+    /**
+     * Utilidad para evitar errores de precisión de punto flotante nativos de JavaScript.
+     * (Ej. Evita que 0.1 + 0.2 retorne 0.30000000000000004)
+     * @param {number} num - Número a redondear.
+     * @param {number} decimals - Cantidad de decimales deseada.
+     * @returns {number} Número redondeado a la cantidad de decimales especificada.
+     * @private
+     */
+    function _round(num, decimals) {
+        var multiplier = Math.pow(10, decimals);
+        return Math.round(num * multiplier) / multiplier;
+    }
+
+    return {
+        buildFacturamaPayload: buildFacturamaPayload
+    };
+});
+
+===================
+File: sads_fama_logger.js
+===================
+/**
+ * @NApiVersion 2.0
+ * @NModuleScope Public
+ * * Módulo: Logger Personalizado (Infraestructura / Adapter)
+ * Patrones: Factory, Strategy (Serialización segura)
+ */
+define(['N/record', 'N/log', 'N/file'], function(record, log, file) {
+    'use strict';
+
+    // ==========================================
+    // 1. CONSTANTES (Eliminación de Magic Strings)
+    // ==========================================
+    var CONSTANTS = {
+        RECORD_TYPE: 'customrecord_sads_fama_logger',
+        FLD_TITLE: 'custrecord_sads_fama_log_title',
+        FLD_MESSAGE: 'custrecord_sads_fama_log_message',
+        FOLDER_ID: -15, // TODO: Idealmente debería venir de sads_fama_config a futuro
+        MAX_CHAR_LIMIT: 3900
+    };
+
+    // ==========================================
+    // 2. API PÚBLICA (El Puerto de Entrada)
+    // ==========================================
+    
+    /**
+     * Función principal de registro (logging) para depuración y auditoría de scripts.
+     * Intercepta mensajes largos y los convierte automáticamente en archivos adjuntos.
+     * * @param {string} title - El título del log (se truncará a 300 caracteres si excede el límite).
+     * @param {string|Object|null} messageData - El contenido a registrar. Puede ser una cadena de texto o un objeto complejo.
+     * @returns {void}
+     */
+    function write(title, messageData) {
+        try {
+            var safeTitle = _sanitizeTitle(title);
+            var parsedMessage = _safeStringify(messageData);
+            
+            var fileId = null;
+            var finalMessage = parsedMessage;
+
+            // Lógica de desbordamiento (Overflow Strategy)
+            if (parsedMessage.length > CONSTANTS.MAX_CHAR_LIMIT) {
+                var isJsonObj = typeof messageData === 'object' && messageData !== null;
+                fileId = _createLogAttachment(safeTitle, parsedMessage, isJsonObj);
+                
+                finalMessage = 'El contenido excede el límite de caracteres (' + parsedMessage.length + 
+                               ' chars).\n\nSe ha generado un archivo adjunto con ID interno: ' + fileId;
+            }
+
+            // Persistencia del Log
+            var logInternalId = _createCustomRecord(safeTitle, finalMessage);
+
+            if (fileId) {
+                _attachFile(fileId, logInternalId);
+            }
+
+        } catch (e) {
+            // FALLBACK ABSOLUTO (Fail-Safe Defaults)
+            // Si todo falla, no podemos dejar de registrar el error crítico. Usamos el log nativo de NetSuite.
+            var errorStack = e.stack || (typeof e.getStackTrace === 'function' ? e.getStackTrace().join('\n') : 'Sin stack trace');
+            log.error({
+                title: 'CRÍTICO: Fallo en Custom Logger (' + (title || 'Sin Título') + ')',
+                details: e.message + '\n' + errorStack
+            });
+        }
+    }
+
+    // ==========================================
+    // 3. FUNCIONES PRIVADAS (Principio de Responsabilidad Única - SRP)
+    // ==========================================
+
+    /**
+     * Sanitiza el título del log para asegurar que cumpla con los límites de la base de datos.
+     * * @private
+     * @param {string} title - El título original enviado al logger.
+     * @returns {string} El título sanitizado y truncado a un máximo de 300 caracteres.
+     */
+    function _sanitizeTitle(title) {
+        return (title || 'Log sin título').substring(0, 300);
+    }
+
+    /**
+     * Serializador Seguro: Previene colapsos (TypeError) causados por Referencias Circulares 
+     * comunes en objetos nativos de JS o NetSuite.
+     * * @private
+     * @param {*} data - Cualquier tipo de dato que se intente registrar.
+     * @returns {string} Una representación segura en cadena del dato proporcionado.
+     */
+    function _safeStringify(data) {
+        if (data === null) return 'null';
+        if (data === undefined) return 'undefined';
+        if (typeof data !== 'object') return String(data);
+
+        try {
+            // Patrón de Caché para detectar referencias circulares
+            var cache = [];
+            var result = JSON.stringify(data, function(key, value) {
+                if (typeof value === 'object' && value !== null) {
+                    if (cache.indexOf(value) !== -1) {
+                        // En lugar de crashear, advertimos la estructura circular
+                        return '[Referencia Circular Detectada]';
+                    }
+                    cache.push(value);
+                }
+                return value;
+            }, 2);
+            cache = null; // Garbage Collection amigable
+            return result;
+        } catch (e) {
+            // Degradación elegante: Si aún así falla, devolvemos lo que podamos
+            return 'Objeto no parseable (Fallo de serialización estricta): ' + e.message;
+        }
+    }
+
+    /**
+     * Crea un archivo físico en el File Cabinet de NetSuite cuando el log excede el límite de texto.
+     * * @private
+     * @param {string} title - El título base para nombrar el archivo.
+     * @param {string} content - El contenido extenso a guardar.
+     * @param {boolean} isJson - Indica si el contenido debe guardarse con extensión .json o .txt.
+     * @returns {number} El ID interno del archivo generado.
+     */
+    function _createLogAttachment(title, content, isJson) {
+        var timestamp = new Date().getTime();
+        var safeFileName = title.replace(/[^a-z0-9]/gi, '_').substring(0, 50);
+        var extension = isJson ? '.json' : '.txt';
+        var fileName = 'Log_' + safeFileName + '_' + timestamp + extension;
+        
+        var logFile = file.create({
+            name: fileName,
+            fileType: isJson ? file.Type.JSON : file.Type.PLAINTEXT,
+            contents: content,
+            folder: CONSTANTS.FOLDER_ID
+        });
+        
+        return logFile.save();
+    }
+
+    /**
+     * Genera el registro personalizado en la base de datos de NetSuite para indexar el log.
+     * * @private
+     * @param {string} title - El título sanitizado del log.
+     * @param {string} message - El mensaje o el aviso de desbordamiento (overflow).
+     * @returns {number} El ID interno del Custom Record creado.
+     */
+    function _createCustomRecord(title, message) {
+        var logRecord = record.create({ type: CONSTANTS.RECORD_TYPE });
+        logRecord.setValue({ fieldId: CONSTANTS.FLD_TITLE, value: title });
+        logRecord.setValue({ fieldId: CONSTANTS.FLD_MESSAGE, value: message });
+        
+        return logRecord.save({ ignoreMandatoryFields: true });
+    }
+
+    /**
+     * Vincula (attach) un archivo del File Cabinet al registro personalizado del log para fácil acceso.
+     * * @private
+     * @param {number} fileId - El ID interno del archivo generado.
+     * @param {number} logId - El ID interno del registro personalizado (Custom Record).
+     * @returns {void}
+     */
+    function _attachFile(fileId, logId) {
+        record.attach({
+            record: { type: 'file', id: fileId },
+            to: { type: CONSTANTS.RECORD_TYPE, id: logId }
+        });
+    }
+
+    return { write: write };
+});
+/**
+ * refactor(logger): aplicar SRP, serialización segura y agregar documentación JSDoc
+ * Descripción (Body):
+ * Se refactorizó el adaptador de infraestructura sads_fama_logger.js para incrementar su robustez y mantenibilidad, aplicando principios SOLID y de diseño seguro:
+ * * 🛡️ Diseño Fail-Safe (_safeStringify): Se mitigó un riesgo crítico donde JSON.stringify causaba un colapso del sistema al intentar serializar objetos con referencias circulares. Se implementó una caché interna que neutraliza el error registrando un [Referencia Circular Detectada].
+ * * 🧹 Clean Code (SRP): Se descompuso la función write en métodos privados atómicos (_createLogAttachment, _createCustomRecord, _attachFile), aislando las responsabilidades (File System vs. Database Records).
+ * * ⚙️ Mejora del Fallback: En caso de fallo total del custom logger (ej. límite de cuota en el File Cabinet), la excepción delegada al sistema nativo (log.error) ahora captura correctamente el stack trace y contexto para evitar la pérdida del Compromise Recording.
+ * * 📚 Documentación (JSDoc): Se añadieron etiquetas de documentación estándar JSDoc a todas las funciones de la API pública y soporte interno, definiendo tipos, parámetros, y retornos esperados, facilitando el mantenimiento y habilitando el IntelliSense en los IDEs.
+ */
+
+===================
+File: sads_fama_response_handler.js
+===================
+/**
+ * @NApiVersion 2.0
+ * @NModuleScope Public
+ * * Módulo: Response Handler (Capa Anticorrupción / Translator)
+ */
+define([], function() {
+    'use strict';
+
+    // ==========================================
+    // 1. CONSTANTES DEL DOMINIO (Evitar Magic Strings)
+    // ==========================================
+    var EDOC_STATUS = {
+        CERTIFIED: '3',
+        CERT_ERROR: '4',
+        DATA_ERROR: '21'
+    };
+
+    // ==========================================
+    // 2. DICCIONARIO DE ESTRATEGIAS (Open/Closed Principle)
+    // ==========================================
+    // Si el PAC agrega nuevos códigos, solo agregamos una línea aquí,
+    // sin tocar la lógica de negocio principal.
+    var ERROR_MAP = {
+        400: { status: EDOC_STATUS.DATA_ERROR, msg: 'PAC - 400 Bad Request: Parámetros incompletos o inválidos.' },
+        401: { status: EDOC_STATUS.CERT_ERROR, msg: 'PAC - 401 Unauthorized: Credenciales incorrectas o caducadas.' },
+        403: { status: EDOC_STATUS.CERT_ERROR, msg: 'PAC - 403 Forbidden: Permisos insuficientes.' },
+        404: { status: EDOC_STATUS.CERT_ERROR, msg: 'PAC - 404 Not Found: Recurso no encontrado.' },
+        500: { status: EDOC_STATUS.CERT_ERROR, msg: 'PAC - 500 Internal Server Error: Error interno en Facturama.' },
+        503: { status: EDOC_STATUS.CERT_ERROR, msg: 'PAC - 503 Service Unavailable: Facturama en mantenimiento.' }
+    };
+
+    // ==========================================
+    // 3. API PÚBLICA (Lógica de Mapeo)
+    // ==========================================
+    
+    /**
+     * Evalúa la respuesta HTTP del PAC y la traduce a los estados estandarizados de NetSuite (eDocStatus).
+     * Funciona como una Capa Anticorrupción (ACL) para proteger el núcleo de la aplicación de cambios en la API externa.
+     * * @param {number|string} httpCode - El código de estado HTTP devuelto por la petición al PAC.
+     * @param {Object|string|null} responseBody - El cuerpo de la respuesta (payload) entregado por el PAC.
+     * @returns {Object} Objeto estructurado que contiene el éxito de la operación (success), el código de estado para NetSuite (eDocStatus) y un mensaje detallado (details).
+     */
+    function analyzeResponse(httpCode, responseBody) {
+        // 1. EVALUACIÓN RESILIENTE: 
+        // Excelente práctica. Nos protegemos de códigos HTTP incorrectos si el UUID ya existe.
+        var hasValidUUID = !!(responseBody && 
+                              responseBody.Complement && 
+                              responseBody.Complement.TaxStamp && 
+                              responseBody.Complement.TaxStamp.Uuid);
+
+        if (httpCode === 200 || httpCode === 201 || httpCode === 208 || hasValidUUID) {
+            return {
+                success: true,
+                eDocStatus: EDOC_STATUS.CERTIFIED,
+                details: httpCode === 208 
+                    ? 'Documento recuperado exitosamente del PAC (208 Already Reported)'
+                    : 'Documento electrónico correctamente certificado'
+            };
+        }
+
+        // 2. EVALUACIÓN DE ERRORES CONOCIDOS (Uso de Diccionario en lugar de Switch)
+        var errorDetail = _extractFacturamaError(responseBody);
+        
+        // Si el código HTTP no está en nuestro mapa, usamos un Fallback seguro.
+        var mappedError = ERROR_MAP[httpCode] || { 
+            status: EDOC_STATUS.CERT_ERROR, 
+            msg: 'PAC - Error no documentado (' + httpCode + ')' 
+        };
+
+        return {
+            success: false,
+            eDocStatus: mappedError.status,
+            details: mappedError.msg + ' Detalles: ' + errorDetail
+        };
+    }
+
+    // ==========================================
+    // 4. FUNCIONES DE SOPORTE (Privadas)
+    // ==========================================
+    
+    /**
+     * Extrae de forma segura el mensaje de error del payload enviado por Facturama.
+     * Implementa defensas contra valores nulos y errores de serialización (Fail-Safe Defaults).
+     * * @private
+     * @param {Object|string|null} responseBody - El cuerpo de la respuesta del PAC que contiene el detalle del error.
+     * @returns {string} El mensaje de error extraído, concatenado de forma segura, o un mensaje genérico de fallback.
+     */
+    function _extractFacturamaError(responseBody) {
+        // BUGFIX CRÍTICO: typeof null === 'object'. Agregamos validación estricta !== null.
+        if (responseBody !== null && typeof responseBody === 'object') {
+            var msg = responseBody.Message || responseBody.message || '';
+            var model = responseBody.ModelState || responseBody.modelState || '';
+            
+            var modelString = '';
+            if (model) {
+                // Fail-Safe: Evitamos que JSON.stringify rompa si hay estructuras circulares o raras
+                try {
+                    modelString = typeof model === 'string' ? model : JSON.stringify(model);
+                } catch (e) {
+                    modelString = '[Error al serializar ModelState]';
+                }
+            }
+            
+            var combined = msg + (modelString ? ' | ' + modelString : '');
+            
+            if (combined) {
+                return combined;
+            }
+            
+            // Fallback si el objeto no trae las propiedades esperadas
+            try {
+                return JSON.stringify(responseBody);
+            } catch (e) {
+                return '[Objeto de error no parseable]';
+            }
+        }
+        
+        // Si es string o undefined, lo casteamos a cadena de forma segura
+        return String(responseBody || 'Sin detalle adicional');
+    }
+
+    return { analyzeResponse: analyzeResponse };
+});
+/**
+ * refactor(response-handler): aplicar patron diccionario, prevenir bugs de null y agregar JSDoc
+ * Descripción (Body):
+ * Se refactorizó la Capa Anticorrupción (ACL) encargada de interpretar las respuestas del PAC hacia NetSuite:
+ * * 🐛 Prevención de Errores (JS Quirks): Se corrigió una vulnerabilidad lógica en la extracción de errores donde typeof null === 'object' podía ocasionar un TypeError fatal en el ERP si el responseBody llegaba nulo. Se implementó un Fail-Safe para serializaciones complejas.
+ * * 🏗️ Clean Code (Open/Closed Principle): Se eliminó el bloque switch verboso reemplazándolo por el patrón ERROR_MAP (Diccionario/Estrategia). Esto reduce la complejidad ciclomática y permite agregar nuevos códigos HTTP en el futuro sin modificar la lógica principal.
+ * * 🏷️ Remoción de Magic Strings: Se centralizaron los códigos de NetSuite (3, 4, 21) en un objeto constante EDOC_STATUS para documentar la intención del dominio y mejorar la mantenibilidad.
+ * * 📚 Documentación (JSDoc): Se incorporaron firmas de funciones estandarizadas en JSDoc para la API pública y funciones privadas, documentando los parámetros esperados, tipos de datos devueltos y protegiendo el contrato de la capa anticorrupción para habilitar IntelliSense en los IDEs.
+ */
+
+===================
+File: pi_sads_fama_connector.js
+===================
+/**
+ * @NApiVersion 2.0
+ * @NScriptType plugintypeimpl
+ * @NModuleScope Public
+ * * SADS Facturama - Orquestador Principal (Mediator Pattern)
+ */
+define([
+    'N/search',
+    'N/record',
+    'N/https', // TODO (Arquitectura): Debería removerse a futuro y delegar 100% en apiModule
+    './lib/sads_fama_logger',
+    './lib/sads_fama_config',
+    './lib/sads_fama_api',
+    './lib/sads_fama_files',
+    './lib/sads_fama_cfdi',
+    './lib/sads_fama_response_handler'
+], function (search, record, https, logger, configModule, apiModule, filesModule, cfdiModule, responseHandler) {
+    'use strict';
+
+    // ==========================================
+    // 1. CONSTANTES (Clean Code: No Magic Strings)
+    // ==========================================
+    var CONSTANTS = {
+        BUNDLE_ID: '436209',
+        BUNDLE_NAME: 'Mexico Compliance',
+        STATUS_ERROR: '4'
+    };
+
+    // ==========================================
+    // 2. CASO DE USO PRINCIPAL (Clean Architecture)
+    // ==========================================
+    
+    /**
+     * Punto de entrada principal del Plug-in de Facturación Electrónica de NetSuite.
+     * Orquesta el flujo completo: validación, obtención de configuración, timbrado en PAC, 
+     * análisis de respuesta, y generación de XML/PDF.
+     * * @param {Object} plugInContext - El contexto inyectado por el framework de NetSuite.
+     * @param {Object} plugInContext.transaction - Información básica de la transacción (id, type, tranType).
+     * @param {Object} [plugInContext.customer] - Información del cliente asociado (id).
+     * @param {string} plugInContext.eInvoiceContent - El payload JSON/XML generado por el estándar de NetSuite.
+     * @param {number|string} plugInContext.userId - El ID del usuario ejecutando la acción.
+     * @returns {Object} Objeto de respuesta estandarizado requerido por el EI Framework (eiStatus, message, success).
+     */
+    function send(plugInContext) {
+        var txnId = (plugInContext.transaction && plugInContext.transaction.id) ? plugInContext.transaction.id : 'DESCONOCIDO';
+        logger.write('1. INICIO FLUJO ORQUESTADOR', 'Plug-in invocado para transacción ID: ' + txnId);
+
+        try {
+            // -- Paso 1: Validación de Entrada (Guard Clauses) --
+            var rawPayload = plugInContext.eInvoiceContent;
+            if (!rawPayload) throw new Error('eInvoiceContent vacío provisto por el framework.');
+            
+            var originalPayload = apiModule.safeParse(rawPayload);
+            var txnType = plugInContext.transaction.tranType || plugInContext.transaction.type;
+
+            // -- Paso 2: Obtención de Configuración --
+            var txnLookup = search.lookupFields({
+                type: search.Type.TRANSACTION,
+                id: txnId,
+                columns: ['subsidiary', 'tranid']
+            });
+
+            // Fail-Safe: Validar que existe la subsidiaria antes de leer la posición [0]
+            if (!txnLookup.subsidiary || txnLookup.subsidiary.length === 0) {
+                throw new Error('La transacción no tiene una subsidiaria asignada.');
+            }
+
+            var configData = configModule.get(txnLookup.subsidiary[0].value);
+            var headers = configModule.getAuthHeaders(configData.user, configData.pass);
+
+            // -- Paso 3: Comunicación con el PAC (Fuga de abstracción mantenida por compatibilidad) --
+            var postResp = https.post({ url: configData.apiPostUrl, headers: headers, body: rawPayload });
+            var parsedBody = apiModule.safeParse(postResp.body);
+
+            // -- Paso 4: Análisis de Respuesta --
+            var statusAnalysis = responseHandler.analyzeResponse(postResp.code, parsedBody);
+
+            if (!statusAnalysis.success) {
+                logger.write('FALLO EN TIMBRADO (PAC)', statusAnalysis.details);
+                return _buildFrameworkReturn(plugInContext, statusAnalysis.eDocStatus, statusAnalysis.details, false, {});
+            }
+
+            // -- Paso 5: Construcción y Guardado de Archivos (XML y PDF) --
+            var facturamaData = parsedBody;
+            var cfdiId = facturamaData.Id;
+            var uuid = facturamaData.Complement && facturamaData.Complement.TaxStamp ? facturamaData.Complement.TaxStamp.Uuid : 'UUID_N/A';
+            var filePrefix = txnLookup.tranid + '_' + uuid;
+
+            var xmlData = apiModule.getFile(configData.apiGetUrl, headers, cfdiId, 'xml');
+            var xmlContent = (xmlData && xmlData.Content) ? xmlData.Content : 'XML_VACIO';
+            var xmlFileId = filesModule.saveFile('CFDI_' + filePrefix + '.xml', xmlContent);
+
+            var extraFields = cfdiModule.buildExtraFields(originalPayload, facturamaData, xmlFileId, cfdiId, xmlContent);
+
+            var txnRecordFull = record.load({ type: txnType, id: txnId });
+            var customerRecordFull = plugInContext.customer ? record.load({ type: 'customer', id: plugInContext.customer.id }) : null;
+
+            if (!configData.templates[txnType]) {
+                throw new Error('No hay plantilla PDF configurada para el tipo de transacción: ' + txnType);
+            }
+
+            var pdfFileId = filesModule.generateCertifiedPdf(txnRecordFull, customerRecordFull, configData.templates[txnType], extraFields, filePrefix + '.pdf');
+            extraFields['custbody_edoc_generated_pdf'] = pdfFileId;
+            extraFields['custbody_sads_fama_cfdi_resp_id'] = cfdiId;
+
+            // -- Paso 6: Retorno Exitoso --
+            var finalReturn = _buildFrameworkReturn(plugInContext, statusAnalysis.eDocStatus, statusAnalysis.details, true, extraFields);
+            logger.write('FIN EXITOSO'+ JSON.stringify({ transactionId: txnId, uuid: uuid }), finalReturn);
+            
+            return finalReturn;
+
+        } catch (ex) {
+            logError('ERROR FATAL EN ORQUESTADOR', ex, { transactionId: txnId });
+            
+            // Retorno degradado de forma elegante hacia el framework
+            var errorMsg = 'Excepción interna: ' + (ex.message || 'Error desconocido');
+            return _buildFrameworkReturn(plugInContext, CONSTANTS.STATUS_ERROR, errorMsg, false, {});
+        }
+    }
+
+    // ==========================================
+    // 3. FUNCIONES DE SOPORTE (Privadas)
+    // ==========================================
+
+    /**
+     * Construye el objeto estandarizado que requiere el framework de NetSuite para actualizar 
+     * los registros tras un intento de envío.
+     * Refactorizado: Se eliminó el try/catch redundante usando inicialización segura (Fail-Safe Defaults).
+     * * @private
+     * @param {Object} plugInContext - Contexto original inyectado por NetSuite.
+     * @param {string} eDocStatus - Estado final del documento (ej. '3' certificado, '4' error).
+     * @param {string} detailsMsg - Mensaje descriptivo del resultado de la operación.
+     * @param {boolean} isSuccess - Determina si la transacción fue exitosa para permitir la actualización de campos.
+     * @param {Object} extraFields - Diccionario de IDs de campos custom a actualizar en la transacción.
+     * @returns {Object} La estructura exacta requerida por `app_einvoice_sending_manager.js`.
+     */
+    function _buildFrameworkReturn(plugInContext, eDocStatus, detailsMsg, isSuccess, extraFields) {
+        // Uso de operadores OR lógicos para evitar accesos a propiedades indefinidas
+        var txn = plugInContext.transaction || {};
+        var cust = plugInContext.customer || {};
+
+        var finalResult = {
+            transactionId: txn.id || '',
+            transactionType: txn.tranType || txn.type || '',
+            entity: cust.id || undefined,
+            eDocStatus: eDocStatus,
+            eventType: eDocStatus,
+            details: detailsMsg,
+            owner: plugInContext.userId || undefined,
+            isUpdateFields: isSuccess,
+            extraFieldsForUpdate: extraFields || {},
+            bundleId: CONSTANTS.BUNDLE_ID,
+            bundleName: CONSTANTS.BUNDLE_NAME
+        };
+
+        logger.write('Funcion _buildFrameworkReturn ejecutada, resultado construido para el framework', finalResult);
+
+        return {
+            eiStatus: finalResult,
+            message: isSuccess ? '' : detailsMsg, // El framework usa message para los errores
+            success: isSuccess
+        };
+    }
+
+    /**
+     * Fábrica de errores estandarizada (Compromise Recording).
+     * * @private
+     * @param {string} customMessage - Mensaje de contexto sobre dónde ocurrió el fallo general.
+     * @param {Error|Object} e - Excepción capturada.
+     * @param {Object} contextData - Variables de estado para recrear el escenario del error.
+     * @returns {void}
+     */
+    function logError(customMessage, e, contextData) {
+        var errorDetails = {
+            name: e.name || 'ORCHESTRATOR_ERROR',
+            message: e.message || e.toString(),
+            stack: e.stack || (typeof e.getStackTrace === 'function' ? e.getStackTrace().join('\n') : 'No stack trace'),
+            context: contextData || {}
+        };
+        logger.write(customMessage, errorDetails);
+    }
+
+    /**
+     * Devuelve el estado y las capacidades actuales del plugin al framework de EI.
+     * * @param {Object} scriptContext - Contexto base de ejecución.
+     * @returns {Object} Objeto de estado indicando soporte de procesamiento síncrono.
+     */
+    function getStatus(scriptContext) { 
+        return { success: true, message: 'Procesamiento síncrono.' }; 
+    }
+
+    /**
+     * Método requerido por la interfaz del plug-in (No implementado/delegado).
+     * * @param {Object} fakeSatCodesInstance - Instancia ficticia o base enviada por NetSuite.
+     * @returns {void}
+     */
+    function setSATCodesInstance(fakeSatCodesInstance) { }
+
+    return { 
+        send: send, 
+        getStatus: getStatus, 
+        setSATCodesInstance: setSATCodesInstance 
+    };
+});
+/**
+ * refactor(orchestrator): aplicar clean architecture, mediator pattern y documentacion JSDoc
+ * Descripción (Body):
+ * Se refactorizó el orquestador principal (pi_sads_fama_connector.js) que actúa como el Mediator central del framework de facturación electrónica de NetSuite:
+ * * 🏗️ Clean Architecture (Mediator Pattern): Se aisló la lógica de negocio delegando las responsabilidades de infraestructura a adaptadores específicos (apiModule, filesModule, configModule, cfdiModule). El orquestador ahora se lee como una secuencia lineal de alto nivel (Casos de Uso) sin preocuparse por los detalles de implementación de bajo nivel.
+ * * 🛡️ Fail-Safe Defaults & Guard Clauses: Se implementó la validación temprana (Fail Fast) para el payload y la subsidiaria. Se eliminó el riesgo de excepciones no controladas causadas por el acceso a propiedades indefinidas mediante el uso de operadores OR lógicos (`||`) al construir la respuesta (`_buildFrameworkReturn`).
+ * * 🧹 Clean Code (DRY Principle): Se eliminó el bloque `try/catch` anidado y redundante en la función de construcción del retorno. Las constantes críticas como el BUNDLE_ID y el STATUS_ERROR se extrajeron a un diccionario central para evitar el uso de Magic Strings.
+ * * 🩺 Compromise Recording (Degradación Elegante): Si ocurre un fallo catastrófico no controlado en cualquier punto del flujo, el bloque `catch` principal captura el *stack trace*, lo registra a través del logger centralizado, y devuelve una estructura de fallo estandarizada ("4") para evitar que la aplicación NetSuite colapse abruptamente.
+ * * 📚 Documentación (JSDoc): Se documentaron todas las funciones públicas y privadas, especificando el contrato estricto del framework `plugInContext` para facilitar el mantenimiento y la comprensión de la arquitectura de inyección de dependencias a futuros desarrolladores.
+ */
+
+===================
+File: sads_fama_mr_global_orchestrator.js
+===================
+/**
+ * @NApiVersion 2.0
+ * @NScriptType MapReduceScript
+ * @NModuleScope Public
+ * 
+ * SADS Facturama - Orquestador Map/Reduce para Factura Global
+ * 
+ * Arquitectura: Hexagonal (Ports and Adapters) & Mediator Pattern
+ * Descripción: Coordina la extracción masiva de tickets (Cash Sales), la transformación
+ * de datos a través de la capa de Dominio, la comunicación con el PAC vía Adaptadores HTTP, 
+ * la generación de archivos físicos y la actualización transaccional usando límites elásticos.
+ */
+define([
+    'N/search',
+    'N/record',
+    'N/runtime',
+    'N/email',
+    'N/file',
+    './lib/sads_fama_logger',
+    './lib/sads_fama_config',
+    './lib/sads_fama_global_mapper',
+    './lib/sads_fama_api',
+    './lib/sads_fama_files'
+], function (search, record, runtime, email, file, logger, configModule, mapper, api, filesAdapter) {
+    'use strict';
+
+    // ==========================================
+    // 1. CONSTANTES DEL SISTEMA (No Magic Strings)
+    // ==========================================
+    var CONSTANTS = {
+        PARAM_REG_ID: 'custscript_sads_fama_reg_fact_id', // ID del Custom Record generado por la UI
+        PARAM_TEMPLATE_ID: 'custscript_sads_fama_pdf_template', // ID de la Plantilla PDF (Advanced PDF/HTML)
+        AUTHOR_ID: -5, // ID interno del empleado/sistema que envía el correo
+        STATUS_SUCCESS: 'SUCCESS',
+        STATUS_ERROR: 'ERROR',
+        FOLDERS: {
+            ROOT: '412704', // Carpeta padre por defecto (Fail-Safe)
+            SUBSIDIARIES: {
+                '2': '412710', // NH ACEROS
+                '3': '412712', // ACEROS DE GUASAVE
+                '4': '412708'  // PROVEEDORA DE FIERRO Y PERFILES
+            }
+        }
+    };
+
+    // ==========================================
+    // 2. GET INPUT DATA (El Recolector)
+    // ==========================================
+
+    /**
+     * Define la entrada de datos para la fase Map.
+     * Patrón Fail-Safe: Falla rápido si no se provee el contexto inicial.
+     * 
+     * @param {Object} inputContext - Objeto inyectado por el framework de NetSuite.
+     * @returns {Array} Un arreglo con un único objeto para forzar una sola ejecución de la etapa Map.
+     * @throws {Error} Si el parámetro de ID de registro no está configurado.
+     */
+    function getInputData(inputContext) {
+        try {
+            var currentScript = runtime.getCurrentScript();
+            var customRecordId = currentScript.getParameter({ name: CONSTANTS.PARAM_REG_ID });
+
+            if (!customRecordId) {
+                throw new Error('Falta el parámetro crítico: ID de Registro de Facturación Intercompañía.');
+            }
+
+            logger.write('1. INICIO MAP/REDUCE: Factura Global', { customRecordId: customRecordId });
+
+            return [{ regId: customRecordId }];
+
+        } catch (e) {
+            logError('Fallo fatal en getInputData', e);
+            throw e; // Interrumpe la ejecución del Map/Reduce completamente
+        }
+    }
+
+    // ==========================================
+    // 3. MAP (El Director de Orquesta - Fase 1)
+    // ==========================================
+
+    /**
+     * Orquesta el flujo de negocio: Extracción, Mapeo, Timbrado y Generación de Archivos.
+     * 
+     * @param {Object} mapContext - Contexto de la fase Map, provee el método write() para pasar datos al Reduce.
+     */
+    function map(mapContext) {
+        try {
+            var data = JSON.parse(mapContext.value);
+            var regId = data.regId;
+            var currentScript = runtime.getCurrentScript();
+
+            // 1. Extracción de Configuración de la UI (Costo: 1 Unidad)
+            var lookupData = search.lookupFields({
+                type: 'customrecord_drt_reg_facturacion_interco',
+                id: regId,
+                columns: [
+                    'custrecord_drt_facturas',
+                    'custrecord_drt_periodicidad',
+                    'custrecord_drt_meses',
+                    'custrecord_drt_anio',
+                    'custrecord_drt_subsidiary',
+                    'custrecord_drt_sat_payment_term', // Forma de Pago
+                    'custrecord_drt_sat_payment_method' // Método de Pago
+                ]
+            });
+
+            var cashSalesIds = _extractMultiSelectIds(lookupData.custrecord_drt_facturas);
+            if (cashSalesIds.length === 0) {
+                throw new Error('El registro no contiene transacciones (Cash Sales) seleccionadas.');
+            }
+
+            // 2. Adaptador de Datos: Búsqueda de tickets (Costo: 10 Unidades)
+            var rawItems = _fetchCashSalesData(cashSalesIds);
+
+            // 3. Preparar Contexto de Dominio (Configuraciones de Emisor)
+            var subsidiaryId = lookupData.custrecord_drt_subsidiary.length > 0 ? lookupData.custrecord_drt_subsidiary[0].value : null;
+            var issuerData = _getIssuerData(subsidiaryId);
+
+            var contextData = {
+                periodicidad: lookupData.custrecord_drt_periodicidad.length > 0 ? lookupData.custrecord_drt_periodicidad[0].text.split(' ')[0] : '01',
+                meses: lookupData.custrecord_drt_meses.length > 0 ? lookupData.custrecord_drt_meses[0].text.split(' ')[0] : '01',
+                anio: lookupData.custrecord_drt_anio || new Date().getFullYear().toString(),
+                formaPago: lookupData.custrecord_drt_sat_payment_term.length > 0 ? lookupData.custrecord_drt_sat_payment_term[0].text.split(' ')[0] : '01',
+                metodoPago: lookupData.custrecord_drt_sat_payment_method.length > 0 ? lookupData.custrecord_drt_sat_payment_method[0].text.split(' ')[0] : 'PUE',
+                fechaEmision: _getIsoDateString(),
+                folioSolicitado: 'GLOBAL-' + regId,
+                issuerRfc: issuerData.rfc,
+                issuerName: issuerData.name,
+                issuerZipCode: issuerData.zip,
+                issuerRegime: issuerData.regime
+            };
+
+            // 4. Transformación a Payload Facturama (Dominio Puro)
+            var payload = mapper.buildFacturamaPayload(contextData, rawItems);
+
+            // 5. Timbrado mediante Adaptador HTTP (Costo: 10 Unidades)
+            var configData = configModule.get(subsidiaryId);
+            var headers = configModule.getAuthHeaders(configData.user, configData.pass);
+            var apiResponse = api.postTimbrado(configData.apiPostUrl, headers, JSON.stringify(payload));
+
+            if (!apiResponse || apiResponse.error_interno) {
+                throw new Error('Fallo en la comunicación con el PAC: ' + (apiResponse ? apiResponse.detalle : 'Timeout'));
+            }
+
+            var cfdiId = apiResponse.Id;
+            var uuid = apiResponse.Complement.TaxStamp.Uuid;
+
+            // 6. Descarga y Generación de Archivos Físicos
+            var xmlData = api.getFile(configData.apiGetUrl, headers, cfdiId, 'xml');
+            var fileNamePrefix = 'FacturaGlobal_' + uuid;
+
+            // Resolvemos la carpeta dinámicamente
+            var targetFolderId = _getDestinationFolderId(subsidiaryId);
+
+            var xmlId = filesAdapter.saveFile(fileNamePrefix + '.xml', xmlData.Content, targetFolderId);
+            var templateId = currentScript.getParameter({ name: CONSTANTS.PARAM_TEMPLATE_ID });
+
+            var templateId = currentScript.getParameter({ name: CONSTANTS.PARAM_TEMPLATE_ID });
+            if (!templateId) {
+                throw new Error('No se ha configurado el parámetro de Plantilla PDF en el despliegue del script.');
+            }
+
+            var dummyRecord = record.load({ type: 'customrecord_drt_reg_facturacion_interco', id: regId });
+            var pdfId = filesAdapter.generateCertifiedPdf(dummyRecord, null, templateId, { custbody_mx_cfdi_uuid: uuid }, fileNamePrefix + '.pdf', targetFolderId);
+
+            // 7. El Puente (Mediator): Despachar tareas atómicas a la fase Reduce
+            var successData = {
+                uuid: uuid,
+                xmlId: xmlId,
+                pdfId: pdfId,
+                regId: regId
+            };
+
+            for (var i = 0; i < cashSalesIds.length; i++) {
+                mapContext.write({
+                    key: cashSalesIds[i],
+                    value: successData
+                });
+            }
+
+            logger.write('2. TIMBRADO GLOBAL EXITOSO', { uuid: uuid, cantidadTickets: cashSalesIds.length });
+
+        } catch (e) {
+            logError('Fallo en la etapa MAP (Construcción o Timbrado)', e, { rawMapValue: mapContext.value });
+            throw e; // Protege el estado: Si falla aquí, la etapa Reduce no mutará la base de datos.
+        }
+    }
+
+    // ==========================================
+    // 4. REDUCE (El Mutador Elástico - Fase 2)
+    // ==========================================
+
+    /**
+     * Actualiza cada Cash Sale con el UUID y los archivos generados.
+     * Se ejecuta de forma paralela y distribuida protegiendo los límites de Gobernanza.
+     * 
+     * @param {Object} reduceContext - Provee el ID del ticket (key) y los datos de éxito (values).
+     */
+    function reduce(reduceContext) {
+        var cashSaleId = reduceContext.key;
+
+        try {
+            var successData = JSON.parse(reduceContext.values[0]);
+
+            // Actualización atómica de la transacción (Costo: 10 Unidades por ticket)
+            record.submitFields({
+                type: record.Type.CASH_SALE,
+                id: cashSaleId,
+                values: {
+                    'custbody_mx_cfdi_uuid': successData.uuid,
+                    'custbody_psg_ei_certified_edoc': successData.xmlId,
+                    'custbody_edoc_generated_pdf': successData.pdfId
+                },
+                options: { ignoreMandatoryFields: true }
+            });
+
+            // Reenviamos metadatos agrupados al Summarize para la notificación
+            reduceContext.write({
+                key: successData.regId,
+                value: { xmlId: successData.xmlId, pdfId: successData.pdfId, uuid: successData.uuid }
+            });
+
+        } catch (e) {
+            logError('Fallo aisaldo al actualizar Cash Sale ID: ' + cashSaleId, e);
+        }
+    }
+
+    // ==========================================
+    // 5. SUMMARIZE (El Observador / Cierre)
+    // ==========================================
+
+    /**
+     * Evalúa el resultado final del proceso distribuido y notifica a los usuarios.
+     * Implementa el Patrón Observer mediante el envío de correos con adjuntos.
+     * 
+     * @param {Object} summaryContext - Contiene las estadísticas, errores y salidas del Map/Reduce.
+     */
+    function summarize(summaryContext) {
+        var totalErrors = 0;
+
+        summaryContext.mapSummary.errors.iterator().each(function (key, error) {
+            logError('Excepción capturada en MapSummary', error);
+            totalErrors++;
+            return true;
+        });
+
+        summaryContext.reduceSummary.errors.iterator().each(function (key, error) {
+            logError('Excepción capturada en ReduceSummary', error);
+            totalErrors++;
+            return true;
+        });
+
+        var fileData = null;
+        var regId = null;
+
+        summaryContext.output.iterator().each(function (key, value) {
+            regId = key;
+            fileData = JSON.parse(value);
+            return false; // Solo necesitamos la metadata de un nodo, todos tienen la misma.
+        });
+
+        try {
+            if (totalErrors === 0 && fileData && regId) {
+                _sendSuccessEmail(regId, fileData.xmlId, fileData.pdfId, fileData.uuid);
+                _updateCustomRecordStatus(regId, CONSTANTS.STATUS_SUCCESS, 'Factura Global Generada Correctamente.');
+                logger.write('3. ORQUESTACIÓN FINALIZADA', { regId: regId, status: 'ÉXITO TOTAL' });
+            } else if (regId) {
+                _updateCustomRecordStatus(regId, CONSTANTS.STATUS_ERROR, 'Proceso finalizado con errores parciales o totales. Revisa el Logger.');
+                logger.write('3. ORQUESTACIÓN FINALIZADA CON ERRORES', { regId: regId, erroresDetectados: totalErrors });
+            }
+        } catch (e) {
+            logError('Fallo crítico en fase Summarize (Envío de correo/Actualización)', e);
+        }
+    }
+
+    // ==========================================
+    // 6. FUNCIONES PRIVADAS (Adaptadores y Helper)
+    // ==========================================
+
+    /**
+     * Recupera y formatea de forma segura los datos de la subsidiaria emisora.
+     * @private
+     */
+    function _getIssuerData(subsidiaryId) {
+        if (!subsidiaryId) throw new Error('Se requiere una subsidiaria para obtener los datos del Emisor.');
+
+        var fields = search.lookupFields({
+            type: search.Type.SUBSIDIARY,
+            id: subsidiaryId,
+            columns: ['federalidnumber', 'name', 'zip', 'custrecord_mx_sat_industry_type']
+        });
+
+        return {
+            rfc: fields.federalidnumber,
+            name: fields.name,
+            zip: fields.zip,
+            regime: fields.custrecord_mx_sat_industry_type[0] ? fields.custrecord_mx_sat_industry_type[0].text.split('-')[0] : '601'
+        };
+    }
+
+    /**
+     * Sanitiza el valor crudo del Multi-Select Field de NetSuite a un Arreglo JS estándar.
+     * Programación Defensiva (Fail-Safe Defaults).
+     * @private
+     */
+    function _extractMultiSelectIds(rawFieldValue) {
+        if (!rawFieldValue) return [];
+        if (Array.isArray(rawFieldValue) && rawFieldValue.length > 0 && typeof rawFieldValue[0] === 'object') {
+            return rawFieldValue.map(function (obj) { return obj.value; });
+        }
+        if (Array.isArray(rawFieldValue)) return rawFieldValue;
+        if (typeof rawFieldValue === 'string') return rawFieldValue.split(',');
+        return [];
+    }
+
+    /**
+     * Repositorio: Realiza la búsqueda de los Cash Sales extraídos de la UI y suma los totales de línea.
+     * @private
+     */
+    function _fetchCashSalesData(cashSalesIds) {
+        if (!cashSalesIds || cashSalesIds.length === 0) return [];
+        var rawItems = [];
+
+        var salesSearch = search.create({
+            type: search.Type.CASH_SALE,
+            filters: [
+                ['internalid', 'anyof', cashSalesIds], 'AND',
+                ['mainline', 'is', 'F'], 'AND',
+                ['taxline', 'is', 'F'], 'AND',
+                ['shipping', 'is', 'F']
+            ],
+            columns: [
+                'tranid', 'quantity', 'amount', 'taxamount', 'taxrate', 'discountamount',
+                search.createColumn({ name: 'custcol_mx_txn_line_sat_item_code' })
+            ]
+        });
+
+        salesSearch.run().each(function (result) {
+            rawItems.push({
+                ticketNumber: result.getValue('tranid'),
+                quantity: result.getValue('quantity'),
+                amount: result.getValue('amount'),
+                taxamt: result.getValue('taxamount'),
+                taxrate: result.getValue('taxrate'),
+                discount: result.getValue('discountamount'),
+                satCode: result.getText({ name: 'custcol_mx_txn_line_sat_item_code' })
+            });
+            return true;
+        });
+
+        return rawItems;
+    }
+
+    /**
+     * Obtiene la fecha actual en formato ISO 8601 estricto para Facturama.
+     * @private
+     */
+    function _getIsoDateString() {
+        var d = new Date();
+        return d.toISOString().split('.')[0]; // Ej. "2026-08-21T12:40:23"
+    }
+
+    /**
+     * Adjunta los archivos del File Cabinet y envía el correo de éxito.
+     * @private
+     */
+    function _sendSuccessEmail(regId, xmlId, pdfId, uuid) {
+        var customRecord = record.load({ type: 'customrecord_drt_reg_facturacion_interco', id: regId });
+        // En un entorno real, extraerías el correo del usuario que creó el registro o de una configuración
+        var recipients = ['facturacion@zapateriascandy.com.mx', 'iztac.amaya@disruptt.mx'];
+
+        var xmlAttachment = file.load({ id: xmlId });
+        var pdfAttachment = file.load({ id: pdfId });
+
+        email.send({
+            author: CONSTANTS.AUTHOR_ID,
+            recipients: recipients,
+            subject: 'Notificación de Sistema: Factura Global Generada Exitosamente',
+            body: 'Se ha completado la generación masiva de la Factura Global.\n\nUUID Fiscal: ' + uuid + '\n\nSe adjuntan los comprobantes XML y PDF generados desde el PAC.',
+            attachments: [xmlAttachment, pdfAttachment]
+        });
+    }
+
+    /**
+     * Actualiza el registro personalizado para informar a la UI (Suitelet) del resultado final.
+     * @private
+     */
+    function _updateCustomRecordStatus(regId, status, message) {
+        record.submitFields({
+            type: 'customrecord_drt_reg_facturacion_interco',
+            id: regId,
+            values: {
+                'custrecord_drt_status': status
+            },
+            options: { ignoreMandatoryFields: true }
+        });
+    }
+
+    /**
+     * Delegador de errores estándar (Compromise Recording).
+     * @private
+     */
+    function logError(customMessage, e, contextData) {
+        var errorDetails = {
+            name: e.name || 'MAP_REDUCE_ERROR',
+            message: e.message || e.toString(),
+            stack: e.stack || (typeof e.getStackTrace === 'function' ? e.getStackTrace().join('\n') : 'No stack trace'),
+            context: contextData || {}
+        };
+        logger.write('ERROR ORQUESTADOR GLOBAL: ' + customMessage, errorDetails);
+    }
+
+    /**
+     * Resuelve el ID de la carpeta de destino basada en la subsidiaria.
+     * Principio Fail-Safe: Retorna la carpeta ROOT si la subsidiaria no está mapeada.
+     * @private
+     */
+    function _getDestinationFolderId(subsidiaryId) {
+        if (!subsidiaryId) return CONSTANTS.FOLDERS.ROOT;
+
+        var folderId = CONSTANTS.FOLDERS.SUBSIDIARIES[String(subsidiaryId)];
+        return folderId || CONSTANTS.FOLDERS.ROOT;
+    }
+
+    return {
+        getInputData: getInputData,
+        map: map,
+        reduce: reduce,
+        summarize: summarize
+    };
+});
+/**
+ * feat(global-invoice): implementar orquestador map/reduce completo con inyección de PDF y validaciones
+ * Descripción (Body):
+ * Se consolidó la arquitectura definitiva del Orquestador Map/Reduce para Facturación Global sustituyendo la topología monolítica anterior:
+ * * 🔌 Parametrización Abierta (Open/Closed): Se inyectó el parámetro dinámico `PARAM_TEMPLATE_ID` (`custscript_sads_fama_pdf_template`), permitiendo a los administradores del sistema intercambiar la plantilla FreeMarker (PDF) de las facturas globales desde la UI sin modificar el código fuente.
+ * * 🛡️ Adaptadores Seguros (Fail-Safe Defaults): Se integraron los adaptadores privados `_fetchCashSalesData` y `_extractMultiSelectIds` que garantizan la sanitización de los objetos extraídos del framework y una consulta optimizada y segura a la base de datos (Search) aislando la memoria.
+ * * 📥 Manejo del Contexto Emisor: Se construyó la función `_getIssuerData` la cual realiza un *lookup* eficiente (1 Unidad) a la subsidiaria operativa para construir el nodo SAT Emisor de forma dinámica y precisa.
+ * * 📬 Notificación Nativa (Observer Pattern): Se completó el motor de `_sendSuccessEmail`, cargando dinámicamente los registros *XML* y *PDF* creados por el módulo de archivos, transmitiéndolos eficientemente al usuario a través del cliente de correo interno de NetSuite.
+ */
+
