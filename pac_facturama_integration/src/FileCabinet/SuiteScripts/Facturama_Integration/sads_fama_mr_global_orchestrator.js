@@ -11,17 +11,17 @@
  * la generación de archivos físicos y la actualización transaccional usando límites elásticos.
  */
 define([
-    'N/search',
-    'N/record',
-    'N/runtime',
-    'N/email',
+    'N/search', 
+    'N/record', 
+    'N/runtime', 
+    'N/email', 
     'N/file',
     './lib/sads_fama_logger',
     './lib/sads_fama_config',
     './lib/sads_fama_global_mapper',
     './lib/sads_fama_api',
     './lib/sads_fama_files'
-], function (search, record, runtime, email, file, logger, configModule, mapper, api, filesAdapter) {
+], function(search, record, runtime, email, file, logger, configModule, mapper, api, filesAdapter) {
     'use strict';
 
     // ==========================================
@@ -32,21 +32,13 @@ define([
         PARAM_TEMPLATE_ID: 'custscript_sads_fama_pdf_template', // ID de la Plantilla PDF (Advanced PDF/HTML)
         AUTHOR_ID: -5, // ID interno del empleado/sistema que envía el correo
         STATUS_SUCCESS: 'SUCCESS',
-        STATUS_ERROR: 'ERROR',
-        FOLDERS: {
-            ROOT: '412704', // Carpeta padre por defecto (Fail-Safe)
-            SUBSIDIARIES: {
-                '2': '412710', // NH ACEROS
-                '3': '412712', // ACEROS DE GUASAVE
-                '4': '412708'  // PROVEEDORA DE FIERRO Y PERFILES
-            }
-        }
+        STATUS_ERROR: 'ERROR'
     };
 
     // ==========================================
     // 2. GET INPUT DATA (El Recolector)
     // ==========================================
-
+    
     /**
      * Define la entrada de datos para la fase Map.
      * Patrón Fail-Safe: Falla rápido si no se provee el contexto inicial.
@@ -59,7 +51,7 @@ define([
         try {
             var currentScript = runtime.getCurrentScript();
             var customRecordId = currentScript.getParameter({ name: CONSTANTS.PARAM_REG_ID });
-
+            
             if (!customRecordId) {
                 throw new Error('Falta el parámetro crítico: ID de Registro de Facturación Intercompañía.');
             }
@@ -77,7 +69,7 @@ define([
     // ==========================================
     // 3. MAP (El Director de Orquesta - Fase 1)
     // ==========================================
-
+    
     /**
      * Orquesta el flujo de negocio: Extracción, Mapeo, Timbrado y Generación de Archivos.
      * 
@@ -115,7 +107,7 @@ define([
             // 3. Preparar Contexto de Dominio (Configuraciones de Emisor)
             var subsidiaryId = lookupData.custrecord_drt_subsidiary.length > 0 ? lookupData.custrecord_drt_subsidiary[0].value : null;
             var issuerData = _getIssuerData(subsidiaryId);
-
+            
             var contextData = {
                 periodicidad: lookupData.custrecord_drt_periodicidad.length > 0 ? lookupData.custrecord_drt_periodicidad[0].text.split(' ')[0] : '01',
                 meses: lookupData.custrecord_drt_meses.length > 0 ? lookupData.custrecord_drt_meses[0].text.split(' ')[0] : '01',
@@ -137,7 +129,7 @@ define([
             var configData = configModule.get(subsidiaryId);
             var headers = configModule.getAuthHeaders(configData.user, configData.pass);
             var apiResponse = api.postTimbrado(configData.apiPostUrl, headers, JSON.stringify(payload));
-
+            
             if (!apiResponse || apiResponse.error_interno) {
                 throw new Error('Fallo en la comunicación con el PAC: ' + (apiResponse ? apiResponse.detalle : 'Timeout'));
             }
@@ -145,23 +137,20 @@ define([
             var cfdiId = apiResponse.Id;
             var uuid = apiResponse.Complement.TaxStamp.Uuid;
 
-            // 6. Descarga y Generación de Archivos Físicos (Delegación al PAC)
-            var targetFolderId = _getDestinationFolderId(subsidiaryId);
+            // 6. Descarga y Generación de Archivos Físicos
+            var xmlData = api.getXml(configData.apiGetUrl, headers, cfdiId);
             var fileNamePrefix = 'FacturaGlobal_' + uuid;
+            
+            var xmlId = filesAdapter.saveXml(fileNamePrefix + '.xml', xmlData.Content);
+            var templateId = currentScript.getParameter({ name: CONSTANTS.PARAM_TEMPLATE_ID });
+            
+            if (!templateId) {
+                throw new Error('No se ha configurado el parámetro de Plantilla PDF en el despliegue del script.');
+            }
 
-            // 6.1 Obtener y guardar XML
-            var xmlData = api.getFile(configData.apiGetUrl, headers, cfdiId, 'xml');
-            var xmlContent = (xmlData && xmlData.Content) ? xmlData.Content : null;
-            if (!xmlContent) throw new Error('Facturama no devolvió el contenido Base64 del XML.');
-
-            var xmlId = filesAdapter.saveFile(fileNamePrefix + '.xml', xmlContent, targetFolderId);
-
-            // 6.2 Obtener y guardar PDF directamente del PAC
-            var pdfData = api.getFile(configData.apiGetUrl, headers, cfdiId, 'pdf');
-            var pdfContent = (pdfData && pdfData.Content) ? pdfData.Content : null;
-            if (!pdfContent) throw new Error('Facturama no devolvió el contenido Base64 del PDF.');
-
-            var pdfId = filesAdapter.saveFile(fileNamePrefix + '.pdf', pdfContent, targetFolderId);
+            // Usamos el Custom Record como pivote para inyectar datos globales a la plantilla
+            var dummyRecord = record.load({ type: 'customrecord_drt_reg_facturacion_interco', id: regId });
+            var pdfId = filesAdapter.generateCertifiedPdf(dummyRecord, null, templateId, { custbody_mx_cfdi_uuid: uuid }, fileNamePrefix + '.pdf');
 
             // 7. El Puente (Mediator): Despachar tareas atómicas a la fase Reduce
             var successData = {
@@ -170,7 +159,7 @@ define([
                 pdfId: pdfId,
                 regId: regId
             };
-
+            
             for (var i = 0; i < cashSalesIds.length; i++) {
                 mapContext.write({
                     key: cashSalesIds[i],
@@ -189,7 +178,7 @@ define([
     // ==========================================
     // 4. REDUCE (El Mutador Elástico - Fase 2)
     // ==========================================
-
+    
     /**
      * Actualiza cada Cash Sale con el UUID y los archivos generados.
      * Se ejecuta de forma paralela y distribuida protegiendo los límites de Gobernanza.
@@ -198,7 +187,7 @@ define([
      */
     function reduce(reduceContext) {
         var cashSaleId = reduceContext.key;
-
+        
         try {
             var successData = JSON.parse(reduceContext.values[0]);
 
@@ -228,7 +217,7 @@ define([
     // ==========================================
     // 5. SUMMARIZE (El Observador / Cierre)
     // ==========================================
-
+    
     /**
      * Evalúa el resultado final del proceso distribuido y notifica a los usuarios.
      * Implementa el Patrón Observer mediante el envío de correos con adjuntos.
@@ -283,7 +272,7 @@ define([
      */
     function _getIssuerData(subsidiaryId) {
         if (!subsidiaryId) throw new Error('Se requiere una subsidiaria para obtener los datos del Emisor.');
-
+        
         var fields = search.lookupFields({
             type: search.Type.SUBSIDIARY,
             id: subsidiaryId,
@@ -306,7 +295,7 @@ define([
     function _extractMultiSelectIds(rawFieldValue) {
         if (!rawFieldValue) return [];
         if (Array.isArray(rawFieldValue) && rawFieldValue.length > 0 && typeof rawFieldValue[0] === 'object') {
-            return rawFieldValue.map(function (obj) { return obj.value; });
+            return rawFieldValue.map(function(obj) { return obj.value; });
         }
         if (Array.isArray(rawFieldValue)) return rawFieldValue;
         if (typeof rawFieldValue === 'string') return rawFieldValue.split(',');
@@ -320,7 +309,7 @@ define([
     function _fetchCashSalesData(cashSalesIds) {
         if (!cashSalesIds || cashSalesIds.length === 0) return [];
         var rawItems = [];
-
+        
         var salesSearch = search.create({
             type: search.Type.CASH_SALE,
             filters: [
@@ -335,7 +324,7 @@ define([
             ]
         });
 
-        salesSearch.run().each(function (result) {
+        salesSearch.run().each(function(result) {
             rawItems.push({
                 ticketNumber: result.getValue('tranid'),
                 quantity: result.getValue('quantity'),
@@ -367,7 +356,7 @@ define([
     function _sendSuccessEmail(regId, xmlId, pdfId, uuid) {
         var customRecord = record.load({ type: 'customrecord_drt_reg_facturacion_interco', id: regId });
         // En un entorno real, extraerías el correo del usuario que creó el registro o de una configuración
-        var recipients = ['facturacion@zapateriascandy.com.mx', 'iztac.amaya@disruptt.mx'];
+        var recipients = ['facturacion@zapateriascandy.com.mx', 'iztac.amaya@disruptt.mx']; 
 
         var xmlAttachment = file.load({ id: xmlId });
         var pdfAttachment = file.load({ id: pdfId });
@@ -408,18 +397,6 @@ define([
             context: contextData || {}
         };
         logger.write('ERROR ORQUESTADOR GLOBAL: ' + customMessage, errorDetails);
-    }
-
-    /**
-     * Resuelve el ID de la carpeta de destino basada en la subsidiaria.
-     * Principio Fail-Safe: Retorna la carpeta ROOT si la subsidiaria no está mapeada.
-     * @private
-     */
-    function _getDestinationFolderId(subsidiaryId) {
-        if (!subsidiaryId) return CONSTANTS.FOLDERS.ROOT;
-
-        var folderId = CONSTANTS.FOLDERS.SUBSIDIARIES[String(subsidiaryId)];
-        return folderId || CONSTANTS.FOLDERS.ROOT;
     }
 
     return {
