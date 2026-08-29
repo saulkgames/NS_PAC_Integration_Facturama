@@ -11,17 +11,17 @@
  * la generación de archivos físicos y la actualización transaccional usando límites elásticos.
  */
 define([
-    'N/search', 
-    'N/record', 
-    'N/runtime', 
-    'N/email', 
+    'N/search',
+    'N/record',
+    'N/runtime',
+    'N/email',
     'N/file',
     './lib/sads_fama_logger',
     './lib/sads_fama_config',
     './lib/sads_fama_global_mapper',
     './lib/sads_fama_api',
     './lib/sads_fama_files'
-], function(search, record, runtime, email, file, logger, configModule, mapper, api, filesAdapter) {
+], function (search, record, runtime, email, file, logger, configModule, mapper, api, filesAdapter) {
     'use strict';
 
     // ==========================================
@@ -38,7 +38,7 @@ define([
     // ==========================================
     // 2. GET INPUT DATA (El Recolector)
     // ==========================================
-    
+
     /**
      * Define la entrada de datos para la fase Map.
      * Patrón Fail-Safe: Falla rápido si no se provee el contexto inicial.
@@ -51,7 +51,7 @@ define([
         try {
             var currentScript = runtime.getCurrentScript();
             var customRecordId = currentScript.getParameter({ name: CONSTANTS.PARAM_REG_ID });
-            
+
             if (!customRecordId) {
                 throw new Error('Falta el parámetro crítico: ID de Registro de Facturación Intercompañía.');
             }
@@ -69,7 +69,7 @@ define([
     // ==========================================
     // 3. MAP (El Director de Orquesta - Fase 1)
     // ==========================================
-    
+
     /**
      * Orquesta el flujo de negocio: Extracción, Mapeo, Timbrado y Generación de Archivos.
      * 
@@ -92,7 +92,8 @@ define([
                     'custrecord_drt_anio',
                     'custrecord_drt_subsidiary',
                     'custrecord_drt_sat_payment_term', // Forma de Pago
-                    'custrecord_drt_sat_payment_method' // Método de Pago
+                    'custrecord_drt_sat_payment_method',// Método de Pago
+                    'custrecord_drt_xml_issue_date'
                 ]
             });
 
@@ -107,31 +108,50 @@ define([
             // 3. Preparar Contexto de Dominio (Configuraciones de Emisor)
             var subsidiaryId = lookupData.custrecord_drt_subsidiary.length > 0 ? lookupData.custrecord_drt_subsidiary[0].value : null;
             var issuerData = _getIssuerData(subsidiaryId);
-            
+            var issueDateStr = lookupData.custrecord_drt_xml_issue_date;
+            var parsedSatDate = _parseAndFormatSatDate(issueDateStr);
+            var extractedMes = extractSatCode(lookupData.custrecord_drt_meses);
+            var extractedAnio = lookupData.custrecord_drt_anio;
+            var extractedFormaPago = extractSatCode(lookupData.custrecord_drt_sat_payment_term);
+
+            if (!extractedFormaPago) {
+                throw new Error('Violación de Regla de Negocio: No se especificó la Forma de Pago (Payment Term). No se permite el uso de valores por defecto.');
+            }
+
             var contextData = {
-                periodicidad: lookupData.custrecord_drt_periodicidad.length > 0 ? lookupData.custrecord_drt_periodicidad[0].text.split(' ')[0] : '01',
-                meses: lookupData.custrecord_drt_meses.length > 0 ? lookupData.custrecord_drt_meses[0].text.split(' ')[0] : '01',
-                anio: lookupData.custrecord_drt_anio || new Date().getFullYear().toString(),
-                formaPago: lookupData.custrecord_drt_sat_payment_term.length > 0 ? lookupData.custrecord_drt_sat_payment_term[0].text.split(' ')[0] : '01',
-                metodoPago: lookupData.custrecord_drt_sat_payment_method.length > 0 ? lookupData.custrecord_drt_sat_payment_method[0].text.split(' ')[0] : 'PUE',
-                fechaEmision: _getIsoDateString(),
+                periodicidad: '01',
+                meses: extractedMes ? extractedMes : parsedSatDate.month,
+                anio: extractedAnio ? extractedAnio : parsedSatDate.year,
+                formaPago: extractedFormaPago,
+                metodoPago: 'PUE',
+                fechaEmision: parsedSatDate.iso,
                 folioSolicitado: 'GLOBAL-' + regId,
                 issuerRfc: issuerData.rfc,
                 issuerName: issuerData.name,
                 issuerZipCode: issuerData.zip,
-                issuerRegime: issuerData.regime
+                issuerRegime: issuerData.regime ? issuerData.regime.trim() : '601'
             };
 
             // 4. Transformación a Payload Facturama (Dominio Puro)
             var payload = mapper.buildFacturamaPayload(contextData, rawItems);
+            logger.write('PAYLOAD SAT (CFDI 4.0) CONSTRUIDO', payload);
+
+            logger.write('SIMULACIÓN FINALIZADA', 'El proceso se detiene aquí por diseño. Revisa el payload anterior. No se enviará a Facturama.');
 
             // 5. Timbrado mediante Adaptador HTTP (Costo: 10 Unidades)
+            /*
             var configData = configModule.get(subsidiaryId);
             var headers = configModule.getAuthHeaders(configData.user, configData.pass);
             var apiResponse = api.postTimbrado(configData.apiPostUrl, headers, JSON.stringify(payload));
-            
-            if (!apiResponse || apiResponse.error_interno) {
-                throw new Error('Fallo en la comunicación con el PAC: ' + (apiResponse ? apiResponse.detalle : 'Timeout'));
+
+            // 🛡️ Fail-Safe Default: Validar que la respuesta sea exitosa y tenga la estructura esperada
+            if (!apiResponse || apiResponse.error_interno || apiResponse.Message || !apiResponse.Complement) {
+                // Extraemos el detalle del error del PAC (ModelState) si existe
+                var errorDetail = 'Error desconocido';
+                if (apiResponse) {
+                    errorDetail = apiResponse.ModelState ? JSON.stringify(apiResponse.ModelState) : (apiResponse.Message || apiResponse.detalle);
+                }
+                throw new Error('El PAC rechazó el timbraFdo (400 Bad Request): ' + errorDetail);
             }
 
             var cfdiId = apiResponse.Id;
@@ -140,10 +160,10 @@ define([
             // 6. Descarga y Generación de Archivos Físicos
             var xmlData = api.getXml(configData.apiGetUrl, headers, cfdiId);
             var fileNamePrefix = 'FacturaGlobal_' + uuid;
-            
+
             var xmlId = filesAdapter.saveXml(fileNamePrefix + '.xml', xmlData.Content);
             var templateId = currentScript.getParameter({ name: CONSTANTS.PARAM_TEMPLATE_ID });
-            
+
             if (!templateId) {
                 throw new Error('No se ha configurado el parámetro de Plantilla PDF en el despliegue del script.');
             }
@@ -159,7 +179,7 @@ define([
                 pdfId: pdfId,
                 regId: regId
             };
-            
+
             for (var i = 0; i < cashSalesIds.length; i++) {
                 mapContext.write({
                     key: cashSalesIds[i],
@@ -168,6 +188,7 @@ define([
             }
 
             logger.write('2. TIMBRADO GLOBAL EXITOSO', { uuid: uuid, cantidadTickets: cashSalesIds.length });
+            */
 
         } catch (e) {
             logError('Fallo en la etapa MAP (Construcción o Timbrado)', e, { rawMapValue: mapContext.value });
@@ -178,7 +199,7 @@ define([
     // ==========================================
     // 4. REDUCE (El Mutador Elástico - Fase 2)
     // ==========================================
-    
+
     /**
      * Actualiza cada Cash Sale con el UUID y los archivos generados.
      * Se ejecuta de forma paralela y distribuida protegiendo los límites de Gobernanza.
@@ -187,7 +208,7 @@ define([
      */
     function reduce(reduceContext) {
         var cashSaleId = reduceContext.key;
-        
+
         try {
             var successData = JSON.parse(reduceContext.values[0]);
 
@@ -217,7 +238,7 @@ define([
     // ==========================================
     // 5. SUMMARIZE (El Observador / Cierre)
     // ==========================================
-    
+
     /**
      * Evalúa el resultado final del proceso distribuido y notifica a los usuarios.
      * Implementa el Patrón Observer mediante el envío de correos con adjuntos.
@@ -272,17 +293,17 @@ define([
      */
     function _getIssuerData(subsidiaryId) {
         if (!subsidiaryId) throw new Error('Se requiere una subsidiaria para obtener los datos del Emisor.');
-        
+
         var fields = search.lookupFields({
             type: search.Type.SUBSIDIARY,
             id: subsidiaryId,
-            columns: ['federalidnumber', 'name', 'zip', 'custrecord_mx_sat_industry_type']
+            columns: ['custrecord_alm_subsidiaria_rfc', 'custrecord_mx_sat_registered_name', 'custrecord_drt_cod_postal_emisor', 'custrecord_mx_sat_industry_type']
         });
 
         return {
-            rfc: fields.federalidnumber,
-            name: fields.name,
-            zip: fields.zip,
+            rfc: fields.custrecord_alm_subsidiaria_rfc,
+            name: fields.custrecord_mx_sat_registered_name,
+            zip: fields.custrecord_drt_cod_postal_emisor,
             regime: fields.custrecord_mx_sat_industry_type[0] ? fields.custrecord_mx_sat_industry_type[0].text.split('-')[0] : '601'
         };
     }
@@ -295,7 +316,7 @@ define([
     function _extractMultiSelectIds(rawFieldValue) {
         if (!rawFieldValue) return [];
         if (Array.isArray(rawFieldValue) && rawFieldValue.length > 0 && typeof rawFieldValue[0] === 'object') {
-            return rawFieldValue.map(function(obj) { return obj.value; });
+            return rawFieldValue.map(function (obj) { return obj.value; });
         }
         if (Array.isArray(rawFieldValue)) return rawFieldValue;
         if (typeof rawFieldValue === 'string') return rawFieldValue.split(',');
@@ -304,39 +325,72 @@ define([
 
     /**
      * Repositorio: Realiza la búsqueda de los Cash Sales extraídos de la UI y suma los totales de línea.
+     * Patrón: Adaptador de Infraestructura (Protege al Dominio mediante search.create).
+     * 
      * @private
+     * @param {Array} cashSalesIds - Arreglo de IDs internos de transacciones.
+     * @returns {Array} Arreglo de objetos de línea sanitizados y listos para el Mapeador.
      */
     function _fetchCashSalesData(cashSalesIds) {
         if (!cashSalesIds || cashSalesIds.length === 0) return [];
         var rawItems = [];
-        
+
+        // 1. Filtros estrictos para ignorar líneas basura (COGS, Impuestos, Envío)
+        var transactionSearchFilters = [
+            ['mainline', 'is', 'F'], 'AND',
+            ['shipping', 'is', 'F'], 'AND',
+            ['taxline', 'is', 'F'], 'AND',
+            ['cogs', 'is', 'F'], 'AND',
+            ['formulatext: {item}', 'isnotempty', ''], 'AND',
+            ['internalid', 'anyof', cashSalesIds]
+        ];
+
+        // 2. Definición de Columnas (Contrato Estricto)
+        var colTranId = search.createColumn({ name: 'tranid' });
+        var colItemName = search.createColumn({ name: 'displayname', join: 'item' });
+        var colQuantity = search.createColumn({ name: 'quantity' });
+        var colAmount = search.createColumn({ name: 'amount' });
+        var colDiscount = search.createColumn({ name: 'discountamount' }); // 🛡️ CORRECCIÓN: Columna real de descuento
+        var colSatItemCode = search.createColumn({ name: 'custcol_mx_txn_line_sat_item_code' });
+        var colTaxAmount = search.createColumn({ name: 'taxamount' });
+        var colTaxRate = search.createColumn({ name: 'rate', join: 'taxitem' });
+        var colTaxObject = search.createColumn({ name: 'custrecord_mx_sat_to_code', join: 'custcol_mx_txn_line_sat_tax_object' });
+        var colItemRate = search.createColumn({ name: 'rate'});
+
         var salesSearch = search.create({
             type: search.Type.CASH_SALE,
-            filters: [
-                ['internalid', 'anyof', cashSalesIds], 'AND',
-                ['mainline', 'is', 'F'], 'AND',
-                ['taxline', 'is', 'F'], 'AND',
-                ['shipping', 'is', 'F']
-            ],
+            filters: transactionSearchFilters,
             columns: [
-                'tranid', 'quantity', 'amount', 'taxamount', 'taxrate', 'discountamount',
-                search.createColumn({ name: 'custcol_mx_txn_line_sat_item_code' })
+                colTranId,
+                colQuantity,
+                colAmount,
+                colDiscount,
+                colSatItemCode,
+                colTaxAmount,
+                colTaxObject,
+                colTaxRate,
+                colItemName,
+                colItemRate
             ]
         });
 
-        salesSearch.run().each(function(result) {
+        // 3. Mapeo Seguro
+        salesSearch.run().each(function (result) {
             rawItems.push({
-                ticketNumber: result.getValue('tranid'),
-                quantity: result.getValue('quantity'),
-                amount: result.getValue('amount'),
-                taxamt: result.getValue('taxamount'),
-                taxrate: result.getValue('taxrate'),
-                discount: result.getValue('discountamount'),
-                satCode: result.getText({ name: 'custcol_mx_txn_line_sat_item_code' })
+                ticketNumber: result.getValue(colTranId),
+                itemDescription: result.getValue(colItemName),
+                qty: result.getValue(colQuantity),
+                amount: result.getValue(colAmount),
+                discount: Math.abs(parseFloat(result.getValue(colDiscount)) || 0),
+                satCode: result.getText(colSatItemCode),
+                taxObject: result.getValue(colTaxObject), 
+                taxAmount: result.getValue(colTaxAmount),
+                taxrate: result.getValue(colTaxRate),
+                unitPrice: result.getValue(colItemRate)
             });
             return true;
         });
-
+        logger.write('RAW ITEMS EXTRAÍDOS DE CASH SALES', { count: rawItems.length, items: rawItems });
         return rawItems;
     }
 
@@ -356,7 +410,7 @@ define([
     function _sendSuccessEmail(regId, xmlId, pdfId, uuid) {
         var customRecord = record.load({ type: 'customrecord_drt_reg_facturacion_interco', id: regId });
         // En un entorno real, extraerías el correo del usuario que creó el registro o de una configuración
-        var recipients = ['facturacion@zapateriascandy.com.mx', 'iztac.amaya@disruptt.mx']; 
+        var recipients = ['facturacion@zapateriascandy.com.mx', 'iztac.amaya@disruptt.mx'];
 
         var xmlAttachment = file.load({ id: xmlId });
         var pdfAttachment = file.load({ id: pdfId });
@@ -399,12 +453,73 @@ define([
         logger.write('ERROR ORQUESTADOR GLOBAL: ' + customMessage, errorDetails);
     }
 
+    /**
+     * Extrae el codigo del SAT de un objeto que contiene el codigo y la descripcion, separando por el caracter '-'.
+     * @param {object} lookupObj - Objeto que contiene el código y la descripción.
+     * @returns {string} El código extraído antes del primer guion.
+     * @private
+     */
+    function extractSatCode(lookupObj) {
+        if (!lookupObj || lookupObj.length === 0) return '';
+        var text = lookupObj[0].text || '';
+        return text.split('-')[0].trim().split(' ')[0].trim();
+    }
+
+    /**
+     * Extrae, normaliza y formatea de forma segura una fecha capturada en la UI.
+     * Convierte los formatos regionales de NetSuite a los estándares requeridos por el SAT (CFDI 4.0).
+     * 
+     * @private
+     * @param {string} rawDateStr - Cadena de texto proveniente de custrecord_drt_xml_issue_date.
+     * @returns {Object} Un objeto con el ISO formatiado, el mes a dos dígitos y el año.
+     */
+    function _parseAndFormatSatDate(rawDateStr) {
+        var dateObj = new Date(); // Fallback seguro (Fecha actual del servidor)
+
+        if (rawDateStr) {
+            var parsed = new Date(rawDateStr);
+            // Si el formato nativo de NetSuite es comprensible por JS, lo adoptamos.
+            if (!isNaN(parsed.getTime())) {
+                dateObj = parsed;
+            } else {
+                // Si NetSuite devuelve un formato invertido (DD/MM/YYYY), aplicamos regex de rescate básico
+                var dateParts = rawDateStr.split(' ')[0].split('/');
+                if (dateParts.length === 3) {
+                    // Forzamos asumiendo formato latino: partes[0]=DD, partes[1]=MM, partes[2]=YYYY
+                    var rescueDate = new Date(dateParts[2], parseInt(dateParts[1], 10) - 1, dateParts[0]);
+                    if (!isNaN(rescueDate.getTime())) {
+                        dateObj = rescueDate;
+                    }
+                }
+            }
+        }
+
+        // El PAC requiere formato YYYY-MM-DDTHH:mm:ss (Sin la 'Z' ni milisegundos)
+        // Usamos una reconstrucción manual para evitar que .toISOString() nos desplace la zona horaria a UTC.
+        var pad = function (n) { return n < 10 ? '0' + n : n; };
+
+        var year = dateObj.getFullYear().toString();
+        var month = pad(dateObj.getMonth() + 1).toString();
+        var day = pad(dateObj.getDate());
+        var hours = pad(dateObj.getHours());
+        var minutes = pad(dateObj.getMinutes());
+        var seconds = pad(dateObj.getSeconds());
+
+        var isoString = year + '-' + month + '-' + day + 'T' + hours + ':' + minutes + ':' + seconds;
+
+        return {
+            iso: isoString,
+            month: month,
+            year: year
+        };
+    }
+
     return {
-        getInputData: getInputData,
-        map: map,
-        reduce: reduce,
-        summarize: summarize
-    };
+    getInputData: getInputData,
+    map: map,
+    reduce: reduce,
+    summarize: summarize
+};
 });
 /**
  * feat(global-invoice): implementar orquestador map/reduce completo con inyección de PDF y validaciones

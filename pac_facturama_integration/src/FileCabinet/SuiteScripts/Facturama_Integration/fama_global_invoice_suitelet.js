@@ -145,7 +145,8 @@ define([
                 customRecFacturacion.setValue("custrecord_drt_cfdi_usage", obj.custpage_usecfdi);
                 customRecFacturacion.setValue("custrecord_drt_sat_payment_method", obj.custpage_paymhetod);
                 customRecFacturacion.setValue("custrecord_drt_sat_payment_term", obj.custpage_payform);
-                customRecFacturacion.setValue("custrecord_drt_facturas", obj.custpage_arreglo);
+                var facturasArray = obj.custpage_arreglo.split(',');
+                customRecFacturacion.setValue("custrecord_drt_facturas", facturasArray);
                 customRecFacturacion.setValue("custrecord_drt_periodicidad", obj.custpage_periodicidad);
                 customRecFacturacion.setValue("custrecord_drt_meses", obj.custpage_meses);
                 customRecFacturacion.setValue("custrecord_drt_anio", obj.custpage_anio);

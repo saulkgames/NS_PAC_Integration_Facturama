@@ -1,0 +1,207 @@
+/**
+ *@NApiVersion 2.x
+ *@NScriptType Suitelet
+ *@NModuleScope Public
+ */
+define(['N/record', 'N/file', 'N/encode', 'N/https', 'N/xml', 'N/search'], function( record, file, encode, https, xml, search ) {
+
+    function onRequest( context ){
+
+        try{
+            if(context.request.method != 'POST'){ return; }
+
+            var obj = JSON.parse(context.request.body);
+            log.audit('obj', obj);
+
+            var transacId     = obj.transacId;
+            var recordType    = obj.recordType;
+            var requestStatus = obj.requestStatus;
+            var transaction   = record.load({type: recordType, id: transacId});
+
+            var uuid         = transaction.getValue({ fieldId: 'custbody_mx_cfdi_uuid' });
+            var timestamp    = transaction.getValue({ fieldId: 'custbody_mx_cfdi_certify_timestamp' });
+            var subsidiaryId = transaction.getValue({ fieldId: 'subsidiary' });
+			var motivoCanc   = transaction.getText({ fieldId: 'custbody_drt_motivo_cancelacion' })||'';
+			var folioSust    = transaction.getText({ fieldId: 'custbody_drt_folio_sustitucion' })||'';
+			var xmlMotivoStrB64 = '';
+			log.audit('folioSust', folioSust);
+			
+			if (motivoCanc) {
+                motivoCanc = motivoCanc.substring(0,2);
+				log.audit('motivoCanc', motivoCanc);
+            }
+			
+            var year  = timestamp.slice(0,4);
+            var month = timestamp.slice(5,7);
+
+            var subsidiary   = record.load({type: 'subsidiary', id: subsidiaryId });
+            var rfcEmisor    = subsidiary.getValue({fieldId: 'federalidnumber'})
+			
+			var operation = '';
+			if (requestStatus) {
+				var obj = {
+					docType:'issued',
+					emisor: rfcEmisor,
+					folioFiscal: uuid,
+					year: year,
+					month: month
+				};
+				
+				var xmlStr = JSON.stringify(obj);
+				operation = 'CONSULT_DOCUMENT';
+			}
+			else {
+				var xmlStr = '<Dictionary name="StoredXmlSelector">';
+				xmlStr += '<Entry k="Store" v="iSSuEd"/>';
+				xmlStr += '<Entry k="IssuerCountryCode" v="MX"/>';
+				xmlStr += '<Entry k="IssuerTaxId" v="'+rfcEmisor+'"/>'
+				xmlStr += '<Entry k="DocumentGUID" v="'+uuid+'"/>'
+				xmlStr += '<Entry k="Year" v="'+year+'"/>';
+				xmlStr += '</Dictionary>';
+				
+				var xmlMotivoStr = '<Dictionary name="CancelInfo">';
+				xmlMotivoStr += '<Entry k="Motivo" v="'+ motivoCanc +'"/>';
+				xmlMotivoStr += '<Entry k="FolioSustitucion" v="'+ folioSust +'"/>';
+				xmlMotivoStr += '</Dictionary>';
+				xmlMotivoStrB64 = encode.convert({ string: xmlMotivoStr, inputEncoding: encode.Encoding.UTF_8, outputEncoding: encode.Encoding.BASE_64 });
+				log.audit('xmlMotivoStr', xmlMotivoStr);
+				operation = 'CANCEL_DOCUMENT_3';
+			}
+
+            var xmlStrB64 = encode.convert({ string: xmlStr, inputEncoding: encode.Encoding.UTF_8, outputEncoding: encode.Encoding.BASE_64 });
+			
+			var configPacSearchObj = search.create({
+				type: 'customrecord_mx_pac_connect_info',
+				filters:
+				[ 
+					["custrecord_mx_pacinfo_subsidiary","anyof",subsidiaryId]
+				],
+				columns:
+				[
+					search.createColumn({name: "internalid", label: "internalid"})
+				]
+			});
+			var configPacSrchResults = configPacSearchObj.run().getRange({
+				start : 0,
+				end   : 9
+			});
+			if(configPacSrchResults.length > 0){
+				var idConfigPac  = configPacSrchResults[0].getValue({name: 'internalid'})||0;
+				log.audit('idConfigPac', idConfigPac);
+				
+				var mySuiteCOnfig = record.load({type: 'customrecord_mx_pac_connect_info', id: idConfigPac });
+				var url           = mySuiteCOnfig.getValue({fieldId: 'custrecord_mx_pacinfo_url'});
+				var requestor     = mySuiteCOnfig.getValue({fieldId: 'custrecord_mx_pacinfo_username'});
+				var entity        = mySuiteCOnfig.getValue({fieldId: 'custrecord_mx_pacinfo_taxid'});
+				var user          = mySuiteCOnfig.getValue({fieldId: 'custrecord_mx_pacinfo_username'});
+				var userName      = 'ADMON'//mySuiteCOnfig.getValue({fieldId: ''});
+			}else{
+				var url           = 'https://www.mysuitecfdi.com/mx.com.fact.wsfront/FactWSFront.asmx';
+				var requestor     = '';
+				var entity        = '';
+				var user          = '';
+				var userName      = 'ADMON'//mySuiteCOnfig.getValue({fieldId: ''});
+			}
+			
+        	var req = '<?xml version=\"1.0\" encoding=\"utf-8\"?> ';
+        	req += '<soap:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"> ';
+        	req +=     '<soap:Body> ';
+        	req +=         '<RequestTransaction xmlns=\"http://www.fact.com.mx/schema/ws\"> ';
+        	req +=             '<Requestor>' + requestor + '</Requestor> ';
+        	req +=             '<Transaction>' + operation + '</Transaction> ';
+        	req +=             '<Country>MX</Country> ';
+        	req +=             '<Entity>' + entity + '</Entity> ';
+        	req +=             '<User>' + user + '</User> ';
+        	req +=             '<UserName>' + userName + '</UserName> ';
+        	req +=             '<Data1>' + xmlStrB64 + '</Data1> ';
+        	req +=             '<Data2>' + xmlMotivoStrB64 + '</Data2> ';;
+        	req +=             '<Data3></Data3> ';
+        	req +=         '</RequestTransaction> ';
+        	req +=     '</soap:Body> ';
+        	req += '</soap:Envelope> ';
+
+            var headers = {
+                'Content-Type': 'text/xml; charset=utf-8',
+                'Content-Length': '"' + req.length + '"',
+                'SOAPAction': 'http://www.fact.com.mx/schema/ws/RequestTransaction',
+            };
+            log.audit({title:'req',details:JSON.stringify(req)});
+            var serviceResponse = https.post( {url: url, body: req, headers: headers });
+            log.audit('serviceResponse', serviceResponse);
+
+            /*var responseText = serviceResponse.body;
+            log.audit('responseText', responseText);
+            var xml_response = xml.Parser.fromString({text: responseText});
+            var response   = xml_response.getElementsByTagName({tagName: 'Response'})[0];
+            var result     = response.getElementsByTagName({tagName: 'Result'})[0].textContent;
+            log.audit('result', result);
+
+            if(result == 'false'){
+                var description = response.getElementsByTagName({tagName: 'Data'})[0].textContent;
+                log.audit('description', description);
+                context.response.write( {output: JSON.stringify( {success: true, message: description} ) } );
+            }
+            else{
+                context.response.write( {output: JSON.stringify( {success: true} ) } );
+            }*/
+
+            var responseText = serviceResponse.body;
+            log.audit('responseText', responseText);
+            var xml_response = xml.Parser.fromString({text: responseText});
+            var response   = xml_response.getElementsByTagName({tagName: 'Response'})[0];
+            var responseData   = xml_response.getElementsByTagName({tagName: 'ResponseData'})[0];
+            var result     = response.getElementsByTagName({tagName: 'Result'})[0].textContent;
+            log.audit('result', result)
+            log.audit('response',response);
+          	// Si el resultado fue falso 
+            if(requestStatus){
+                // Si el resultado fue falso 
+                if(result == 'false'){
+                    // Regresa la descripción y respueta exitosa
+                    var description = response.getElementsByTagName({tagName: 'Description'})[0].textContent;
+                    if(description.length == 0){
+                        var ResponseData2 = responseData.getElementsByTagName({tagName: 'ResponseData2'})[0].textContent;
+                        description = ResponseData2;
+                    }
+                    context.response.write( {output: JSON.stringify( {success: true, message: 'Estatus del Documento: ' + description } ) } );
+                }else{
+                    // Si el resultado es exito
+                    var respB64 = responseData.getElementsByTagName({tagName: 'ResponseData1'})[0].textContent;
+                    //var ResponseData2 = responseData.getElementsByTagName({tagName: 'ResponseData2'})[0].textContent;
+                    log.audit('respB64', respB64);
+                    var respObj = JSON.parse(encode.convert({ string: respB64, outputEncoding: encode.Encoding.UTF_8, inputEncoding: encode.Encoding.BASE_64 }));
+                    log.audit('respObj', respObj);
+                    log.audit('respObj.Estado', respObj.Estado);
+                    context.response.write( {output: JSON.stringify( {success: true, message: 'Estatus Cancelación: ' + respObj.EstatusCancelacion + ', Estatus Documento: ' + respObj.Estado} ) } );
+                }
+            } else {
+                  // Si el resultado es exito
+                  var description = responseData.getElementsByTagName({tagName: 'ResponseData2'})[0].textContent;
+                  if(result == 'true' && description.indexOf("201")){
+                    if(description.length == 0){
+                        description = response.getElementsByTagName({tagName: 'Description'})[0].textContent;
+                    }
+                    context.response.write( {output: JSON.stringify( {success: true, message: 'Estatus Cancelación: ' + description} ) } );
+                  } else {
+                        description = response.getElementsByTagName({tagName: 'Data'})[0].textContent;
+                        if(result == 'false' && description.indexOf("999 - EstatusUUID desconocido")){
+                            context.response.write( {output: JSON.stringify( {success: false, message: 'Estatus Cancelación: Se produjo un error, documento no admitido al proceso de cancelación Error: 999 - EstatusUUID desconocido'} ) } );
+                        } else {
+                            context.response.write( {output: JSON.stringify( {success: result, message: 'Estatus Cancelación: ' + description} ) } );
+                        } 
+                  }
+            }
+
+          
+
+        }
+        catch(ex){
+            log.error('main error', ex);
+            context.response.write( {output: JSON.stringify( {success: false, message: ex.message} ) } );
+        }
+    }
+
+    return{
+        onRequest:onRequest
+    }
+});
