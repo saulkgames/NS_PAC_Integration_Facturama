@@ -21,7 +21,9 @@ define(['N/search', 'N/encode'], function(search, encode) {
         TMPL_CS: 'custrecord_sads_fama_tmpl_cs',
         TMPL_CM: 'custrecord_sads_fama_tmpl_cm',
         TMPL_IF: 'custrecord_sads_fama_tmpl_if',
-        TMPL_CP: 'custrecord_sads_fama_tmpl_cp'
+        TMPL_CP: 'custrecord_sads_fama_tmpl_cp',
+        FLD_ID_PDF: 'custrecord_sads_fama_folderid_pdf',
+        FLD_ID_XML: 'custrecord_sads_fama_folderid_xml'
     };
 
     // ==========================================
@@ -48,7 +50,7 @@ define(['N/search', 'N/encode'], function(search, encode) {
                 [FLD.SUB, 'anyof', subsidiaryId]
             ],
             columns: [
-                FLD.USER, FLD.PASS, FLD.URL_API, FLD.URL_GET,
+                FLD.USER, FLD.PASS, FLD.URL_API, FLD.URL_GET,FLD.FLD_ID_PDF, FLD.FLD_ID_XML,
                 FLD.TMPL_INV, FLD.TMPL_CS, FLD.TMPL_CM, FLD.TMPL_IF, FLD.TMPL_CP
             ]
         });
@@ -67,6 +69,8 @@ define(['N/search', 'N/encode'], function(search, encode) {
             pass: row.getValue(FLD.PASS),
             apiPostUrl: row.getValue(FLD.URL_API),
             apiGetUrl: row.getValue(FLD.URL_GET),
+            folderIdPdf: row.getValue(FLD.FLD_ID_PDF),
+            folderIdXml: row.getValue(FLD.FLD_ID_XML),
             templates: {
                 'invoice': row.getValue(FLD.TMPL_INV),
                 'cashsale': row.getValue(FLD.TMPL_CS),

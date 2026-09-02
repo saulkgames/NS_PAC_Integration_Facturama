@@ -10,7 +10,7 @@ define(['N/file', 'N/encode', 'N/render', './sads_fama_logger'], function (file,
     // 1. CONSTANTES (Clean Code: Evitar Magic Numbers)
     // ==========================================
     var CONSTANTS = {
-        TARGET_FOLDER_ID: -15, // Carpeta de Attachments por defecto
+        TARGET_FOLDER_ID: 412704, // Carpeta de Attachments por defecto
         DATA_SOURCE_ALIAS: 'custom',
         TEMPLATE_RECORD: 'record',
         TEMPLATE_CUSTOMER: 'customer',

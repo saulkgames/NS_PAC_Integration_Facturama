@@ -110,9 +110,8 @@ define([
             var issuerData = _getIssuerData(subsidiaryId);
             var issueDateStr = lookupData.custrecord_drt_xml_issue_date;
             var parsedSatDate = _parseAndFormatSatDate(issueDateStr);
-            var extractedMes = extractSatCode(lookupData.custrecord_drt_meses);
-            var extractedAnio = lookupData.custrecord_drt_anio;
-            var extractedFormaPago = extractSatCode(lookupData.custrecord_drt_sat_payment_term);
+            var extractedFormaPago = extractSatCode(lookupData.custrecord_drt_sat_payment_method);
+            var extractedMetodoPago = extractSatCode(lookupData.custrecord_drt_sat_payment_term);
 
             if (!extractedFormaPago) {
                 throw new Error('Violación de Regla de Negocio: No se especificó la Forma de Pago (Payment Term). No se permite el uso de valores por defecto.');
@@ -120,10 +119,10 @@ define([
 
             var contextData = {
                 periodicidad: '01',
-                meses: extractedMes ? extractedMes : parsedSatDate.month,
-                anio: extractedAnio ? extractedAnio : parsedSatDate.year,
+                meses: parsedSatDate.month,
+                anio: parsedSatDate.year,
                 formaPago: extractedFormaPago,
-                metodoPago: 'PUE',
+                metodoPago: extractedMetodoPago,
                 fechaEmision: parsedSatDate.iso,
                 folioSolicitado: 'GLOBAL-' + regId,
                 issuerRfc: issuerData.rfc,
@@ -139,7 +138,6 @@ define([
             logger.write('SIMULACIÓN FINALIZADA', 'El proceso se detiene aquí por diseño. Revisa el payload anterior. No se enviará a Facturama.');
 
             // 5. Timbrado mediante Adaptador HTTP (Costo: 10 Unidades)
-            /*
             var configData = configModule.get(subsidiaryId);
             var headers = configModule.getAuthHeaders(configData.user, configData.pass);
             var apiResponse = api.postTimbrado(configData.apiPostUrl, headers, JSON.stringify(payload));
@@ -158,19 +156,20 @@ define([
             var uuid = apiResponse.Complement.TaxStamp.Uuid;
 
             // 6. Descarga y Generación de Archivos Físicos
-            var xmlData = api.getXml(configData.apiGetUrl, headers, cfdiId);
+            var xmlData = api.getFile(configData.apiGetUrl, headers, cfdiId, 'xml');
             var fileNamePrefix = 'FacturaGlobal_' + uuid;
 
-            var xmlId = filesAdapter.saveXml(fileNamePrefix + '.xml', xmlData.Content);
-            var templateId = currentScript.getParameter({ name: CONSTANTS.PARAM_TEMPLATE_ID });
+            var xmlId = filesAdapter.saveFile(fileNamePrefix + '.xml', xmlData.Content, configData.folderIdXml);
+            //var templateId = currentScript.getParameter({ name: CONSTANTS.PARAM_TEMPLATE_ID });
 
-            if (!templateId) {
+            /*if (!templateId) {
                 throw new Error('No se ha configurado el parámetro de Plantilla PDF en el despliegue del script.');
             }
-
+            */
             // Usamos el Custom Record como pivote para inyectar datos globales a la plantilla
-            var dummyRecord = record.load({ type: 'customrecord_drt_reg_facturacion_interco', id: regId });
-            var pdfId = filesAdapter.generateCertifiedPdf(dummyRecord, null, templateId, { custbody_mx_cfdi_uuid: uuid }, fileNamePrefix + '.pdf');
+            //var dummyRecord = record.load({ type: 'customrecord_drt_reg_facturacion_interco', id: regId });
+            var pdfData = api.getFile(configData.apiGetUrl, headers, cfdiId, 'pdf');
+            var pdfId = filesAdapter.saveFile(fileNamePrefix + '.pdf', pdfData.Content, configData.folderIdPdf);
 
             // 7. El Puente (Mediator): Despachar tareas atómicas a la fase Reduce
             var successData = {
@@ -188,7 +187,6 @@ define([
             }
 
             logger.write('2. TIMBRADO GLOBAL EXITOSO', { uuid: uuid, cantidadTickets: cashSalesIds.length });
-            */
 
         } catch (e) {
             logError('Fallo en la etapa MAP (Construcción o Timbrado)', e, { rawMapValue: mapContext.value });
@@ -355,7 +353,7 @@ define([
         var colTaxAmount = search.createColumn({ name: 'taxamount' });
         var colTaxRate = search.createColumn({ name: 'rate', join: 'taxitem' });
         var colTaxObject = search.createColumn({ name: 'custrecord_mx_sat_to_code', join: 'custcol_mx_txn_line_sat_tax_object' });
-        var colItemRate = search.createColumn({ name: 'rate'});
+        var colItemRate = search.createColumn({ name: 'rate' });
 
         var salesSearch = search.create({
             type: search.Type.CASH_SALE,
@@ -383,7 +381,7 @@ define([
                 amount: result.getValue(colAmount),
                 discount: Math.abs(parseFloat(result.getValue(colDiscount)) || 0),
                 satCode: result.getText(colSatItemCode),
-                taxObject: result.getValue(colTaxObject), 
+                taxObject: result.getValue(colTaxObject),
                 taxAmount: result.getValue(colTaxAmount),
                 taxrate: result.getValue(colTaxRate),
                 unitPrice: result.getValue(colItemRate)
@@ -467,59 +465,80 @@ define([
 
     /**
      * Extrae, normaliza y formatea de forma segura una fecha capturada en la UI.
-     * Convierte los formatos regionales de NetSuite a los estándares requeridos por el SAT (CFDI 4.0).
+     * Patrón: Anticorruption Layer - Aísla el motor JS de los formatos regionales impredecibles de NetSuite.
      * 
      * @private
-     * @param {string} rawDateStr - Cadena de texto proveniente de custrecord_drt_xml_issue_date.
-     * @returns {Object} Un objeto con el ISO formatiado, el mes a dos dígitos y el año.
+     * @param {string} rawDateStr - Cadena de texto proveniente de NetSuite (ej. "01/09/2026 6:00:00 pm").
+     * @returns {Object} Un objeto con el ISO formateado, el mes a dos dígitos y el año.
      */
     function _parseAndFormatSatDate(rawDateStr) {
         var dateObj = new Date(); // Fallback seguro (Fecha actual del servidor)
 
         if (rawDateStr) {
-            var parsed = new Date(rawDateStr);
-            // Si el formato nativo de NetSuite es comprensible por JS, lo adoptamos.
-            if (!isNaN(parsed.getTime())) {
-                dateObj = parsed;
+            var cleanStr = rawDateStr.toLowerCase().trim();
+            // Detectamos si viene en el formato regional latino específico: "DD/MM/YYYY h:mm:ss am/pm"
+            var isNetSuiteLatamFormat = /^\d{1,2}\/\d{1,2}\/\d{4}/.test(cleanStr);
+
+            if (isNetSuiteLatamFormat) {
+                // 1. Desarmamos el string: ["01/09/2026", "6:00:00", "pm"]
+                var parts = cleanStr.split(' ');
+
+                // 2. Extraemos Día, Mes, Año (Asumiendo formato DD/MM/YYYY de la cuenta)
+                var dateParts = parts[0].split('/');
+                var day = parseInt(dateParts[0], 10);
+                var month = parseInt(dateParts[1], 10) - 1; // JS indexa los meses de 0 a 11
+                var year = parseInt(dateParts[2], 10);
+
+                // 3. Extraemos Horas, Minutos, Segundos
+                var timeParts = parts[1] ? parts[1].split(':') : ['00', '00', '00'];
+                var hours = parseInt(timeParts[0], 10) || 0;
+                var minutes = parseInt(timeParts[1], 10) || 0;
+                var seconds = parseInt(timeParts[2], 10) || 0;
+
+                // 4. Conversión estricta a formato de 24 horas
+                var ampm = parts[2] ? parts[2].trim() : '';
+                if (ampm === 'pm' && hours < 12) {
+                    hours += 12;
+                } else if (ampm === 'am' && hours === 12) {
+                    hours = 0;
+                }
+
+                // Inyección estricta (Evita que JS adivine)
+                dateObj = new Date(year, month, day, hours, minutes, seconds);
             } else {
-                // Si NetSuite devuelve un formato invertido (DD/MM/YYYY), aplicamos regex de rescate básico
-                var dateParts = rawDateStr.split(' ')[0].split('/');
-                if (dateParts.length === 3) {
-                    // Forzamos asumiendo formato latino: partes[0]=DD, partes[1]=MM, partes[2]=YYYY
-                    var rescueDate = new Date(dateParts[2], parseInt(dateParts[1], 10) - 1, dateParts[0]);
-                    if (!isNaN(rescueDate.getTime())) {
-                        dateObj = rescueDate;
-                    }
+                // Fallback por si el usuario cambia el formato de la cuenta a ISO nativo
+                var parsed = new Date(rawDateStr);
+                if (!isNaN(parsed.getTime())) {
+                    dateObj = parsed;
                 }
             }
         }
 
-        // El PAC requiere formato YYYY-MM-DDTHH:mm:ss (Sin la 'Z' ni milisegundos)
-        // Usamos una reconstrucción manual para evitar que .toISOString() nos desplace la zona horaria a UTC.
+        // 5. Reconstrucción manual exacta para el PAC (Sin depender de .toISOString)
         var pad = function (n) { return n < 10 ? '0' + n : n; };
 
-        var year = dateObj.getFullYear().toString();
-        var month = pad(dateObj.getMonth() + 1).toString();
-        var day = pad(dateObj.getDate());
-        var hours = pad(dateObj.getHours());
-        var minutes = pad(dateObj.getMinutes());
-        var seconds = pad(dateObj.getSeconds());
+        var finalYear = dateObj.getFullYear().toString();
+        var finalMonth = pad(dateObj.getMonth() + 1).toString();
+        var finalDay = pad(dateObj.getDate());
+        var finalHours = pad(dateObj.getHours());
+        var finalMinutes = pad(dateObj.getMinutes());
+        var finalSeconds = pad(dateObj.getSeconds());
 
-        var isoString = year + '-' + month + '-' + day + 'T' + hours + ':' + minutes + ':' + seconds;
+        var formattedDate = finalYear + '-' + finalMonth + '-' + finalDay + ' ' + finalHours + ':' + finalMinutes + ':' + finalSeconds;
 
         return {
-            iso: isoString,
-            month: month,
-            year: year
+            iso: formattedDate,
+            month: finalMonth,
+            year: finalYear
         };
     }
 
     return {
-    getInputData: getInputData,
-    map: map,
-    reduce: reduce,
-    summarize: summarize
-};
+        getInputData: getInputData,
+        map: map,
+        reduce: reduce,
+        summarize: summarize
+    };
 });
 /**
  * feat(global-invoice): implementar orquestador map/reduce completo con inyección de PDF y validaciones
