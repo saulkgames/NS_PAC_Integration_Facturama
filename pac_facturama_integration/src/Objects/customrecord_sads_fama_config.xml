@@ -1,5 +1,6 @@
 <customrecordtype scriptid="customrecord_sads_fama_config">
   <accesstype>CUSTRECORDENTRYPERM</accesstype>
+  <aidescription></aidescription>
   <allowattachments>T</allowattachments>
   <allowinlinedeleting>F</allowinlinedeleting>
   <allowinlinedetaching>T</allowinlinedetaching>
@@ -43,6 +44,7 @@
   <customrecordcustomfields>
     <customrecordcustomfield scriptid="custrecord_sads_fama_sub">
       <accesslevel>2</accesslevel>
+      <aidescription></aidescription>
       <allowquickadd>F</allowquickadd>
       <applyformatting>F</applyformatting>
       <checkspelling>F</checkspelling>
@@ -54,6 +56,7 @@
       <displaytype>NORMAL</displaytype>
       <displaywidth></displaywidth>
       <dynamicdefault></dynamicdefault>
+      <enabletextenhance>F</enabletextenhance>
       <encryptatrest>F</encryptatrest>
       <fieldtype>SELECT</fieldtype>
       <globalsearch>F</globalsearch>
@@ -82,6 +85,7 @@
     </customrecordcustomfield>
     <customrecordcustomfield scriptid="custrecord_sads_fama_env">
       <accesslevel>2</accesslevel>
+      <aidescription></aidescription>
       <allowquickadd>F</allowquickadd>
       <applyformatting>F</applyformatting>
       <checkspelling>F</checkspelling>
@@ -93,6 +97,7 @@
       <displaytype>NORMAL</displaytype>
       <displaywidth></displaywidth>
       <dynamicdefault></dynamicdefault>
+      <enabletextenhance>F</enabletextenhance>
       <encryptatrest>F</encryptatrest>
       <fieldtype>CHECKBOX</fieldtype>
       <globalsearch>F</globalsearch>
@@ -121,6 +126,7 @@
     </customrecordcustomfield>
     <customrecordcustomfield scriptid="custrecord_sads_fama_user">
       <accesslevel>2</accesslevel>
+      <aidescription></aidescription>
       <allowquickadd>F</allowquickadd>
       <applyformatting>F</applyformatting>
       <checkspelling>F</checkspelling>
@@ -132,6 +138,7 @@
       <displaytype>NORMAL</displaytype>
       <displaywidth></displaywidth>
       <dynamicdefault></dynamicdefault>
+      <enabletextenhance>F</enabletextenhance>
       <encryptatrest>F</encryptatrest>
       <fieldtype>TEXT</fieldtype>
       <globalsearch>F</globalsearch>
@@ -160,6 +167,7 @@
     </customrecordcustomfield>
     <customrecordcustomfield scriptid="custrecord_sads_fama_url_api">
       <accesslevel>2</accesslevel>
+      <aidescription></aidescription>
       <allowquickadd>F</allowquickadd>
       <applyformatting>F</applyformatting>
       <checkspelling>F</checkspelling>
@@ -171,6 +179,7 @@
       <displaytype>NORMAL</displaytype>
       <displaywidth></displaywidth>
       <dynamicdefault></dynamicdefault>
+      <enabletextenhance>F</enabletextenhance>
       <encryptatrest>F</encryptatrest>
       <fieldtype>TEXT</fieldtype>
       <globalsearch>F</globalsearch>
@@ -199,6 +208,7 @@
     </customrecordcustomfield>
     <customrecordcustomfield scriptid="custrecord_sads_fama_url_api_getfile">
       <accesslevel>2</accesslevel>
+      <aidescription></aidescription>
       <allowquickadd>F</allowquickadd>
       <applyformatting>F</applyformatting>
       <checkspelling>F</checkspelling>
@@ -210,6 +220,7 @@
       <displaytype>NORMAL</displaytype>
       <displaywidth></displaywidth>
       <dynamicdefault></dynamicdefault>
+      <enabletextenhance>F</enabletextenhance>
       <encryptatrest>F</encryptatrest>
       <fieldtype>TEXT</fieldtype>
       <globalsearch>F</globalsearch>
@@ -238,6 +249,7 @@
     </customrecordcustomfield>
     <customrecordcustomfield scriptid="custrecord_sads_fama_pass">
       <accesslevel>2</accesslevel>
+      <aidescription></aidescription>
       <allowquickadd>F</allowquickadd>
       <applyformatting>F</applyformatting>
       <checkspelling>F</checkspelling>
@@ -249,6 +261,7 @@
       <displaytype>NORMAL</displaytype>
       <displaywidth></displaywidth>
       <dynamicdefault></dynamicdefault>
+      <enabletextenhance>F</enabletextenhance>
       <encryptatrest>F</encryptatrest>
       <fieldtype>TEXT</fieldtype>
       <globalsearch>F</globalsearch>
@@ -277,6 +290,7 @@
     </customrecordcustomfield>
     <customrecordcustomfield scriptid="custrecord_sads_fama_tmpl_inv">
       <accesslevel>2</accesslevel>
+      <aidescription></aidescription>
       <allowquickadd>F</allowquickadd>
       <applyformatting>F</applyformatting>
       <checkspelling>F</checkspelling>
@@ -288,6 +302,7 @@
       <displaytype>NORMAL</displaytype>
       <displaywidth></displaywidth>
       <dynamicdefault></dynamicdefault>
+      <enabletextenhance>F</enabletextenhance>
       <encryptatrest>F</encryptatrest>
       <fieldtype>SELECT</fieldtype>
       <globalsearch>F</globalsearch>
@@ -316,6 +331,7 @@
     </customrecordcustomfield>
     <customrecordcustomfield scriptid="custrecord_sads_fama_tmpl_cs">
       <accesslevel>2</accesslevel>
+      <aidescription></aidescription>
       <allowquickadd>F</allowquickadd>
       <applyformatting>F</applyformatting>
       <checkspelling>F</checkspelling>
@@ -327,6 +343,7 @@
       <displaytype>NORMAL</displaytype>
       <displaywidth></displaywidth>
       <dynamicdefault></dynamicdefault>
+      <enabletextenhance>F</enabletextenhance>
       <encryptatrest>F</encryptatrest>
       <fieldtype>SELECT</fieldtype>
       <globalsearch>F</globalsearch>
@@ -355,6 +372,7 @@
     </customrecordcustomfield>
     <customrecordcustomfield scriptid="custrecord_sads_fama_tmpl_cm">
       <accesslevel>2</accesslevel>
+      <aidescription></aidescription>
       <allowquickadd>F</allowquickadd>
       <applyformatting>F</applyformatting>
       <checkspelling>F</checkspelling>
@@ -366,6 +384,7 @@
       <displaytype>NORMAL</displaytype>
       <displaywidth></displaywidth>
       <dynamicdefault></dynamicdefault>
+      <enabletextenhance>F</enabletextenhance>
       <encryptatrest>F</encryptatrest>
       <fieldtype>SELECT</fieldtype>
       <globalsearch>F</globalsearch>
@@ -393,7 +412,8 @@
       <subtab></subtab>
     </customrecordcustomfield>
     <customrecordcustomfield scriptid="custrecord_sads_fama_tmpl_if">
-      <accesslevel>2</accesslevel>     
+      <accesslevel>2</accesslevel>
+      <aidescription></aidescription>
       <allowquickadd>F</allowquickadd>
       <applyformatting>F</applyformatting>
       <checkspelling>F</checkspelling>
@@ -405,6 +425,7 @@
       <displaytype>NORMAL</displaytype>
       <displaywidth></displaywidth>
       <dynamicdefault></dynamicdefault>
+      <enabletextenhance>F</enabletextenhance>
       <encryptatrest>F</encryptatrest>
       <fieldtype>SELECT</fieldtype>
       <globalsearch>F</globalsearch>
@@ -433,6 +454,7 @@
     </customrecordcustomfield>
     <customrecordcustomfield scriptid="custrecord_sads_fama_tmpl_cp">
       <accesslevel>2</accesslevel>
+      <aidescription></aidescription>
       <allowquickadd>F</allowquickadd>
       <applyformatting>F</applyformatting>
       <checkspelling>F</checkspelling>
@@ -444,6 +466,7 @@
       <displaytype>NORMAL</displaytype>
       <displaywidth></displaywidth>
       <dynamicdefault></dynamicdefault>
+      <enabletextenhance>F</enabletextenhance>
       <encryptatrest>F</encryptatrest>
       <fieldtype>SELECT</fieldtype>
       <globalsearch>F</globalsearch>
@@ -470,5 +493,105 @@
       <storevalue>T</storevalue>
       <subtab></subtab>
     </customrecordcustomfield>
+    <customrecordcustomfield scriptid="custrecord_sads_fama_folderid_pdf">
+      <accesslevel>2</accesslevel>
+      <aidescription></aidescription>
+      <allowquickadd>F</allowquickadd>
+      <applyformatting>F</applyformatting>
+      <checkspelling>F</checkspelling>
+      <defaultchecked>F</defaultchecked>
+      <defaultselection></defaultselection>
+      <defaultvalue></defaultvalue>
+      <description></description>
+      <displayheight></displayheight>
+      <displaytype>NORMAL</displaytype>
+      <displaywidth></displaywidth>
+      <dynamicdefault></dynamicdefault>
+      <enabletextenhance>F</enabletextenhance>
+      <encryptatrest>F</encryptatrest>
+      <fieldtype>TEXT</fieldtype>
+      <globalsearch>F</globalsearch>
+      <help></help>
+      <isformula>F</isformula>
+      <ismandatory>F</ismandatory>
+      <isparent>F</isparent>
+      <label>Id de Carpeta para PDFs</label>
+      <linktext></linktext>
+      <maxlength></maxlength>
+      <maxvalue></maxvalue>
+      <minvalue></minvalue>
+      <onparentdelete></onparentdelete>
+      <parentsubtab></parentsubtab>
+      <rolerestrict>F</rolerestrict>
+      <searchcomparefield></searchcomparefield>
+      <searchdefault></searchdefault>
+      <searchlevel>2</searchlevel>
+      <selectrecordtype></selectrecordtype>
+      <showinlist>F</showinlist>
+      <sourcefilterby></sourcefilterby>
+      <sourcefrom></sourcefrom>
+      <sourcelist></sourcelist>
+      <storevalue>T</storevalue>
+      <subtab></subtab>
+    </customrecordcustomfield>
+    <customrecordcustomfield scriptid="custrecord_sads_fama_folderid_xml">
+      <accesslevel>2</accesslevel>
+      <aidescription></aidescription>
+      <allowquickadd>F</allowquickadd>
+      <applyformatting>F</applyformatting>
+      <checkspelling>F</checkspelling>
+      <defaultchecked>F</defaultchecked>
+      <defaultselection></defaultselection>
+      <defaultvalue></defaultvalue>
+      <description></description>
+      <displayheight></displayheight>
+      <displaytype>NORMAL</displaytype>
+      <displaywidth></displaywidth>
+      <dynamicdefault></dynamicdefault>
+      <enabletextenhance>F</enabletextenhance>
+      <encryptatrest>F</encryptatrest>
+      <fieldtype>TEXT</fieldtype>
+      <globalsearch>F</globalsearch>
+      <help></help>
+      <isformula>F</isformula>
+      <ismandatory>F</ismandatory>
+      <isparent>F</isparent>
+      <label>Id de Carpeta para XMLs</label>
+      <linktext></linktext>
+      <maxlength></maxlength>
+      <maxvalue></maxvalue>
+      <minvalue></minvalue>
+      <onparentdelete></onparentdelete>
+      <parentsubtab></parentsubtab>
+      <rolerestrict>F</rolerestrict>
+      <searchcomparefield></searchcomparefield>
+      <searchdefault></searchdefault>
+      <searchlevel>2</searchlevel>
+      <selectrecordtype></selectrecordtype>
+      <showinlist>F</showinlist>
+      <sourcefilterby></sourcefilterby>
+      <sourcefrom></sourcefrom>
+      <sourcelist></sourcelist>
+      <storevalue>T</storevalue>
+      <subtab></subtab>
+    </customrecordcustomfield>
   </customrecordcustomfields>
+  <instances>
+    <instance scriptid="val_8908228_5490848_347">
+      <custrecord_sads_fama_env>F</custrecord_sads_fama_env>
+      <custrecord_sads_fama_folderid_pdf>412708</custrecord_sads_fama_folderid_pdf>
+      <custrecord_sads_fama_folderid_xml>412708</custrecord_sads_fama_folderid_xml>
+      <custrecord_sads_fama_pass>ItPfP810520Jx0.-</custrecord_sads_fama_pass>
+      <custrecord_sads_fama_sub>3</custrecord_sads_fama_sub>
+      <custrecord_sads_fama_tmpl_cm>[scriptid=custtmpl_creditmemo_certified_pdf_template]</custrecord_sads_fama_tmpl_cm>
+      <custrecord_sads_fama_tmpl_cp>[scriptid=custtmpl_payment_certified_pdf_template]</custrecord_sads_fama_tmpl_cp>
+      <custrecord_sads_fama_tmpl_cs>[scriptid=custtmpl_cashsale_certified_pdf_template]</custrecord_sads_fama_tmpl_cs>
+      <custrecord_sads_fama_tmpl_if>[scriptid=custtmpl_itemfulfillment_certified_pdf]</custrecord_sads_fama_tmpl_if>
+      <custrecord_sads_fama_tmpl_inv>[scriptid=custtmpl_invoice_certified_pdf_template]</custrecord_sads_fama_tmpl_inv>
+      <custrecord_sads_fama_url_api>https://apisandbox.facturama.mx/api-lite/3/cfdis</custrecord_sads_fama_url_api>
+      <custrecord_sads_fama_url_api_getfile>https://apisandbox.facturama.mx/cfdi/{type}/issuedLite/{id}</custrecord_sads_fama_url_api_getfile>
+      <custrecord_sads_fama_user>AlmetalSistemas</custrecord_sads_fama_user>
+      <isinactive>F</isinactive>
+    </instance>
+  </instances>
 </customrecordtype>

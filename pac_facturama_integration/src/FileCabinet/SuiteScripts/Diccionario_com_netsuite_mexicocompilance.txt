@@ -1,212 +1,253 @@
 ===================
 File: fama_global_invoice_client.js
 ===================
-/******************************************************************
- * * DisrupTT * DisrupTT Developers *
- * ****************************************************************
- * Date: 2021
- * Script name: Global Invoice Client
- * Script id: customscript_global_invoice_client
- * Deployment id: customdeploy_global_invoice_suitelet
- * Applied to:
- * File: global_invoice_client.js
- ******************************************************************/
 /**
  * @NApiVersion 2.x
  * @NScriptType ClientScript
  * @NModuleScope Public
+ * 
+ * SADS Facturama - Adaptador de Entrada (Frontend / UI)
+ * 
+ * Arquitectura: Hexagonal (Ports and Adapters)
+ * Descripción: Controla la interactividad en el navegador del usuario. Valida las 
+ * reglas de negocio antes de permitir el envío al servidor (Fail-Safe) y manipula 
+ * el DOM dinámicamente para recalcular totales (Observer Pattern).
  */
 define(['N/currentRecord', 'N/url', 'N/format', 'N/ui/message', 'N/log'],
 
-	function (currentRecord, url, format, message, log) {
+    function (currentRecord, url, format, message, log) {
+        'use strict';
 
-		function pageInit() {}
+        /**
+         * Evento de inicialización de la página.
+         * @param {Object} context - Contexto de ejecución proveído por NetSuite.
+         */
+        function pageInit(context) {
+            // Inicialización vacía por diseño. Se deja el hook preparado (Open/Closed Principle).
+        }
 
-		function saveRecord(context) {
-			var rec = currentRecord.get();
+        /**
+         * Actúa como Guardián de Frontera (Gatekeeper) validando los datos antes de hacer el POST.
+         * Aplica el principio Fail-Safe Defaults de Saltzer & Schroeder.
+         * 
+         * @param {Object} context - Contexto del evento de guardado.
+         * @returns {boolean} Retorna true si los datos son válidos; false para bloquear el envío.
+         */
+        function saveRecord(context) {
+            var rec = currentRecord.get();
 
-			if (!rec.getValue('custpage_usecfdi')) {
-				showMessage('Capture el valor para el campo Uso de CFDI.');
-				return false;
-			}
+            // 1. Validaciones de Campos Obligatorios (Reglas de Negocio SAT)
+            if (!rec.getValue('custpage_usecfdi')) {
+                showMessage('Capture el valor para el campo Uso de CFDI.');
+                return false;
+            }
 
-			if (!rec.getValue('custpage_paymhetod')) {
-				showMessage('Capture el valor para el campo Methodo de pago.');
-				return false;
-			}
+            if (!rec.getValue('custpage_paymhetod')) {
+                showMessage('Capture el valor para el campo Método de pago.');
+                return false;
+            }
 
-			if (!rec.getValue('custpage_payform')) {
-				showMessage('Capture el valor para el campo Forma de Pago.');
-				return false;
-			}
+            if (!rec.getValue('custpage_payform')) {
+                showMessage('Capture el valor para el campo Forma de Pago.');
+                return false;
+            }
 
-			if (!rec.getValue('custpage_dateini')) {
-				showMessage('Capture el valor para el campo Fecha.');
-				return false;
-			}
+            if (!rec.getValue('custpage_dateini')) {
+                showMessage('Capture el valor para el campo Fecha de Inicio.');
+                return false;
+            }
 
-			if (!rec.getValue('custpage_dateinie')) {
-				showMessage('Capture el valor para el campo Fecha.');
-				return false;
-			}
+            if (!rec.getValue('custpage_dateinie')) {
+                showMessage('Capture el valor para el campo Fecha de Fin.');
+                return false;
+            }
 
-			var sublistName = 'custpage_transactions';
-			var rows = rec.getLineCount({
-				sublistId: sublistName
-			});
+            // 2. Validación de UI: Existencia de líneas
+            var sublistName = 'custpage_transactions';
+            var rows = rec.getLineCount({ sublistId: sublistName });
 
-			if (rows == 0) {
-				showMessage('No hay registros a Procesar.');
-				return false;
-			}
-			return true;
-		}
-		/**
-		 * [reloadForm description]
-		 * @param  {[type]} scId [description]
-		 * @param  {[type]} dpId [description]
-		 * @return {[type]}      [description]
-		 */
-		function reloadForm(scId, dpId) {
-			debugger;
-			var rec = currentRecord.get();
-			// mando los parametros al suitelet
-			var trandate = '';
-			if (rec.getValue('custpage_dateini')) {
-				trandate = format.format({
-					value: rec.getValue('custpage_dateini'),
-					type: format.Type.DATE
-				}) || '';
-			}
-			var endDate = '';
-			if (rec.getValue('custpage_dateinie')) {
-				endDate = format.format({
-					value: rec.getValue('custpage_dateinie'),
-					type: format.Type.DATE
-				}) || '';
-			}
-			var created = '';
-			/*if (rec.getValue('custpage_createdate')) {
-				created = format.format({
-					value: rec.getValue('custpage_createdate'),
-					type: format.Type.DATE
-				}) || '';
-			}*/
-			if (rec.getValue('custpage_createdate')) {
-				created = rec.getText('custpage_createdate');
-			}
-			var subsidiary = rec.getValue('custpage_subsidiary') || null;
-			var ucfdi = rec.getValue('custpage_usecfdi') || null;
-			var paymethod = rec.getValue('custpage_paymhetod') || null;
-			var payformat = rec.getValue('custpage_payform') || null;
-			var customer = rec.getValue('custpage_customer') || null;
-			var periodicidad = rec.getValue('custpage_periodicidad') || null;
-			var meses = rec.getValue('custpage_meses') || null;
-			var anio = rec.getValue('custpage_anio');
+            if (rows === 0) {
+                showMessage('No hay registros a Procesar en la tabla.');
+                return false;
+            }
 
-			var script = url.resolveScript({
-				scriptId: scId,
-				deploymentId: dpId,
-				returnExternalUrl: false,
-				params: {
-					subsidiary: subsidiary,
-					pde: endDate,
-					pds: trandate,
-					pdc: created,
-					ucfdi: ucfdi,
-					pm: paymethod,
-					pf: payformat,
-					cus: customer,
-					per: periodicidad,
-					mes: meses,
-					ani: anio,
-				}
-			});
-			// refresco la pantalla
-			window.onbeforeunload = false;
-			window.location.href = script;
-		}
-		/**
-		 * [showMessage description]
-		 * @param  {[type]} msg [description]
-		 * @return {[type]}     [description]
-		 */
-		function showMessage(msg, time) {
-			if (!msg) {
-				return;
-			}
-			if (!time) {
-				time = 3000;
-			}
-			var myMessage = message.create({
-				title: 'WARNING',
-				message: msg,
-				type: message.Type.WARNING
-			});
-			myMessage.show({
-				duration: time
-			});
-		}
+            // 3. 🛡️ BUGFIX (Defensa en Profundidad): Validación de Selección Real
+            // Evita que se cree un registro pivote fantasma si el usuario no seleccionó ninguna casilla
+            var arregloFacturas = rec.getValue('custpage_arreglo');
+            if (!arregloFacturas || arregloFacturas.length === 0) {
+                showMessage('Por favor, seleccione al menos una transacción marcando la casilla de verificación.');
+                return false;
+            }
 
-		function fieldChanged(context) {
-			var currentRecord = context.currentRecord;
-			var sublistName = context.sublistId;
-			var sublistFieldName = context.fieldId;
-			var totalSuma = 0;
-			var counter = 0;
-			var idInternoFacturas = [];
+            return true;
+        }
 
-			if (sublistName === 'custpage_transactions' && sublistFieldName === 'custpage_validar'){
-				var lineasTotal = currentRecord.getLineCount("custpage_transactions");
+        /**
+         * Captura los filtros de la pantalla y recarga el Suitelet realizando una petición GET.
+         * 
+         * @param {string} scId - El Script ID del Suitelet.
+         * @param {string} dpId - El Deployment ID del Suitelet.
+         */
+        function reloadForm(scId, dpId) {
+            var rec = currentRecord.get();
+            var trandate = '';
+            var endDate = '';
+            var created = '';
 
-				for (var i = 0; i < lineasTotal; i++){
-					if(currentRecord.getSublistValue({sublistId: 'custpage_transactions', fieldId: 'custpage_validar', line: i }) === true){
+            // Formateo seguro de fechas
+            if (rec.getValue('custpage_dateini')) {
+                trandate = format.format({
+                    value: rec.getValue('custpage_dateini'),
+                    type: format.Type.DATE
+                });
+            }
+            if (rec.getValue('custpage_dateinie')) {
+                endDate = format.format({
+                    value: rec.getValue('custpage_dateinie'),
+                    type: format.Type.DATE
+                });
+            }
+            if (rec.getValue('custpage_createdate')) {
+                created = rec.getText('custpage_createdate');
+            }
 
-						var total = currentRecord.getSublistValue({sublistId: 'custpage_transactions', fieldId: 'custpage_fxamount', line: i });
+            var subsidiary = rec.getValue('custpage_subsidiary') || null;
+            var ucfdi = rec.getValue('custpage_usecfdi') || null;
+            var paymethod = rec.getValue('custpage_paymhetod') || null;
+            var payformat = rec.getValue('custpage_payform') || null;
+            var customer = rec.getValue('custpage_customer') || null;
+            var periodicidad = rec.getValue('custpage_periodicidad') || null;
+            var meses = rec.getValue('custpage_meses') || null;
+            var anio = rec.getValue('custpage_anio');
 
-						var idFactura = currentRecord.getSublistValue({sublistId: 'custpage_transactions', fieldId: 'custpage_internalid', line: i });
+            // Construcción dinámica de la URL (Aísla la lógica de enrutamiento)
+            var scriptUrl = url.resolveScript({
+                scriptId: scId,
+                deploymentId: dpId,
+                returnExternalUrl: false,
+                params: {
+                    subsidiary: subsidiary,
+                    pde: endDate,
+                    pds: trandate,
+                    pdc: created,
+                    ucfdi: ucfdi,
+                    pm: paymethod,
+                    pf: payformat,
+                    cus: customer,
+                    per: periodicidad,
+                    mes: meses,
+                    ani: anio,
+                }
+            });
 
-						totalSuma += total;
+            // Evitamos que el navegador pregunte si el usuario quiere abandonar la página
+            window.onbeforeunload = null; 
+            window.location.href = scriptUrl;
+        }
 
-						currentRecord.setValue({
-							fieldId: 'custpage_importe',
-							value: totalSuma.toFixed(2)
-						});
+        /**
+         * Muestra notificaciones visuales nativas de NetSuite al usuario (UX).
+         * 
+         * @param {string} msg - El texto a mostrar en la advertencia.
+         * @param {number} [time=3000] - Tiempo en milisegundos que el mensaje permanecerá visible.
+         */
+        function showMessage(msg, time) {
+            if (!msg) return;
+            
+            var duration = time || 3000;
+            
+            var myMessage = message.create({
+                title: 'ADVERTENCIA',
+                message: msg,
+                type: message.Type.WARNING
+            });
+            
+            myMessage.show({
+                duration: duration
+            });
+        }
 
-						idInternoFacturas.push(idFactura);
+        /**
+         * Implementa el Patrón Observer (GoF). Escucha los cambios en la sublista 
+         * para recalcular en tiempo real el importe total y actualizar el arreglo de IDs.
+         * 
+         * @param {Object} context - Objeto de contexto inyectado por NetSuite.
+         * @param {Record} context.currentRecord - Referencia al registro actual en memoria.
+         * @param {string} context.sublistId - ID de la sublista modificada.
+         * @param {string} context.fieldId - ID del campo modificado.
+         */
+        function fieldChanged(context) {
+            var currentRecord = context.currentRecord;
+            var sublistName = context.sublistId;
+            var sublistFieldName = context.fieldId;
+            var totalSuma = 0;
+            var counter = 0;
+            var idInternoFacturas = [];
 
-						currentRecord.setValue({
-							fieldId: 'custpage_arreglo',
-							value: idInternoFacturas
-						});
-						
-						counter = counter + 1;
+            // Solo recalculamos si el usuario hace clic en el checkbox 'custpage_validar'
+            if (sublistName === 'custpage_transactions' && sublistFieldName === 'custpage_validar') {
+                var lineasTotal = currentRecord.getLineCount({ sublistId: "custpage_transactions" });
 
-					}
-				}
+                for (var i = 0; i < lineasTotal; i++) {
+                    var isChecked = currentRecord.getSublistValue({
+                        sublistId: 'custpage_transactions', 
+                        fieldId: 'custpage_validar', 
+                        line: i 
+                    });
 
-				if(counter == 0){
-					currentRecord.setValue({
-						fieldId: 'custpage_importe',
-						value: counter
-					});
+                    if (isChecked === true) {
+                        var total = currentRecord.getSublistValue({
+                            sublistId: 'custpage_transactions', 
+                            fieldId: 'custpage_fxamount', 
+                            line: i 
+                        });
 
-					currentRecord.setValue({
-						fieldId: 'custpage_arreglo',
-						value: ""
-					});
-				}
-			}
-		}
-		   
+                        var idFactura = currentRecord.getSublistValue({
+                            sublistId: 'custpage_transactions', 
+                            fieldId: 'custpage_internalid', 
+                            line: i 
+                        });
 
-		return {
-			pageInit: pageInit,
-			saveRecord: saveRecord,
-			reloadForm: reloadForm,
-			fieldChanged: fieldChanged
-		};
-	});
+                        totalSuma += total;
+                        idInternoFacturas.push(idFactura);
+                        counter++;
+                    }
+                }
+
+                // Actualizamos los campos de cabecera con los resultados consolidados
+                if (counter > 0) {
+                    currentRecord.setValue({
+                        fieldId: 'custpage_importe',
+                        value: totalSuma.toFixed(2)
+                    });
+
+                    currentRecord.setValue({
+                        fieldId: 'custpage_arreglo',
+                        value: idInternoFacturas.join(',') // Garantizamos serialización consistente
+                    });
+                } else {
+                    // Si desmarcó todo, reseteamos a cero
+                    currentRecord.setValue({
+                        fieldId: 'custpage_importe',
+                        value: 0
+                    });
+
+                    currentRecord.setValue({
+                        fieldId: 'custpage_arreglo',
+                        value: ""
+                    });
+                }
+            }
+        }
+
+        return {
+            pageInit: pageInit,
+            saveRecord: saveRecord,
+            fieldChanged: fieldChanged,
+            // Funciones personalizadas que son llamadas desde botones en la UI
+            reloadForm: reloadForm 
+        };
+    });
 
 ===================
 File: fama_global_invoice_library.js
@@ -557,7 +598,8 @@ define([
                 customRecFacturacion.setValue("custrecord_drt_cfdi_usage", obj.custpage_usecfdi);
                 customRecFacturacion.setValue("custrecord_drt_sat_payment_method", obj.custpage_paymhetod);
                 customRecFacturacion.setValue("custrecord_drt_sat_payment_term", obj.custpage_payform);
-                customRecFacturacion.setValue("custrecord_drt_facturas", obj.custpage_arreglo);
+                var facturasArray = obj.custpage_arreglo.split(',');
+                customRecFacturacion.setValue("custrecord_drt_facturas", facturasArray);
                 customRecFacturacion.setValue("custrecord_drt_periodicidad", obj.custpage_periodicidad);
                 customRecFacturacion.setValue("custrecord_drt_meses", obj.custpage_meses);
                 customRecFacturacion.setValue("custrecord_drt_anio", obj.custpage_anio);
@@ -1086,7 +1128,9 @@ define(['N/search', 'N/encode'], function(search, encode) {
         TMPL_CS: 'custrecord_sads_fama_tmpl_cs',
         TMPL_CM: 'custrecord_sads_fama_tmpl_cm',
         TMPL_IF: 'custrecord_sads_fama_tmpl_if',
-        TMPL_CP: 'custrecord_sads_fama_tmpl_cp'
+        TMPL_CP: 'custrecord_sads_fama_tmpl_cp',
+        FLD_ID_PDF: 'custrecord_sads_fama_folderid_pdf',
+        FLD_ID_XML: 'custrecord_sads_fama_folderid_xml'
     };
 
     // ==========================================
@@ -1113,7 +1157,7 @@ define(['N/search', 'N/encode'], function(search, encode) {
                 [FLD.SUB, 'anyof', subsidiaryId]
             ],
             columns: [
-                FLD.USER, FLD.PASS, FLD.URL_API, FLD.URL_GET,
+                FLD.USER, FLD.PASS, FLD.URL_API, FLD.URL_GET,FLD.FLD_ID_PDF, FLD.FLD_ID_XML,
                 FLD.TMPL_INV, FLD.TMPL_CS, FLD.TMPL_CM, FLD.TMPL_IF, FLD.TMPL_CP
             ]
         });
@@ -1132,6 +1176,8 @@ define(['N/search', 'N/encode'], function(search, encode) {
             pass: row.getValue(FLD.PASS),
             apiPostUrl: row.getValue(FLD.URL_API),
             apiGetUrl: row.getValue(FLD.URL_GET),
+            folderIdPdf: row.getValue(FLD.FLD_ID_PDF),
+            folderIdXml: row.getValue(FLD.FLD_ID_XML),
             templates: {
                 'invoice': row.getValue(FLD.TMPL_INV),
                 'cashsale': row.getValue(FLD.TMPL_CS),
@@ -1219,7 +1265,7 @@ define(['N/file', 'N/encode', 'N/render', './sads_fama_logger'], function (file,
     // 1. CONSTANTES (Clean Code: Evitar Magic Numbers)
     // ==========================================
     var CONSTANTS = {
-        TARGET_FOLDER_ID: -15, // Carpeta de Attachments por defecto
+        TARGET_FOLDER_ID: 412704, // Carpeta de Attachments por defecto
         DATA_SOURCE_ALIAS: 'custom',
         TEMPLATE_RECORD: 'record',
         TEMPLATE_CUSTOMER: 'customer',
@@ -1231,48 +1277,61 @@ define(['N/file', 'N/encode', 'N/render', './sads_fama_logger'], function (file,
     // ==========================================
 
     /**
-     * Decodifica una cadena Base64 a UTF-8 y guarda el resultado como un archivo XML en el File Cabinet.
+     * Decodifica una cadena Base64 a UTF-8 y guarda el resultado como un archivo XML, PDF o JSON en el File Cabinet.
      * Implementa un Patrón de Seguridad Fail-Safe Defaults (Falla rápido si los datos son inválidos o corruptos).
-     * * @param {string} fileName - El nombre que se le asignará al archivo XML en NetSuite.
-     * @param {string} base64Content - El contenido del XML codificado en formato Base64.
+     * @param {string} fileName - El nombre que se le asignará al archivo en NetSuite.
+     * @param {string} baseContent - El contenido del archivo.
      * @returns {number} El ID interno (internalid) del archivo guardado en el File Cabinet.
      * @throws {Error} Si el contenido Base64 está vacío o si falla la decodificación nativa del motor de NetSuite.
      */
-    function saveFile(fileName, base64Content, targetFolderId) {
+    function saveFile(fileName, baseContent, targetFolderId) {
         var nsFileType;
         var fileContent = '';
         var finalFolderId = targetFolderId || CONSTANTS.TARGET_FOLDER_ID;
         var isPDF = fileName.toLowerCase().indexOf('.pdf') !== -1;
+        var isXML = fileName.toLowerCase().indexOf('.xml') !== -1;
+        var isJSON = fileName.toLowerCase().indexOf('.json') !== -1;
+
+        // Validación de parámetros críticos
+        if (!fileName) {
+            throw new Error('El nombre del archivo (fileName) es obligatorio para guardar el archivo.');
+        }
+        if (!baseContent) {
+            throw new Error('El contenido de baseContent está vacío.');
+        }
 
         try {
-            // Validamos que venga contenido antes de intentar procesar
-            if (!base64Content) {
-                throw new Error('El contenido Base64 del XML está vacío.');
-            }
-
             if (isPDF) {
-                fileContent = base64Content; // Para PDF, no decodificamos, lo guardamos tal cual
+                fileContent = baseContent;
                 nsFileType = file.Type.PDF;
-            } else {
+            } else if (isXML) {
 
                 try {
-                    fileContents = encode.convert({
-                        string: base64Content,
+                    fileContent = encode.convert({
+                        string: baseContent,
                         inputEncoding: encode.Encoding.BASE_64,
                         outputEncoding: encode.Encoding.UTF_8
                     });
                     nsFileType = file.Type.XMLDOC;
                 } catch (decodeError) {
-                    throw new Error('Fallo al decodificar el archivo Base64 a UTF-8: ' + decodeError.message);
+                    throw new Error('Fallo al decodificar el baseContent a UTF-8: ' + decodeError.message);
                 }
 
+            } else if (isJSON) {
+                try {
+                    fileContent = JSON.stringify(baseContent);
+                    nsFileType = file.Type.JSON;
+                } catch (decodeError) {
+                    throw new Error('Fallo al parsear el baseContent a String: ' + decodeError.message);
+                }
+            } else {
+                throw new Error('Tipo de archivo no soportado. Solo se permiten archivos PDF, XML o JSON.');
             }
-
 
             var newFile = file.create({
                 name: fileName,
                 fileType: nsFileType,
-                contents: fileContents,
+                contents: fileContent,
                 folder: finalFolderId
             });
 
@@ -1385,7 +1444,7 @@ File: sads_fama_global_mapper.js
  * Módulo: Mapeador de Factura Global (Domain Layer / Core)
  * Responsabilidad: Construir el payload JSON exacto para Facturama CFDI 4.0 Global
  */
-define([], function() {
+define([], function () {
     'use strict';
 
     // ==========================================
@@ -1414,13 +1473,13 @@ define([], function() {
         }
 
         var payload = {
-            "NameId": 1, 
+            "NameId": 1,
             "CfdiType": "I",
             "Folio": ctx.folioSolicitado || "GLOBAL",
-            "Date": ctx.fechaEmision, 
+            "Date": ctx.fechaEmision,
             "PaymentForm": ctx.formaPago,
             "PaymentMethod": ctx.metodoPago,
-            "Currency": "MXN", 
+            "Currency": "MXN",
             "CurrencyExchangeRate": 1,
             "ExpeditionPlace": ctx.issuerZipCode,
             "Exportation": ctx.exportation || "01",
@@ -1438,7 +1497,7 @@ define([], function() {
             "Receiver": {
                 "Rfc": SAT_GLOBAL.RFC,
                 "Name": SAT_GLOBAL.NAME,
-                "TaxZipCode": ctx.issuerZipCode, 
+                "TaxZipCode": ctx.issuerZipCode,
                 "FiscalRegime": SAT_GLOBAL.REGIME,
                 "CfdiUse": SAT_GLOBAL.USE_CFDI
             },
@@ -1460,45 +1519,47 @@ define([], function() {
      */
     function _buildItems(rawItems) {
         var items = [];
-        
+
         for (var i = 0; i < rawItems.length; i++) {
             var row = rawItems[i];
-        
-            // Aseguramos que los valores matemáticos jamás sean NaN o indefinidos.
-            var qty = parseFloat(row.quantity) || 1;
-            var amount = parseFloat(row.amount) || 0;
-            var taxRate = parseFloat(row.taxrate) || 0;
-            var taxAmount = parseFloat(row.taxamt) || 0;
-            var discount = parseFloat(row.discount) || 0;
-            var unitPrice = amount / qty;
 
-            var itemNode = {               
-                "ProductCode": "01010101", 
-                "IdentificationNumber": row.ticketNumber || "TICKET",
+            // Aseguramos que los valores matemáticos jamás sean NaN o indefinidos.
+            var qty = parseFloat(row.qty) || 1;
+            var amount = parseFloat(row.amount) || 0;
+            var rawTaxRate = parseFloat(row.taxrate) || 0;
+            var taxRate = rawTaxRate > 1 ? (rawTaxRate / 100) : rawTaxRate;
+            var taxAmount = parseFloat(row.taxAmount) || 0;
+            var discount = parseFloat(row.discount) || 0;
+            var unitPrice = parseFloat(row.unitPrice) || 0;
+            var taxObject = row.taxObject;
+
+            var itemNode = {
+                "ProductCode": "01010101",
+                "IdentificationNumber": row.ticketNumber + "-" + row.itemDescription,
                 "Description": "Venta",
                 "Unit": "ACT",
                 "UnitCode": "ACT",
-                "UnitPrice": _round(unitPrice, 6), 
-                "Quantity": qty, 
-                "Subtotal": _round(amount, 2), 
-                "Discount": _round(discount, 2), 
-                "Total": _round((amount - discount) + taxAmount, 2), 
-                "TaxObject": "02",
+                "UnitPrice": _round(unitPrice, 6),
+                "Quantity": qty,
+                "Subtotal": _round(amount, 2),
+                "Discount": _round(discount, 2),
+                "Total": _round((amount - discount) + taxAmount, 2),
+                "TaxObject": taxObject,
                 "Taxes": [
                     {
+                        "Total": _round(taxAmount, 2),
                         "Name": "IVA",
                         "Base": _round(amount - discount, 2),
                         "Rate": _round(taxRate, 6),
-                        "Total": _round(taxAmount, 2),
                         "IsRetention": false,
                         "IsQuota": false
                     }
-                ]
+                ],
             };
-            
+
             items.push(itemNode);
         }
-        
+
         return items;
     }
 
@@ -2092,15 +2153,7 @@ define([
         PARAM_TEMPLATE_ID: 'custscript_sads_fama_pdf_template', // ID de la Plantilla PDF (Advanced PDF/HTML)
         AUTHOR_ID: -5, // ID interno del empleado/sistema que envía el correo
         STATUS_SUCCESS: 'SUCCESS',
-        STATUS_ERROR: 'ERROR',
-        FOLDERS: {
-            ROOT: '412704', // Carpeta padre por defecto (Fail-Safe)
-            SUBSIDIARIES: {
-                '2': '412710', // NH ACEROS
-                '3': '412712', // ACEROS DE GUASAVE
-                '4': '412708'  // PROVEEDORA DE FIERRO Y PERFILES
-            }
-        }
+        STATUS_ERROR: 'ERROR'
     };
 
     // ==========================================
@@ -2160,7 +2213,8 @@ define([
                     'custrecord_drt_anio',
                     'custrecord_drt_subsidiary',
                     'custrecord_drt_sat_payment_term', // Forma de Pago
-                    'custrecord_drt_sat_payment_method' // Método de Pago
+                    'custrecord_drt_sat_payment_method',// Método de Pago
+                    'custrecord_drt_xml_issue_date'
                 ]
             });
 
@@ -2175,60 +2229,79 @@ define([
             // 3. Preparar Contexto de Dominio (Configuraciones de Emisor)
             var subsidiaryId = lookupData.custrecord_drt_subsidiary.length > 0 ? lookupData.custrecord_drt_subsidiary[0].value : null;
             var issuerData = _getIssuerData(subsidiaryId);
+            var issueDateStr = lookupData.custrecord_drt_xml_issue_date;
+            var parsedSatDate = _parseAndFormatSatDate(issueDateStr);
+            var extractedFormaPago = extractSatCode(lookupData.custrecord_drt_sat_payment_method);
+            var extractedMetodoPago = extractSatCode(lookupData.custrecord_drt_sat_payment_term);
+
+            if (!extractedFormaPago) {
+                throw new Error('Violación de Regla de Negocio: No se especificó la Forma de Pago (Payment Term). No se permite el uso de valores por defecto.');
+            }
 
             var contextData = {
-                periodicidad: lookupData.custrecord_drt_periodicidad.length > 0 ? lookupData.custrecord_drt_periodicidad[0].text.split(' ')[0] : '01',
-                meses: lookupData.custrecord_drt_meses.length > 0 ? lookupData.custrecord_drt_meses[0].text.split(' ')[0] : '01',
-                anio: lookupData.custrecord_drt_anio || new Date().getFullYear().toString(),
-                formaPago: lookupData.custrecord_drt_sat_payment_term.length > 0 ? lookupData.custrecord_drt_sat_payment_term[0].text.split(' ')[0] : '01',
-                metodoPago: lookupData.custrecord_drt_sat_payment_method.length > 0 ? lookupData.custrecord_drt_sat_payment_method[0].text.split(' ')[0] : 'PUE',
-                fechaEmision: _getIsoDateString(),
+                periodicidad: '01',
+                meses: parsedSatDate.month,
+                anio: parsedSatDate.year,
+                formaPago: extractedFormaPago,
+                metodoPago: extractedMetodoPago,
+                fechaEmision: parsedSatDate.iso,
                 folioSolicitado: 'GLOBAL-' + regId,
                 issuerRfc: issuerData.rfc,
                 issuerName: issuerData.name,
                 issuerZipCode: issuerData.zip,
-                issuerRegime: issuerData.regime
+                issuerRegime: issuerData.regime ? issuerData.regime.trim() : '601'
             };
 
             // 4. Transformación a Payload Facturama (Dominio Puro)
+            var configData = configModule.get(subsidiaryId);
             var payload = mapper.buildFacturamaPayload(contextData, rawItems);
+            var jsonId = filesAdapter.saveFile('Payload_Facturama_' + regId + '.json', payload, configData.folderIdPdf);
 
             // 5. Timbrado mediante Adaptador HTTP (Costo: 10 Unidades)
-            var configData = configModule.get(subsidiaryId);
             var headers = configModule.getAuthHeaders(configData.user, configData.pass);
             var apiResponse = api.postTimbrado(configData.apiPostUrl, headers, JSON.stringify(payload));
 
-            if (!apiResponse || apiResponse.error_interno) {
-                throw new Error('Fallo en la comunicación con el PAC: ' + (apiResponse ? apiResponse.detalle : 'Timeout'));
+            // 🛡️ Fail-Safe Default: Validar que la respuesta sea exitosa y tenga la estructura esperada
+            if (!apiResponse || apiResponse.error_interno || apiResponse.Message || !apiResponse.Complement) {
+                // Extraemos el detalle del error del PAC (ModelState) si existe
+                var errorDetail = 'Error desconocido';
+                var failData = {
+                    'custrecord_drt_status': apiResponse.Message || errorDetail,
+                    'custrecord_drt_documento_xml': jsonId,
+                };
+                if (apiResponse) {
+                    errorDetail = apiResponse.ModelState ? JSON.stringify(apiResponse.ModelState) : (apiResponse.Message || apiResponse.detalle);
+                }
+                record.submitFields({
+                    type: 'customrecord_drt_reg_facturacion_interco',
+                    id: regId,
+                    values: failData,
+                    options: { ignoreMandatoryFields: true }
+                });
+                throw new Error('El PAC rechazó el timbraFdo (400 Bad Request): ' + errorDetail);
             }
 
             var cfdiId = apiResponse.Id;
             var uuid = apiResponse.Complement.TaxStamp.Uuid;
+            var date = _parsePacDate(apiResponse.Complement.TaxStamp.Date);
 
             // 6. Descarga y Generación de Archivos Físicos
-            var xmlData = api.getFile(configData.apiGetUrl, headers, cfdiId, 'xml');
             var fileNamePrefix = 'FacturaGlobal_' + uuid;
 
-            // Resolvemos la carpeta dinámicamente
-            var targetFolderId = _getDestinationFolderId(subsidiaryId);
+            var xmlData = api.getFile(configData.apiGetUrl, headers, cfdiId, 'xml');
+            var xmlId = filesAdapter.saveFile(fileNamePrefix + '.xml', xmlData.Content, configData.folderIdXml);
 
-            var xmlId = filesAdapter.saveFile(fileNamePrefix + '.xml', xmlData.Content, targetFolderId);
-            var templateId = currentScript.getParameter({ name: CONSTANTS.PARAM_TEMPLATE_ID });
-
-            var templateId = currentScript.getParameter({ name: CONSTANTS.PARAM_TEMPLATE_ID });
-            if (!templateId) {
-                throw new Error('No se ha configurado el parámetro de Plantilla PDF en el despliegue del script.');
-            }
-
-            var dummyRecord = record.load({ type: 'customrecord_drt_reg_facturacion_interco', id: regId });
-            var pdfId = filesAdapter.generateCertifiedPdf(dummyRecord, null, templateId, { custbody_mx_cfdi_uuid: uuid }, fileNamePrefix + '.pdf', targetFolderId);
+            var pdfData = api.getFile(configData.apiGetUrl, headers, cfdiId, 'pdf');
+            var pdfId = filesAdapter.saveFile(fileNamePrefix + '.pdf', pdfData.Content, configData.folderIdPdf);
 
             // 7. El Puente (Mediator): Despachar tareas atómicas a la fase Reduce
             var successData = {
                 uuid: uuid,
+                date: date,
                 xmlId: xmlId,
                 pdfId: pdfId,
-                regId: regId
+                regId: regId,
+                jsonId: jsonId
             };
 
             for (var i = 0; i < cashSalesIds.length; i++) {
@@ -2269,7 +2342,9 @@ define([
                 values: {
                     'custbody_mx_cfdi_uuid': successData.uuid,
                     'custbody_psg_ei_certified_edoc': successData.xmlId,
-                    'custbody_edoc_generated_pdf': successData.pdfId
+                    'custbody_edoc_generated_pdf': successData.pdfId,
+                    'custbody_psg_ei_status': 7,
+                    'custbody_mx_cfdi_certify_timestamp': successData.date
                 },
                 options: { ignoreMandatoryFields: true }
             });
@@ -2277,7 +2352,7 @@ define([
             // Reenviamos metadatos agrupados al Summarize para la notificación
             reduceContext.write({
                 key: successData.regId,
-                value: { xmlId: successData.xmlId, pdfId: successData.pdfId, uuid: successData.uuid }
+                value: { xmlId: successData.xmlId, pdfId: successData.pdfId, uuid: successData.uuid, date: successData.date, jsonId: successData.jsonId }
             });
 
         } catch (e) {
@@ -2322,10 +2397,10 @@ define([
         try {
             if (totalErrors === 0 && fileData && regId) {
                 _sendSuccessEmail(regId, fileData.xmlId, fileData.pdfId, fileData.uuid);
-                _updateCustomRecordStatus(regId, CONSTANTS.STATUS_SUCCESS, 'Factura Global Generada Correctamente.');
+                _updateCustomRecordStatus(regId, fileData, 'Factura Global Generada Correctamente.');
                 logger.write('3. ORQUESTACIÓN FINALIZADA', { regId: regId, status: 'ÉXITO TOTAL' });
             } else if (regId) {
-                _updateCustomRecordStatus(regId, CONSTANTS.STATUS_ERROR, 'Proceso finalizado con errores parciales o totales. Revisa el Logger.');
+                _updateCustomRecordStatus(regId, fileData, 'Proceso finalizado con errores parciales o totales. Revisa el Logger.');
                 logger.write('3. ORQUESTACIÓN FINALIZADA CON ERRORES', { regId: regId, erroresDetectados: totalErrors });
             }
         } catch (e) {
@@ -2347,13 +2422,13 @@ define([
         var fields = search.lookupFields({
             type: search.Type.SUBSIDIARY,
             id: subsidiaryId,
-            columns: ['federalidnumber', 'name', 'zip', 'custrecord_mx_sat_industry_type']
+            columns: ['custrecord_alm_subsidiaria_rfc', 'custrecord_mx_sat_registered_name', 'custrecord_drt_cod_postal_emisor', 'custrecord_mx_sat_industry_type']
         });
 
         return {
-            rfc: fields.federalidnumber,
-            name: fields.name,
-            zip: fields.zip,
+            rfc: fields.custrecord_alm_subsidiaria_rfc,
+            name: fields.custrecord_mx_sat_registered_name,
+            zip: fields.custrecord_drt_cod_postal_emisor,
             regime: fields.custrecord_mx_sat_industry_type[0] ? fields.custrecord_mx_sat_industry_type[0].text.split('-')[0] : '601'
         };
     }
@@ -2375,39 +2450,72 @@ define([
 
     /**
      * Repositorio: Realiza la búsqueda de los Cash Sales extraídos de la UI y suma los totales de línea.
+     * Patrón: Adaptador de Infraestructura (Protege al Dominio mediante search.create).
+     * 
      * @private
+     * @param {Array} cashSalesIds - Arreglo de IDs internos de transacciones.
+     * @returns {Array} Arreglo de objetos de línea sanitizados y listos para el Mapeador.
      */
     function _fetchCashSalesData(cashSalesIds) {
         if (!cashSalesIds || cashSalesIds.length === 0) return [];
         var rawItems = [];
 
+        // 1. Filtros estrictos para ignorar líneas basura (COGS, Impuestos, Envío)
+        var transactionSearchFilters = [
+            ['mainline', 'is', 'F'], 'AND',
+            ['shipping', 'is', 'F'], 'AND',
+            ['taxline', 'is', 'F'], 'AND',
+            ['cogs', 'is', 'F'], 'AND',
+            ['formulatext: {item}', 'isnotempty', ''], 'AND',
+            ['internalid', 'anyof', cashSalesIds]
+        ];
+
+        // 2. Definición de Columnas (Contrato Estricto)
+        var colTranId = search.createColumn({ name: 'tranid' });
+        var colItemName = search.createColumn({ name: 'displayname', join: 'item' });
+        var colQuantity = search.createColumn({ name: 'quantity' });
+        var colAmount = search.createColumn({ name: 'amount' });
+        var colDiscount = search.createColumn({ name: 'discountamount' }); // 🛡️ CORRECCIÓN: Columna real de descuento
+        var colSatItemCode = search.createColumn({ name: 'custcol_mx_txn_line_sat_item_code' });
+        var colTaxAmount = search.createColumn({ name: 'taxamount' });
+        var colTaxRate = search.createColumn({ name: 'rate', join: 'taxitem' });
+        var colTaxObject = search.createColumn({ name: 'custrecord_mx_sat_to_code', join: 'custcol_mx_txn_line_sat_tax_object' });
+        var colItemRate = search.createColumn({ name: 'rate' });
+
         var salesSearch = search.create({
             type: search.Type.CASH_SALE,
-            filters: [
-                ['internalid', 'anyof', cashSalesIds], 'AND',
-                ['mainline', 'is', 'F'], 'AND',
-                ['taxline', 'is', 'F'], 'AND',
-                ['shipping', 'is', 'F']
-            ],
+            filters: transactionSearchFilters,
             columns: [
-                'tranid', 'quantity', 'amount', 'taxamount', 'taxrate', 'discountamount',
-                search.createColumn({ name: 'custcol_mx_txn_line_sat_item_code' })
+                colTranId,
+                colQuantity,
+                colAmount,
+                colDiscount,
+                colSatItemCode,
+                colTaxAmount,
+                colTaxObject,
+                colTaxRate,
+                colItemName,
+                colItemRate
             ]
         });
 
+        // 3. Mapeo Seguro
         salesSearch.run().each(function (result) {
             rawItems.push({
-                ticketNumber: result.getValue('tranid'),
-                quantity: result.getValue('quantity'),
-                amount: result.getValue('amount'),
-                taxamt: result.getValue('taxamount'),
-                taxrate: result.getValue('taxrate'),
-                discount: result.getValue('discountamount'),
-                satCode: result.getText({ name: 'custcol_mx_txn_line_sat_item_code' })
+                ticketNumber: result.getValue(colTranId),
+                itemDescription: result.getValue(colItemName),
+                qty: result.getValue(colQuantity),
+                amount: result.getValue(colAmount),
+                discount: Math.abs(parseFloat(result.getValue(colDiscount)) || 0),
+                satCode: result.getText(colSatItemCode),
+                taxObject: result.getValue(colTaxObject),
+                taxAmount: result.getValue(colTaxAmount),
+                taxrate: result.getValue(colTaxRate),
+                unitPrice: result.getValue(colItemRate)
             });
             return true;
         });
-
+        logger.write('RAW ITEMS EXTRAÍDOS DE CASH SALES', { count: rawItems.length, items: rawItems });
         return rawItems;
     }
 
@@ -2427,7 +2535,9 @@ define([
     function _sendSuccessEmail(regId, xmlId, pdfId, uuid) {
         var customRecord = record.load({ type: 'customrecord_drt_reg_facturacion_interco', id: regId });
         // En un entorno real, extraerías el correo del usuario que creó el registro o de una configuración
-        var recipients = ['facturacion@zapateriascandy.com.mx', 'iztac.amaya@disruptt.mx'];
+        var userObj = runtime.getCurrentUser();
+        var userEmail = userObj.email || 'operaciones@almetal.in'
+        var recipients = [userEmail];
 
         var xmlAttachment = file.load({ id: xmlId });
         var pdfAttachment = file.load({ id: pdfId });
@@ -2445,12 +2555,17 @@ define([
      * Actualiza el registro personalizado para informar a la UI (Suitelet) del resultado final.
      * @private
      */
-    function _updateCustomRecordStatus(regId, status, message) {
+    function _updateCustomRecordStatus(regId, fileData, message) {
         record.submitFields({
             type: 'customrecord_drt_reg_facturacion_interco',
             id: regId,
             values: {
-                'custrecord_drt_status': status
+                'custrecord_drt_status': CONSTANTS.STATUS_SUCCESS,
+                'custrecord_drt_xml_generado': fileData.xmlId,
+                'custrecord_drt_pdf_generado': fileData.pdfId,
+                'custrecord_drt_documento_xml': fileData.jsonId,
+                'custrecord_drt_uuid': fileData.uuid,
+                'custrecord_drt_xml_issue_date_2': fileData.date
             },
             options: { ignoreMandatoryFields: true }
         });
@@ -2471,15 +2586,113 @@ define([
     }
 
     /**
-     * Resuelve el ID de la carpeta de destino basada en la subsidiaria.
-     * Principio Fail-Safe: Retorna la carpeta ROOT si la subsidiaria no está mapeada.
+     * Extrae el codigo del SAT de un objeto que contiene el codigo y la descripcion, separando por el caracter '-'.
+     * @param {object} lookupObj - Objeto que contiene el código y la descripción.
+     * @returns {string} El código extraído antes del primer guion.
      * @private
      */
-    function _getDestinationFolderId(subsidiaryId) {
-        if (!subsidiaryId) return CONSTANTS.FOLDERS.ROOT;
+    function extractSatCode(lookupObj) {
+        if (!lookupObj || lookupObj.length === 0) return '';
+        var text = lookupObj[0].text || '';
+        return text.split('-')[0].trim().split(' ')[0].trim();
+    }
 
-        var folderId = CONSTANTS.FOLDERS.SUBSIDIARIES[String(subsidiaryId)];
-        return folderId || CONSTANTS.FOLDERS.ROOT;
+    /**
+     * Extrae, normaliza y formatea de forma segura una fecha capturada en la UI.
+     * Patrón: Anticorruption Layer - Aísla el motor JS de los formatos regionales impredecibles de NetSuite.
+     * 
+     * @private
+     * @param {string} rawDateStr - Cadena de texto proveniente de NetSuite (ej. "01/09/2026 6:00:00 pm").
+     * @returns {Object} Un objeto con el ISO formateado, el mes a dos dígitos y el año.
+     */
+    function _parseAndFormatSatDate(rawDateStr) {
+        var dateObj = new Date(); // Fallback seguro (Fecha actual del servidor)
+
+        if (rawDateStr) {
+            var cleanStr = rawDateStr.toLowerCase().trim();
+            // Detectamos si viene en el formato regional latino específico: "DD/MM/YYYY h:mm:ss am/pm"
+            var isNetSuiteLatamFormat = /^\d{1,2}\/\d{1,2}\/\d{4}/.test(cleanStr);
+
+            if (isNetSuiteLatamFormat) {
+                // 1. Desarmamos el string: ["01/09/2026", "6:00:00", "pm"]
+                var parts = cleanStr.split(' ');
+
+                // 2. Extraemos Día, Mes, Año (Asumiendo formato DD/MM/YYYY de la cuenta)
+                var dateParts = parts[0].split('/');
+                var day = parseInt(dateParts[0], 10);
+                var month = parseInt(dateParts[1], 10) - 1; // JS indexa los meses de 0 a 11
+                var year = parseInt(dateParts[2], 10);
+
+                // 3. Extraemos Horas, Minutos, Segundos
+                var timeParts = parts[1] ? parts[1].split(':') : ['00', '00', '00'];
+                var hours = parseInt(timeParts[0], 10) || 0;
+                var minutes = parseInt(timeParts[1], 10) || 0;
+                var seconds = parseInt(timeParts[2], 10) || 0;
+
+                // 4. Conversión estricta a formato de 24 horas
+                var ampm = parts[2] ? parts[2].trim() : '';
+                if (ampm === 'pm' && hours < 12) {
+                    hours += 12;
+                } else if (ampm === 'am' && hours === 12) {
+                    hours = 0;
+                }
+
+                // Inyección estricta (Evita que JS adivine)
+                dateObj = new Date(year, month, day, hours, minutes, seconds);
+            } else {
+                // Fallback por si el usuario cambia el formato de la cuenta a ISO nativo
+                var parsed = new Date(rawDateStr);
+                if (!isNaN(parsed.getTime())) {
+                    dateObj = parsed;
+                }
+            }
+        }
+
+        // 5. Reconstrucción manual exacta para el PAC (Sin depender de .toISOString)
+        var pad = function (n) { return n < 10 ? '0' + n : n; };
+
+        var finalYear = dateObj.getFullYear().toString();
+        var finalMonth = pad(dateObj.getMonth() + 1).toString();
+        var finalDay = pad(dateObj.getDate());
+        var finalHours = pad(dateObj.getHours());
+        var finalMinutes = pad(dateObj.getMinutes());
+        var finalSeconds = pad(dateObj.getSeconds());
+
+        var formattedDate = finalYear + '-' + finalMonth + '-' + finalDay + ' ' + finalHours + ':' + finalMinutes + ':' + finalSeconds;
+
+        return {
+            iso: formattedDate,
+            month: finalMonth,
+            year: finalYear
+        };
+    }
+
+    /**
+     * Convierte la fecha del PAC a un objeto Date nativo de JS.
+     * Patrón: Boundary Protection - Aísla el motor JS de suposiciones de zona horaria.
+     * 
+     * @private
+     * @param {string} pacDateStr - Fecha retornada por el PAC (ej. "2018-02-27T10:46:19").
+     * @returns {Date} Objeto Date válido para la base de datos de NetSuite.
+     */
+    function _parsePacDate(pacDateStr) {
+        if (!pacDateStr) return new Date(); // Fail-Safe: Retorna la fecha actual si viene vacío
+
+        // 1. Separamos fecha y hora en el delimitador "T"
+        var parts = pacDateStr.split('T');
+        var dateParts = parts[0].split('-'); // Resulta en ["2018", "02", "27"]
+        var timeParts = parts[1].split(':'); // Resulta en ["10", "46", "19"]
+
+        var year = parseInt(dateParts[0], 10);
+        var month = parseInt(dateParts[1], 10) - 1; // JS indexa los meses de 0 a 11
+        var day = parseInt(dateParts[2], 10);
+
+        var hours = parseInt(timeParts[0], 10) || 0;
+        var minutes = parseInt(timeParts[1], 10) || 0;
+        var seconds = parseInt(timeParts[2], 10) || 0;
+
+        // 2. Construcción segura: Instancia la fecha en el tiempo local exacto de los números provistos
+        return new Date(year, month, day, hours, minutes, seconds);
     }
 
     return {

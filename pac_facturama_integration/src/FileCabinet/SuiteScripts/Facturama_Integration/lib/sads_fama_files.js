@@ -22,41 +22,55 @@ define(['N/file', 'N/encode', 'N/render', './sads_fama_logger'], function (file,
     // ==========================================
 
     /**
-     * Decodifica una cadena Base64 a UTF-8 y guarda el resultado como un archivo XML en el File Cabinet.
+     * Decodifica una cadena Base64 a UTF-8 y guarda el resultado como un archivo XML, PDF o JSON en el File Cabinet.
      * Implementa un Patrón de Seguridad Fail-Safe Defaults (Falla rápido si los datos son inválidos o corruptos).
-     * * @param {string} fileName - El nombre que se le asignará al archivo XML en NetSuite.
-     * @param {string} base64Content - El contenido del XML codificado en formato Base64.
+     * @param {string} fileName - El nombre que se le asignará al archivo en NetSuite.
+     * @param {string} baseContent - El contenido del archivo.
      * @returns {number} El ID interno (internalid) del archivo guardado en el File Cabinet.
      * @throws {Error} Si el contenido Base64 está vacío o si falla la decodificación nativa del motor de NetSuite.
      */
-    function saveFile(fileName, base64Content, targetFolderId) {
+    function saveFile(fileName, baseContent, targetFolderId) {
         var nsFileType;
         var fileContent = '';
         var finalFolderId = targetFolderId || CONSTANTS.TARGET_FOLDER_ID;
         var isPDF = fileName.toLowerCase().indexOf('.pdf') !== -1;
+        var isXML = fileName.toLowerCase().indexOf('.xml') !== -1;
+        var isJSON = fileName.toLowerCase().indexOf('.json') !== -1;
+
+        // Validación de parámetros críticos
+        if (!fileName) {
+            throw new Error('El nombre del archivo (fileName) es obligatorio para guardar el archivo.');
+        }
+        if (!baseContent) {
+            throw new Error('El contenido de baseContent está vacío.');
+        }
 
         try {
-            // Validamos que venga contenido antes de intentar procesar
-            if (!base64Content) {
-                throw new Error('El contenido Base64 del XML está vacío.');
-            }
-
             if (isPDF) {
-                fileContent = base64Content; // Para PDF, no decodificamos, lo guardamos tal cual
+                fileContent = baseContent;
                 nsFileType = file.Type.PDF;
-            } else {
+            } else if (isXML) {
 
                 try {
                     fileContent = encode.convert({
-                        string: base64Content,
+                        string: baseContent,
                         inputEncoding: encode.Encoding.BASE_64,
                         outputEncoding: encode.Encoding.UTF_8
                     });
                     nsFileType = file.Type.XMLDOC;
                 } catch (decodeError) {
-                    throw new Error('Fallo al decodificar el archivo Base64 a UTF-8: ' + decodeError.message);
+                    throw new Error('Fallo al decodificar el baseContent a UTF-8: ' + decodeError.message);
                 }
 
+            } else if (isJSON) {
+                try {
+                    fileContent = JSON.stringify(baseContent);
+                    nsFileType = file.Type.JSON;
+                } catch (decodeError) {
+                    throw new Error('Fallo al parsear el baseContent a String: ' + decodeError.message);
+                }
+            } else {
+                throw new Error('Tipo de archivo no soportado. Solo se permiten archivos PDF, XML o JSON.');
             }
 
             var newFile = file.create({

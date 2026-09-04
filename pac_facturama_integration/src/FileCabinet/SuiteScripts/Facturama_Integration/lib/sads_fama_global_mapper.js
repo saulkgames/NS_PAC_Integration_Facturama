@@ -85,7 +85,8 @@ define([], function () {
             var row = rawItems[i];
 
             // Aseguramos que los valores matemáticos jamás sean NaN o indefinidos.
-            var qty = parseFloat(row.qty) || 1;
+            var rawQty = parseFloat(row.qty) || 1;
+            var qty = _round(rawQty, 6);
             var amount = parseFloat(row.amount) || 0;
             var rawTaxRate = parseFloat(row.taxrate) || 0;
             var taxRate = rawTaxRate > 1 ? (rawTaxRate / 100) : rawTaxRate;
@@ -102,15 +103,15 @@ define([], function () {
                 "UnitCode": "ACT",
                 "UnitPrice": _round(unitPrice, 6),
                 "Quantity": qty,
-                "Subtotal": _round(amount, 2),
-                "Discount": _round(discount, 2),
-                "Total": _round((amount - discount) + taxAmount, 2),
+                "Subtotal": _round(amount, 6),
+                "Discount": _round(discount, 6),
+                "Total": _round((amount - discount) + taxAmount, 6),
                 "TaxObject": taxObject,
                 "Taxes": [
                     {
-                        "Total": _round(taxAmount, 2),
+                        "Total": _round(taxAmount, 6),
                         "Name": "IVA",
-                        "Base": _round(amount - discount, 2),
+                        "Base": _round(amount - discount, 6),
                         "Rate": _round(taxRate, 6),
                         "IsRetention": false,
                         "IsQuota": false
@@ -141,3 +142,4 @@ define([], function () {
         buildFacturamaPayload: buildFacturamaPayload
     };
 });
+// Correcion de decimales, redondeados a 6 decimales para cumplir con el esquema de Facturama CFDI 4.0 Global, evitando errores de validación en la API de Facturama.

@@ -23,7 +23,7 @@ define(['N/encode', 'N/xml', './sads_fama_logger'], function (encode, xml, logge
         SERIE: 'custbody_mx_cfdi_serie',
         ISSUE_DATETIME: 'custbody_mx_cfdi_issue_datetime',
         ISSUER_SERIAL: 'custbody_mx_cfdi_issuer_serial'
-        
+
     };
 
     // ==========================================
@@ -73,17 +73,6 @@ define(['N/encode', 'N/xml', './sads_fama_logger'], function (encode, xml, logge
                         '&tt=' + originalPayload.Total + '&fe=' + last8Sello;
                     fields[FIELDS.QR_CODE] = qrUrl;
                 }
-            }
-
-            if (originalPayload && originalPayload.Issuer && originalPayload.Receiver) {
-                var last8Sello = taxStamp.CfdiSign.substring(taxStamp.CfdiSign.length - 8);
-
-                var qrUrl = 'https://verificacfdi.facturaelectronica.sat.gob.mx/default.aspx?id=' +
-                    taxStamp.Uuid + '&amp;re=' + originalPayload.Issuer.Rfc +
-                    '&amp;rr=' + originalPayload.Receiver.Rfc +
-                    '&amp;tt=' + originalPayload.Total + '&amp;fe=' + last8Sello;
-
-                fields[FIELDS.QR_CODE] = qrUrl;
             }
 
             // Extracción del número de certificado

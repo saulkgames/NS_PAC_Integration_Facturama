@@ -27,10 +27,15 @@
       <feature required="false">CREATESUITEBUNDLES</feature>
     </features>
     <objects>
+      <object>custtmpl_itemfulfillment_certified_pdf</object>
+      <object>custtmpl_cashsale_certified_pdf_template</object>
       <object>custbody_psg_ei_trans_edoc_standard</object>
       <object>customrecord_psg_ei_standards</object>
       <object>custtab_7_4346104_208</object>
+      <object>custtmpl_payment_certified_pdf_template</object>
       <object>custtab_mx_cfdi_data</object>
+      <object>custtmpl_invoice_certified_pdf_template</object>
+      <object>custtmpl_creditmemo_certified_pdf_template</object>
     </objects>
   </dependencies>
 </manifest>

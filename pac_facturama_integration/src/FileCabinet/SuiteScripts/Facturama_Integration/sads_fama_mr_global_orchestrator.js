@@ -56,7 +56,7 @@ define([
                 throw new Error('Falta el parámetro crítico: ID de Registro de Facturación Intercompañía.');
             }
 
-            logger.write('1. INICIO MAP/REDUCE: Factura Global', { customRecordId: customRecordId });
+            //logger.write('1. INICIO MAP/REDUCE: Factura Global', { customRecordId: customRecordId });
 
             return [{ regId: customRecordId }];
 
@@ -132,13 +132,11 @@ define([
             };
 
             // 4. Transformación a Payload Facturama (Dominio Puro)
+            var configData = configModule.get(subsidiaryId);
             var payload = mapper.buildFacturamaPayload(contextData, rawItems);
-            logger.write('PAYLOAD SAT (CFDI 4.0) CONSTRUIDO', payload);
-
-            logger.write('SIMULACIÓN FINALIZADA', 'El proceso se detiene aquí por diseño. Revisa el payload anterior. No se enviará a Facturama.');
+            var jsonId = filesAdapter.saveFile('Payload_Facturama_' + regId + '.json', payload, configData.folderIdPdf);
 
             // 5. Timbrado mediante Adaptador HTTP (Costo: 10 Unidades)
-            var configData = configModule.get(subsidiaryId);
             var headers = configModule.getAuthHeaders(configData.user, configData.pass);
             var apiResponse = api.postTimbrado(configData.apiPostUrl, headers, JSON.stringify(payload));
 
@@ -146,37 +144,43 @@ define([
             if (!apiResponse || apiResponse.error_interno || apiResponse.Message || !apiResponse.Complement) {
                 // Extraemos el detalle del error del PAC (ModelState) si existe
                 var errorDetail = 'Error desconocido';
+                var failData = {
+                    'custrecord_drt_status': apiResponse.Message || errorDetail,
+                    'custrecord_drt_documento_xml': jsonId,
+                };
                 if (apiResponse) {
                     errorDetail = apiResponse.ModelState ? JSON.stringify(apiResponse.ModelState) : (apiResponse.Message || apiResponse.detalle);
                 }
+                record.submitFields({
+                    type: 'customrecord_drt_reg_facturacion_interco',
+                    id: regId,
+                    values: failData,
+                    options: { ignoreMandatoryFields: true }
+                });
                 throw new Error('El PAC rechazó el timbraFdo (400 Bad Request): ' + errorDetail);
             }
 
             var cfdiId = apiResponse.Id;
             var uuid = apiResponse.Complement.TaxStamp.Uuid;
+            var rawPacDate = apiResponse.Complement.TaxStamp.Date;
 
             // 6. Descarga y Generación de Archivos Físicos
-            var xmlData = api.getFile(configData.apiGetUrl, headers, cfdiId, 'xml');
             var fileNamePrefix = 'FacturaGlobal_' + uuid;
 
+            var xmlData = api.getFile(configData.apiGetUrl, headers, cfdiId, 'xml');
             var xmlId = filesAdapter.saveFile(fileNamePrefix + '.xml', xmlData.Content, configData.folderIdXml);
-            //var templateId = currentScript.getParameter({ name: CONSTANTS.PARAM_TEMPLATE_ID });
 
-            /*if (!templateId) {
-                throw new Error('No se ha configurado el parámetro de Plantilla PDF en el despliegue del script.');
-            }
-            */
-            // Usamos el Custom Record como pivote para inyectar datos globales a la plantilla
-            //var dummyRecord = record.load({ type: 'customrecord_drt_reg_facturacion_interco', id: regId });
             var pdfData = api.getFile(configData.apiGetUrl, headers, cfdiId, 'pdf');
             var pdfId = filesAdapter.saveFile(fileNamePrefix + '.pdf', pdfData.Content, configData.folderIdPdf);
 
             // 7. El Puente (Mediator): Despachar tareas atómicas a la fase Reduce
             var successData = {
                 uuid: uuid,
+                date: rawPacDate,
                 xmlId: xmlId,
                 pdfId: pdfId,
-                regId: regId
+                regId: regId,
+                jsonId: jsonId
             };
 
             for (var i = 0; i < cashSalesIds.length; i++) {
@@ -186,7 +190,7 @@ define([
                 });
             }
 
-            logger.write('2. TIMBRADO GLOBAL EXITOSO', { uuid: uuid, cantidadTickets: cashSalesIds.length });
+            //logger.write('2. TIMBRADO GLOBAL EXITOSO', { uuid: uuid, cantidadTickets: cashSalesIds.length });
 
         } catch (e) {
             logError('Fallo en la etapa MAP (Construcción o Timbrado)', e, { rawMapValue: mapContext.value });
@@ -211,13 +215,16 @@ define([
             var successData = JSON.parse(reduceContext.values[0]);
 
             // Actualización atómica de la transacción (Costo: 10 Unidades por ticket)
+            var safeDate = _parsePacDate(successData.date);
             record.submitFields({
                 type: record.Type.CASH_SALE,
                 id: cashSaleId,
                 values: {
                     'custbody_mx_cfdi_uuid': successData.uuid,
                     'custbody_psg_ei_certified_edoc': successData.xmlId,
-                    'custbody_edoc_generated_pdf': successData.pdfId
+                    'custbody_edoc_generated_pdf': successData.pdfId,
+                    'custbody_psg_ei_status': 7,
+                    'custbody_mx_cfdi_certify_timestamp': safeDate
                 },
                 options: { ignoreMandatoryFields: true }
             });
@@ -225,7 +232,7 @@ define([
             // Reenviamos metadatos agrupados al Summarize para la notificación
             reduceContext.write({
                 key: successData.regId,
-                value: { xmlId: successData.xmlId, pdfId: successData.pdfId, uuid: successData.uuid }
+                value: { xmlId: successData.xmlId, pdfId: successData.pdfId, uuid: successData.uuid, date: safeDate, jsonId: successData.jsonId }
             });
 
         } catch (e) {
@@ -270,10 +277,10 @@ define([
         try {
             if (totalErrors === 0 && fileData && regId) {
                 _sendSuccessEmail(regId, fileData.xmlId, fileData.pdfId, fileData.uuid);
-                _updateCustomRecordStatus(regId, CONSTANTS.STATUS_SUCCESS, 'Factura Global Generada Correctamente.');
+                _updateCustomRecordStatus(regId, fileData, 'Factura Global Generada Correctamente.');
                 logger.write('3. ORQUESTACIÓN FINALIZADA', { regId: regId, status: 'ÉXITO TOTAL' });
             } else if (regId) {
-                _updateCustomRecordStatus(regId, CONSTANTS.STATUS_ERROR, 'Proceso finalizado con errores parciales o totales. Revisa el Logger.');
+                _updateCustomRecordStatus(regId, fileData, 'Proceso finalizado con errores parciales o totales. Revisa el Logger.');
                 logger.write('3. ORQUESTACIÓN FINALIZADA CON ERRORES', { regId: regId, erroresDetectados: totalErrors });
             }
         } catch (e) {
@@ -388,7 +395,7 @@ define([
             });
             return true;
         });
-        logger.write('RAW ITEMS EXTRAÍDOS DE CASH SALES', { count: rawItems.length, items: rawItems });
+        //logger.write('RAW ITEMS EXTRAÍDOS DE CASH SALES', { count: rawItems.length, items: rawItems });
         return rawItems;
     }
 
@@ -408,7 +415,9 @@ define([
     function _sendSuccessEmail(regId, xmlId, pdfId, uuid) {
         var customRecord = record.load({ type: 'customrecord_drt_reg_facturacion_interco', id: regId });
         // En un entorno real, extraerías el correo del usuario que creó el registro o de una configuración
-        var recipients = ['facturacion@zapateriascandy.com.mx', 'iztac.amaya@disruptt.mx'];
+        var userObj = runtime.getCurrentUser();
+        var userEmail = userObj.email || 'operaciones@almetal.in'
+        var recipients = [userEmail];
 
         var xmlAttachment = file.load({ id: xmlId });
         var pdfAttachment = file.load({ id: pdfId });
@@ -426,12 +435,18 @@ define([
      * Actualiza el registro personalizado para informar a la UI (Suitelet) del resultado final.
      * @private
      */
-    function _updateCustomRecordStatus(regId, status, message) {
+    function _updateCustomRecordStatus(regId, fileData, message) {
+        var safeDate = _parsePacDate(fileData.date);
         record.submitFields({
             type: 'customrecord_drt_reg_facturacion_interco',
             id: regId,
             values: {
-                'custrecord_drt_status': status
+                'custrecord_drt_status': CONSTANTS.STATUS_SUCCESS,
+                'custrecord_drt_xml_generado': fileData.xmlId,
+                'custrecord_drt_pdf_generado': fileData.pdfId,
+                'custrecord_drt_documento_xml': fileData.jsonId,
+                'custrecord_drt_uuid': fileData.uuid,
+                'custrecord_drt_xml_issue_date_2': safeDate,
             },
             options: { ignoreMandatoryFields: true }
         });
@@ -533,6 +548,34 @@ define([
         };
     }
 
+    /**
+     * Convierte la fecha del PAC a un objeto Date nativo de JS.
+     * Patrón: Boundary Protection - Aísla el motor JS de suposiciones de zona horaria.
+     * 
+     * @private
+     * @param {string} pacDateStr - Fecha retornada por el PAC (ej. "2018-02-27T10:46:19").
+     * @returns {Date} Objeto Date válido para la base de datos de NetSuite.
+     */
+    function _parsePacDate(pacDateStr) {
+        if (!pacDateStr) return new Date(); // Fail-Safe: Retorna la fecha actual si viene vacío
+
+        // 1. Separamos fecha y hora en el delimitador "T"
+        var parts = pacDateStr.split('T');
+        var dateParts = parts[0].split('-'); // Resulta en ["2018", "02", "27"]
+        var timeParts = parts[1].split(':'); // Resulta en ["10", "46", "19"]
+
+        var year = parseInt(dateParts[0], 10);
+        var month = parseInt(dateParts[1], 10) - 1; // JS indexa los meses de 0 a 11
+        var day = parseInt(dateParts[2], 10);
+
+        var hours = parseInt(timeParts[0], 10) || 0;
+        var minutes = parseInt(timeParts[1], 10) || 0;
+        var seconds = parseInt(timeParts[2], 10) || 0;
+
+        // 2. Construcción segura: Instancia la fecha en el tiempo local exacto de los números provistos
+        return new Date(year, month, day, hours, minutes, seconds);
+    }
+
     return {
         getInputData: getInputData,
         map: map,
@@ -548,4 +591,9 @@ define([
  * * 🛡️ Adaptadores Seguros (Fail-Safe Defaults): Se integraron los adaptadores privados `_fetchCashSalesData` y `_extractMultiSelectIds` que garantizan la sanitización de los objetos extraídos del framework y una consulta optimizada y segura a la base de datos (Search) aislando la memoria.
  * * 📥 Manejo del Contexto Emisor: Se construyó la función `_getIssuerData` la cual realiza un *lookup* eficiente (1 Unidad) a la subsidiaria operativa para construir el nodo SAT Emisor de forma dinámica y precisa.
  * * 📬 Notificación Nativa (Observer Pattern): Se completó el motor de `_sendSuccessEmail`, cargando dinámicamente los registros *XML* y *PDF* creados por el módulo de archivos, transmitiéndolos eficientemente al usuario a través del cliente de correo interno de NetSuite.
+ * * 🧩 Se implemento un submitfields por si el PAC responde con algun error.
+ * * 🧪 Validación de Respuesta PAC: Se reforzó la verificación de la respuesta del PAC, asegurando que los campos `Complement` y `TaxStamp` estén presentes antes de proceder con la generación de archivos y actualización de registros.
+ * * Implementacion de funcion `_parseAndFormatSatDate` para normalizar y formatear fechas provenientes de la UI, garantizando compatibilidad con el PAC y evitando errores de zona horaria.
+ * * Implementacion de funcion `_parsePacDate` para convertir la fecha del PAC a un objeto Date nativo de JS, protegiendo el motor JS de suposiciones de zona horaria.
+ * * 📝 Documentación Exhaustiva: Se añadieron comentarios detallados en cada función, describiendo su propósito, parámetros y comportamiento esperado, facilitando la comprensión y mantenimiento del código.
  */
