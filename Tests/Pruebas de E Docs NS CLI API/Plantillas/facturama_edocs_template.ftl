@@ -6,7 +6,7 @@
 </#if>
 </#function>
 
-<#-- 1. PREPARACIÓN DE VARIABLES (Idéntico a la lógica nativa) -->
+<#-- 1. PREPARACIÓN DE VARIABLES Y CONTEXTO -->
 <#if custom.multiCurrencyFeature == "true">
 <#assign "currencyCode" = transaction.currencysymbol>
 <#if transaction.exchangerate == 1>
@@ -25,7 +25,6 @@
 <#assign customCompanyInfo = companyinformation>
 </#if>
 
-<#assign "summary" = custom.summary>
 <#assign "satCodes" = custom.satcodes>
 <#assign "companyTaxRegNumber" = custom.companyInfo.rfc>
 
@@ -42,6 +41,22 @@
 <#return "IVA">
 </#function>
 
+<#assign satMetodoPago = satCodes.paymentTerm!"">
+<#assign satFormaPago = satCodes.paymentMethod!"">
+
+<#if !satMetodoPago?has_content>
+<#stop "ERROR FATAL: El Método de Pago está vacío. Capture el dato en NetSuite antes de timbrar.">
+</#if>
+
+<#if !satFormaPago?has_content>
+<#stop "ERROR FATAL: La Forma de Pago está vacía. Capture el dato en NetSuite antes de timbrar.">
+</#if>
+
+<#if satMetodoPago == "PPD" && satFormaPago != "99">
+<#stop "ERROR DE INTEGRIDAD: Si el Método de Pago es PPD, la Forma de Pago debe ser '99' en el registro. Corrija NetSuite para evitar discrepancias contables con el SAT.">
+</#if>
+
+
 <#-- 2. CONSTRUCCIÓN DEL JSON -->
 {
 "NameId": 1,
@@ -54,37 +69,49 @@
 <#if transaction.custbody_mx_cfdi_serie?has_content>
 "Serie": "${transaction.custbody_mx_cfdi_serie?json_string}",
 </#if>
-"Date": "${transaction.trandate?string.iso}T00:00:00",
-
-"PaymentForm": "${satCodes.paymentMethod}",
-"PaymentMethod": "PUE",
+"Date": "${transaction.custbody_alm_date_time?datetime?string("yyyy-MM-dd HH:mm:ss")}",
+"PaymentForm": "${satFormaPago}",
+"PaymentMethod": "${satMetodoPago}",
 <#if transaction.terms?has_content>
 "PaymentConditions": "${transaction.terms?json_string}",
 </#if>
-
 "Currency": "${currencyCode}",
 "CurrencyExchangeRate": ${exchangeRate},
-
 "ExpeditionPlace": "${customCompanyInfo.zip}",
 "Exportation": "${satCodes.exportType}",
-
+<#-- NODO: CFDI Relacionados -->
+<#if custom.relatedCfdis?has_content && custom.relatedCfdis.types?has_content>
+<#if custom.relatedCfdis.types?size > 1>
+<#stop "ERROR FATAL: El proveedor PAC (Facturama) no soporta múltiples Tipos de Relación en un mismo comprobante. La transacción tiene ${custom.relatedCfdis.types?size} tipos distintos. Unifique el Tipo de Relación en NetSuite.">
+</#if>
+<#assign cfdiRelType = custom.relatedCfdis.types[0]>
+<#assign cfdisArray = custom.relatedCfdis.cfdis["k0"]>
+<#if cfdisArray?has_content>
+"Relations": {
+"Type": "${cfdiRelType}",
+"Cfdis": [
+<#list cfdisArray as cfdiIdx>
+{
+"Uuid": "${transaction.recmachcustrecord_mx_rcs_orig_trans[cfdiIdx.index?number].custrecord_mx_rcs_uuid}"
+}<#if cfdiIdx_has_next>,</#if>
+</#list>
+]
+},
+</#if>
+</#if>
 "Issuer": {
 "FiscalRegime": "${satCodes.industryType}",
 "Rfc": "${companyTaxRegNumber}",
 "Name": "${customCompanyInfo.custrecord_mx_sat_registered_name?json_string}"
 },
-
 "Receiver": {
 "Rfc": "${customer.custentity_mx_rfc}",
 "Name": "${customer.custentity_mx_sat_registered_name?json_string}",
 "TaxZipCode": "${domicilioFiscalReceptor}",
 "FiscalRegime": "${satCodes.customerIndustryType}",
 "CfdiUse": "${satCodes.cfdiUsage}"
-},
-
-"Items": [
+},"Items": [
 <#list custom.items as customItem>
-<#-- El parche crítico: ?trim?number para evitar errores de espacios en blanco -->
 <#assign "item" = transaction.item[customItem.line?trim?number]>
 <#assign "taxes" = customItem.taxes>
 <#assign "itemSatCodes" = satCodes.items[customItem.line?trim?number]>
@@ -95,7 +122,6 @@
 <#assign "itemSatUnitCode" = (customItem.satUnitCode)!"">
 <#assign "itemUnits" = item.units>
 </#if>
-<#-- Parche: Calculo de TOTAL -->
 <#assign subTotal = customItem.amount?number>
 <#assign Descuento = customItem.discount?number?abs>
 <#assign Impuestos_Trasladados = 0>
@@ -103,16 +129,13 @@
 <#assign Total_Item = 0>
 <#assign has_Taxes = false >
 <#assign has_whTaxes = false>
-<#-- Ciclo condicional para acceder a las variables y sumarlas -->
 <#if itemSatCodes.taxObject == "02">
-<#-- Ciclo condicional para arreglo de impuestos Trasladados -->
 <#if taxes.taxItems?has_content >
 <#assign has_Taxes = true >
 <#list taxes.taxItems as txItem>
 <#assign Impuestos_Trasladados += txItem.taxAmount?number>
 </#list>
 </#if>
-<#-- Ciclo condicional para arreglo de impuestos Retenidos -->
 <#if taxes.whTaxItems?has_content >
 <#assign has_whTaxes = true >
 <#list taxes.whTaxItems as whTxItem>
@@ -122,7 +145,7 @@
 </#if>
 {
 "ProductCode": "${itemSatCodes.itemCode}",
-"IdentificationNumber": "${item.displayname?json_string}",
+"IdentificationNumber": "${item.custcol_pfp_codigoarticulo_?json_string}",
 "Description": "${item.item?json_string}",
 <#if itemUnits?has_content>
 "Unit": "${itemUnits?json_string}",

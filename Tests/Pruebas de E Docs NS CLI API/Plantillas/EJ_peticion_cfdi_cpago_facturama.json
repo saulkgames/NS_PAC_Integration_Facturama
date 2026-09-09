@@ -1,0 +1,68 @@
+{
+  "CfdiType": "P",
+  "NameId": "14",
+  "Folio": "93",
+  "ExpeditionPlace": "78240",  
+  "Receiver": {
+    "Rfc": "URE180429TM6",
+    "CfdiUse": "CP01",
+    "Name": "UNIVERSIDAD ROBOTICA ESPAÑOLA",
+    "FiscalRegime": "601",
+    "TaxZipCode" : "65000"
+   },
+  "Complemento": {
+    "Payments":  [
+        {
+          "Date": "2018-10-04",
+          "PaymentForm": "03",
+          "Amount": "12040.82",
+          "Currency": "MXN",
+          "RelatedDocuments": [
+            {
+              "TaxObject": "02",
+              "Uuid": "C94C8AF3-C774-4D4C-802E-781411934A6E",
+              "Serie": "BQ",
+              "Folio": "2205",
+              "Currency": "USD",
+              "EquivalenceDocRel": 0.049,
+              "PaymentMethod": "PUE",
+              "PartialityNumber": "1",
+              "PreviousBalanceAmount": "1160.00",
+              "AmountPaid": "580.00",
+              "ImpSaldoInsoluto": "580.00",
+              "Taxes": [
+                  {
+                    "Total": 80,
+                    "Name": "IVA",
+                    "Base": 500,
+                    "Rate": 0.160000,
+                    "IsRetention": false
+                  }
+              ]
+            },
+            {
+              "TaxObject": "02",
+              "Uuid": "C94C8AF3-C774-4D4C-802E-781411934A6F",
+              "Serie": "BQ",
+              "Folio": "2206",
+              "Currency": "MXN",
+              "PaymentMethod": "PUE",
+              "PartialityNumber": "1",
+              "PreviousBalanceAmount": "204.08",
+              "AmountPaid": "204.08",
+              "ImpSaldoInsoluto": "0.00",
+              "Taxes": [
+                  {
+                    "Total": 1.60,
+                    "Name": "IVA",
+                    "Base": 10,
+                    "Rate": 0.160000,
+                    "IsRetention": false
+                  }
+              ]
+            }
+          ]
+        }
+    ]
+  }
+}

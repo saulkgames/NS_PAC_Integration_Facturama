@@ -974,7 +974,7 @@ define(['N/encode', 'N/xml', './sads_fama_logger'], function (encode, xml, logge
         SERIE: 'custbody_mx_cfdi_serie',
         ISSUE_DATETIME: 'custbody_mx_cfdi_issue_datetime',
         ISSUER_SERIAL: 'custbody_mx_cfdi_issuer_serial'
-        
+
     };
 
     // ==========================================
@@ -1024,17 +1024,6 @@ define(['N/encode', 'N/xml', './sads_fama_logger'], function (encode, xml, logge
                         '&tt=' + originalPayload.Total + '&fe=' + last8Sello;
                     fields[FIELDS.QR_CODE] = qrUrl;
                 }
-            }
-
-            if (originalPayload && originalPayload.Issuer && originalPayload.Receiver) {
-                var last8Sello = taxStamp.CfdiSign.substring(taxStamp.CfdiSign.length - 8);
-
-                var qrUrl = 'https://verificacfdi.facturaelectronica.sat.gob.mx/default.aspx?id=' +
-                    taxStamp.Uuid + '&amp;re=' + originalPayload.Issuer.Rfc +
-                    '&amp;rr=' + originalPayload.Receiver.Rfc +
-                    '&amp;tt=' + originalPayload.Total + '&amp;fe=' + last8Sello;
-
-                fields[FIELDS.QR_CODE] = qrUrl;
             }
 
             // Extracción del número de certificado
@@ -1524,7 +1513,8 @@ define([], function () {
             var row = rawItems[i];
 
             // Aseguramos que los valores matemáticos jamás sean NaN o indefinidos.
-            var qty = parseFloat(row.qty) || 1;
+            var rawQty = parseFloat(row.qty) || 1;
+            var qty = _round(rawQty, 6);
             var amount = parseFloat(row.amount) || 0;
             var rawTaxRate = parseFloat(row.taxrate) || 0;
             var taxRate = rawTaxRate > 1 ? (rawTaxRate / 100) : rawTaxRate;
@@ -1541,15 +1531,15 @@ define([], function () {
                 "UnitCode": "ACT",
                 "UnitPrice": _round(unitPrice, 6),
                 "Quantity": qty,
-                "Subtotal": _round(amount, 2),
-                "Discount": _round(discount, 2),
-                "Total": _round((amount - discount) + taxAmount, 2),
+                "Subtotal": _round(amount, 6),
+                "Discount": _round(discount, 6),
+                "Total": _round((amount - discount) + taxAmount, 6),
                 "TaxObject": taxObject,
                 "Taxes": [
                     {
-                        "Total": _round(taxAmount, 2),
+                        "Total": _round(taxAmount, 6),
                         "Name": "IVA",
-                        "Base": _round(amount - discount, 2),
+                        "Base": _round(amount - discount, 6),
                         "Rate": _round(taxRate, 6),
                         "IsRetention": false,
                         "IsQuota": false
@@ -1557,7 +1547,7 @@ define([], function () {
                 ],
             };
 
-            items.push(itemNode);
+            items.push(itemNode);   
         }
 
         return items;
@@ -1580,6 +1570,7 @@ define([], function () {
         buildFacturamaPayload: buildFacturamaPayload
     };
 });
+// Correcion de decimales, redondeados a 6 decimales para cumplir con el esquema de Facturama CFDI 4.0 Global, evitando errores de validación en la API de Facturama.
 
 ===================
 File: sads_fama_logger.js
@@ -2177,7 +2168,7 @@ define([
                 throw new Error('Falta el parámetro crítico: ID de Registro de Facturación Intercompañía.');
             }
 
-            logger.write('1. INICIO MAP/REDUCE: Factura Global', { customRecordId: customRecordId });
+            //logger.write('1. INICIO MAP/REDUCE: Factura Global', { customRecordId: customRecordId });
 
             return [{ regId: customRecordId }];
 
@@ -2283,7 +2274,7 @@ define([
 
             var cfdiId = apiResponse.Id;
             var uuid = apiResponse.Complement.TaxStamp.Uuid;
-            var date = _parsePacDate(apiResponse.Complement.TaxStamp.Date);
+            var rawPacDate = apiResponse.Complement.TaxStamp.Date;
 
             // 6. Descarga y Generación de Archivos Físicos
             var fileNamePrefix = 'FacturaGlobal_' + uuid;
@@ -2297,7 +2288,7 @@ define([
             // 7. El Puente (Mediator): Despachar tareas atómicas a la fase Reduce
             var successData = {
                 uuid: uuid,
-                date: date,
+                date: rawPacDate,
                 xmlId: xmlId,
                 pdfId: pdfId,
                 regId: regId,
@@ -2311,7 +2302,7 @@ define([
                 });
             }
 
-            logger.write('2. TIMBRADO GLOBAL EXITOSO', { uuid: uuid, cantidadTickets: cashSalesIds.length });
+            //logger.write('2. TIMBRADO GLOBAL EXITOSO', { uuid: uuid, cantidadTickets: cashSalesIds.length });
 
         } catch (e) {
             logError('Fallo en la etapa MAP (Construcción o Timbrado)', e, { rawMapValue: mapContext.value });
@@ -2336,6 +2327,7 @@ define([
             var successData = JSON.parse(reduceContext.values[0]);
 
             // Actualización atómica de la transacción (Costo: 10 Unidades por ticket)
+            var safeDate = _parsePacDate(successData.date);
             record.submitFields({
                 type: record.Type.CASH_SALE,
                 id: cashSaleId,
@@ -2344,7 +2336,7 @@ define([
                     'custbody_psg_ei_certified_edoc': successData.xmlId,
                     'custbody_edoc_generated_pdf': successData.pdfId,
                     'custbody_psg_ei_status': 7,
-                    'custbody_mx_cfdi_certify_timestamp': successData.date
+                    'custbody_mx_cfdi_certify_timestamp': safeDate
                 },
                 options: { ignoreMandatoryFields: true }
             });
@@ -2352,7 +2344,7 @@ define([
             // Reenviamos metadatos agrupados al Summarize para la notificación
             reduceContext.write({
                 key: successData.regId,
-                value: { xmlId: successData.xmlId, pdfId: successData.pdfId, uuid: successData.uuid, date: successData.date, jsonId: successData.jsonId }
+                value: { xmlId: successData.xmlId, pdfId: successData.pdfId, uuid: successData.uuid, date: safeDate, jsonId: successData.jsonId }
             });
 
         } catch (e) {
@@ -2515,7 +2507,7 @@ define([
             });
             return true;
         });
-        logger.write('RAW ITEMS EXTRAÍDOS DE CASH SALES', { count: rawItems.length, items: rawItems });
+        //logger.write('RAW ITEMS EXTRAÍDOS DE CASH SALES', { count: rawItems.length, items: rawItems });
         return rawItems;
     }
 
@@ -2556,6 +2548,7 @@ define([
      * @private
      */
     function _updateCustomRecordStatus(regId, fileData, message) {
+        var safeDate = _parsePacDate(fileData.date);
         record.submitFields({
             type: 'customrecord_drt_reg_facturacion_interco',
             id: regId,
@@ -2565,7 +2558,7 @@ define([
                 'custrecord_drt_pdf_generado': fileData.pdfId,
                 'custrecord_drt_documento_xml': fileData.jsonId,
                 'custrecord_drt_uuid': fileData.uuid,
-                'custrecord_drt_xml_issue_date_2': fileData.date
+                'custrecord_drt_xml_issue_date_2': safeDate,
             },
             options: { ignoreMandatoryFields: true }
         });
@@ -2710,5 +2703,10 @@ define([
  * * 🛡️ Adaptadores Seguros (Fail-Safe Defaults): Se integraron los adaptadores privados `_fetchCashSalesData` y `_extractMultiSelectIds` que garantizan la sanitización de los objetos extraídos del framework y una consulta optimizada y segura a la base de datos (Search) aislando la memoria.
  * * 📥 Manejo del Contexto Emisor: Se construyó la función `_getIssuerData` la cual realiza un *lookup* eficiente (1 Unidad) a la subsidiaria operativa para construir el nodo SAT Emisor de forma dinámica y precisa.
  * * 📬 Notificación Nativa (Observer Pattern): Se completó el motor de `_sendSuccessEmail`, cargando dinámicamente los registros *XML* y *PDF* creados por el módulo de archivos, transmitiéndolos eficientemente al usuario a través del cliente de correo interno de NetSuite.
+ * * 🧩 Se implemento un submitfields por si el PAC responde con algun error.
+ * * 🧪 Validación de Respuesta PAC: Se reforzó la verificación de la respuesta del PAC, asegurando que los campos `Complement` y `TaxStamp` estén presentes antes de proceder con la generación de archivos y actualización de registros.
+ * * Implementacion de funcion `_parseAndFormatSatDate` para normalizar y formatear fechas provenientes de la UI, garantizando compatibilidad con el PAC y evitando errores de zona horaria.
+ * * Implementacion de funcion `_parsePacDate` para convertir la fecha del PAC a un objeto Date nativo de JS, protegiendo el motor JS de suposiciones de zona horaria.
+ * * 📝 Documentación Exhaustiva: Se añadieron comentarios detallados en cada función, describiendo su propósito, parámetros y comportamiento esperado, facilitando la comprensión y mantenimiento del código.
  */
 

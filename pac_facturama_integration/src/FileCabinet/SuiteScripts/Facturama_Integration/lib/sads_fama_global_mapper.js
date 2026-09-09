@@ -119,7 +119,7 @@ define([], function () {
                 ],
             };
 
-            items.push(itemNode);
+            items.push(itemNode);   
         }
 
         return items;
