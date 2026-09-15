@@ -73,56 +73,131 @@ define([], function () {
     // ==========================================
 
     /**
-     * Transforma las líneas de NetSuite en el arreglo 'Items' esperado por Facturama.
-     * @param {Array} rawItems - Arreglo de líneas/tickets obtenidos de NetSuite.
-     * @returns {Array} Arreglo de objetos 'Item' listos para el payload.
-     * @private
-     */
+      * Mapeador puro (Adaptador de Salida). 
+      * Su única responsabilidad es ensamblar el JSON requerido por Facturama.
+      * 
+      * @param {Array} rawItems - Arreglo de líneas obtenidas de NetSuite.
+      * @returns {Array} Arreglo de objetos 'Item' listos para el payload.
+      * @private
+      */
     function _buildItems(rawItems) {
         var items = [];
 
         for (var i = 0; i < rawItems.length; i++) {
-            var row = rawItems[i];
+            // 1. Sanitización
+            var cleanData = _sanitizeRowData(rawItems[i]);
 
-            // Aseguramos que los valores matemáticos jamás sean NaN o indefinidos.
-            var rawQty = parseFloat(row.qty) || 1;
-            var qty = _round(rawQty, 6);
-            var amount = parseFloat(row.amount) || 0;
-            var rawTaxRate = parseFloat(row.taxrate) || 0;
-            var taxRate = rawTaxRate > 1 ? (rawTaxRate / 100) : rawTaxRate;
-            var taxAmount = parseFloat(row.taxAmount) || 0;
-            var discount = parseFloat(row.discount) || 0;
-            var unitPrice = parseFloat(row.unitPrice) || 0;
-            var taxObject = row.taxObject;
+            // 2. Ejecución de Reglas de Negocio (Dominio)
+            var fiscalData = _calculateFiscalValues(cleanData);
 
+            // 3. Mapeo estricto del contrato (JSON)
             var itemNode = {
                 "ProductCode": "01010101",
-                "IdentificationNumber": row.ticketNumber + "-" + row.itemDescription,
+                "IdentificationNumber": cleanData.ticketNumber + "-" + cleanData.itemDescription,
                 "Description": "Venta",
                 "Unit": "ACT",
                 "UnitCode": "ACT",
-                "UnitPrice": _round(unitPrice, 6),
-                "Quantity": qty,
-                "Subtotal": _round(amount, 6),
-                "Discount": _round(discount, 6),
-                "Total": _round((amount - discount) + taxAmount, 6),
-                "TaxObject": taxObject,
+                "UnitPrice": fiscalData.unitPrice,
+                "Quantity": cleanData.qty,
+                "Subtotal": fiscalData.subtotal,
+                "Discount": cleanData.discount,
+                "Total": fiscalData.totalLine,
+                "TaxObject": cleanData.taxObject,
                 "Taxes": [
                     {
-                        "Total": _round(taxAmount, 6),
+                        "Total": fiscalData.tax,
                         "Name": "IVA",
-                        "Base": _round(amount - discount, 6),
-                        "Rate": _round(taxRate, 6),
+                        "Base": fiscalData.base,
+                        "Rate": cleanData.taxRate,
                         "IsRetention": false,
                         "IsQuota": false
                     }
-                ],
+                ]
             };
 
-            items.push(itemNode);   
+            items.push(itemNode);
         }
 
         return items;
+    }
+
+    /**
+     * Filtro de Frontera (Anticorruption Layer).
+     * Extrae, parsea y protege contra valores nulos o indefinidos del ERP.
+     * 
+     * @param {Object} row - Fila cruda de NetSuite.
+     * @returns {Object} Diccionario con datos limpios y tipados.
+     * @private
+     */
+    function _sanitizeRowData(row) {
+        var rawTaxRate = parseFloat(row.taxrate) || 0;
+
+        return {
+            ticketNumber: row.ticketNumber || "N/A",
+            itemDescription: row.itemDescription || "Venta",
+            taxObject: row.taxObject || "02",
+            qty: _round(parseFloat(row.qty) || 1, 6),
+            amount: parseFloat(row.amount) || 0,
+            discount: _round(parseFloat(row.discount) || 0, 6),
+            unitPrice: parseFloat(row.unitPrice) || 0,
+            erpTaxAmount: _round(parseFloat(row.taxAmount) || 0, 6),
+            taxRate: _round(rawTaxRate > 1 ? (rawTaxRate / 100) : rawTaxRate, 6)
+        };
+    }
+
+    /**
+     * Motor de Cálculo de Dominio (Top-Down Reverse Engineering).
+     * Aplica el Patrón Estrategia y Fail-Fast para garantizar la invariante del SAT.
+     * @param {Object} data - Diccionario de datos sanitizados.
+     * @returns {Object} Nodos financieros perfectamente cuadrados para el PAC.
+     * @private
+     */
+    function _calculateFiscalValues(data) {
+        var TOLERANCIA_MAXIMA = 0.05;
+
+        var erpTotalLine = _round((data.amount - data.discount) + data.erpTaxAmount, 6);
+
+        var fwdBase = _round(data.amount - data.discount, 6);
+        var fwdTax = _round(fwdBase * data.taxRate, 6);
+        var fwdTotal = _round(fwdBase + fwdTax, 6);
+        var fwdSubtotalCalc = _round(data.unitPrice * data.qty, 6);
+
+        var isMathPerfect = (fwdTax === data.erpTaxAmount) &&
+            (fwdTotal === erpTotalLine) &&
+            (Math.abs(fwdSubtotalCalc - data.amount) < 0.01);
+
+        if (isMathPerfect) {
+            return {
+                base: fwdBase,
+                tax: fwdTax,
+                subtotal: _round(data.amount, 6),
+                unitPrice: _round(data.unitPrice, 6),
+                totalLine: erpTotalLine
+            };
+        }
+
+        var finalBase = _round(erpTotalLine / (1 + data.taxRate), 6);
+        var finalTax = _round(erpTotalLine - finalBase, 6);
+        var finalSubtotal = _round(finalBase + data.discount, 6);
+        var finalUnitPrice = _round(finalSubtotal / data.qty, 6);
+
+        var discrepanciaImpuesto = Math.abs(_round(data.erpTaxAmount - finalTax, 6));
+
+        if (discrepanciaImpuesto > TOLERANCIA_MAXIMA) {
+            throw new Error(
+                'FAIL-FAST: Discrepancia matemática insalvable en Ticket ' + data.ticketNumber +
+                '. Impuesto ERP: ' + data.erpTaxAmount + ' | Impuesto Real PAC: ' + finalTax +
+                '. El registro contable está corrompido.'
+            );
+        }
+
+        return {
+            base: finalBase,
+            tax: finalTax,
+            subtotal: finalSubtotal,
+            unitPrice: finalUnitPrice,
+            totalLine: erpTotalLine
+        };
     }
 
     /**
@@ -143,3 +218,4 @@ define([], function () {
     };
 });
 // Correcion de decimales, redondeados a 6 decimales para cumplir con el esquema de Facturama CFDI 4.0 Global, evitando errores de validación en la API de Facturama.
+// Agregada estrategia para impuesto y subtotal basado en el total cuando el erp redondee los montos y genere discrepancias matemáticas. Se implementa un patrón de Fail-Fast para detectar inconsistencias graves en los registros contables.

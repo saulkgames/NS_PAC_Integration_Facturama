@@ -89,7 +89,7 @@ define(['N/file', 'N/encode', 'N/render', './sads_fama_logger'], function (file,
 
     /**
      * Renderiza un PDF de la transacción uniendo los datos estándar de NetSuite y los datos fiscales del PAC.
-     * * @param {Object} txnRecord - El objeto record de la transacción principal cargada (ej. Invoice).
+     * @param {Object} txnRecord - El objeto record de la transacción principal cargada (ej. Invoice).
      * @param {Object|null} customerRecord - El objeto record del cliente cargado (opcional).
      * @param {number|string} pdfTemplateId - El ID interno de la plantilla avanzada de PDF/HTML (FreeMarker/BFO).
      * @param {Object} extraFields - Objeto con la metadata extraída del XML (UUID, cadena original, sellos, etc.).

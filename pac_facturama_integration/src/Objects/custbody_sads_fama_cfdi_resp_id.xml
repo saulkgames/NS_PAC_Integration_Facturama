@@ -1,5 +1,6 @@
 <transactionbodycustomfield scriptid="custbody_sads_fama_cfdi_resp_id">
   <accesslevel>2</accesslevel>
+  <aidescription></aidescription>
   <applyformatting>F</applyformatting>
   <bodycustomerpayment>T</bodycustomerpayment>
   <bodycustomtransactions></bodycustomtransactions>
@@ -17,12 +18,14 @@
   <bodypaycheck>F</bodypaycheck>
   <bodypickingticket>F</bodypickingticket>
   <bodyprintflag>F</bodyprintflag>
+  <bodyprintpackingslip>F</bodyprintpackingslip>
   <bodyprintstatement>F</bodyprintstatement>
   <bodypurchase>F</bodypurchase>
   <bodysale>T</bodysale>
   <bodystore>F</bodystore>
   <bodytransferorder>T</bodytransferorder>
   <bodyvendorpayment>F</bodyvendorpayment>
+  <bodyvendorprepayment>F</bodyvendorprepayment>
   <checkspelling>F</checkspelling>
   <defaultchecked>F</defaultchecked>
   <defaultselection></defaultselection>
@@ -32,6 +35,7 @@
   <displaytype>LOCKED</displaytype>
   <displaywidth></displaywidth>
   <dynamicdefault></dynamicdefault>
+  <enabletextenhance>F</enabletextenhance>
   <encryptatrest>F</encryptatrest>
   <fieldtype>TEXT</fieldtype>
   <fldsizelabel></fldsizelabel>

@@ -1,5 +1,6 @@
 <transactionbodycustomfield scriptid="custbody_sads_edocuments_package">
   <accesslevel>2</accesslevel>
+  <aidescription></aidescription>
   <applyformatting>F</applyformatting>
   <bodycustomerpayment>F</bodycustomerpayment>
   <bodycustomtransactions></bodycustomtransactions>
@@ -24,6 +25,7 @@
   <bodystore>F</bodystore>
   <bodytransferorder>F</bodytransferorder>
   <bodyvendorpayment>F</bodyvendorpayment>
+  <bodyvendorprepayment>F</bodyvendorprepayment>
   <checkspelling>F</checkspelling>
   <defaultchecked>F</defaultchecked>
   <defaultselection></defaultselection>
@@ -33,6 +35,7 @@
   <displaytype>NORMAL</displaytype>
   <displaywidth></displaywidth>
   <dynamicdefault></dynamicdefault>
+  <enabletextenhance>F</enabletextenhance>
   <encryptatrest>F</encryptatrest>
   <fieldtype>SELECT</fieldtype>
   <fldsizelabel></fldsizelabel>

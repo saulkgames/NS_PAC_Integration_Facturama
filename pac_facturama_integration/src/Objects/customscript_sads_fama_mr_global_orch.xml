@@ -9,6 +9,7 @@
   <scriptcustomfields>
     <scriptcustomfield scriptid="custscript_sads_fama_reg_fact_id">
       <accesslevel>2</accesslevel>
+      <aidescription></aidescription>
       <applyformatting>T</applyformatting>
       <checkspelling>F</checkspelling>
       <defaultchecked>F</defaultchecked>
@@ -36,6 +37,7 @@
     </scriptcustomfield>
     <scriptcustomfield scriptid="custscript_sads_fama_pdf_template">
       <accesslevel>2</accesslevel>
+      <aidescription></aidescription>
       <applyformatting>F</applyformatting>
       <checkspelling>F</checkspelling>
       <defaultchecked>F</defaultchecked>
