@@ -2,13 +2,10 @@
  * @NApiVersion 2.0
  * @NScriptType MapReduceScript
  * @NModuleScope Public
- * 
- * SADS Facturama - Orquestador Map/Reduce para Factura Global
- * 
- * Arquitectura: Hexagonal (Ports and Adapters) & Mediator Pattern
- * Descripción: Coordina la extracción masiva de tickets (Cash Sales), la transformación
- * de datos a través de la capa de Dominio, la comunicación con el PAC vía Adaptadores HTTP, 
- * la generación de archivos físicos y la actualización transaccional usando límites elásticos.
+ *
+ * SADS Facturama - Orquestador Map/Reduce de Factura Global.
+ * Coordina la extracción de Cash Sales, la construcción del payload CFDI 4.0,
+ * el timbrado en el PAC, la generación de archivos y la actualización transaccional.
  */
 define([
     'N/search',
@@ -24,27 +21,18 @@ define([
 ], function (search, record, runtime, email, file, logger, configModule, mapper, api, filesAdapter) {
     'use strict';
 
-    // ==========================================
-    // 1. CONSTANTES DEL SISTEMA (No Magic Strings)
-    // ==========================================
     var CONSTANTS = {
         PARAM_REG_ID: 'custscript_sads_fama_reg_fact_id', // ID del Custom Record generado por la UI
-        PARAM_TEMPLATE_ID: 'custscript_sads_fama_pdf_template', // ID de la Plantilla PDF (Advanced PDF/HTML)
+        PARAM_TEMPLATE_ID: 'custscript_sads_fama_pdf_template', // ID de la plantilla PDF (Advanced PDF/HTML)
         AUTHOR_ID: -5, // ID interno del empleado/sistema que envía el correo
         STATUS_SUCCESS: 'SUCCESS',
         STATUS_ERROR: 'ERROR'
     };
 
-    // ==========================================
-    // 2. GET INPUT DATA (El Recolector)
-    // ==========================================
-
     /**
-     * Define la entrada de datos para la fase Map.
-     * Patrón Fail-Safe: Falla rápido si no se provee el contexto inicial.
-     * 
+     * Define la entrada de la fase Map. Falla rápido si no se provee el contexto inicial.
      * @param {Object} inputContext - Objeto inyectado por el framework de NetSuite.
-     * @returns {Array} Un arreglo con un único objeto para forzar una sola ejecución de la etapa Map.
+     * @returns {Array} Arreglo con un único objeto para forzar una sola ejecución de Map.
      * @throws {Error} Si el parámetro de ID de registro no está configurado.
      */
     function getInputData(inputContext) {
@@ -56,24 +44,18 @@ define([
                 throw new Error('Falta el parámetro crítico: ID de Registro de Facturación Intercompañía.');
             }
 
-            //logger.write('1. INICIO MAP/REDUCE: Factura Global', { customRecordId: customRecordId });
-
             return [{ regId: customRecordId }];
 
         } catch (e) {
             logError('Fallo fatal en getInputData', e);
-            throw e; // Interrumpe la ejecución del Map/Reduce completamente
+            throw e; // Interrumpe la ejecución del Map/Reduce por completo
         }
     }
 
-    // ==========================================
-    // 3. MAP (El Director de Orquesta - Fase 1)
-    // ==========================================
-
     /**
-     * Orquesta el flujo de negocio: Extracción, Mapeo, Timbrado y Generación de Archivos.
-     * 
-     * @param {Object} mapContext - Contexto de la fase Map, provee el método write() para pasar datos al Reduce.
+     * Orquesta el flujo de negocio: extracción, mapeo, timbrado y generación de archivos.
+     * @param {Object} mapContext - Contexto de la fase Map; provee write() para pasar datos al Reduce.
+     * @returns {void}
      */
     function map(mapContext) {
         try {
@@ -81,7 +63,7 @@ define([
             var regId = data.regId;
             var currentScript = runtime.getCurrentScript();
 
-            // 1. Extracción de Configuración de la UI (Costo: 1 Unidad)
+            // 1. Extracción de la configuración capturada en la UI
             var lookupData = search.lookupFields({
                 type: 'customrecord_drt_reg_facturacion_interco',
                 id: regId,
@@ -102,10 +84,10 @@ define([
                 throw new Error('El registro no contiene transacciones (Cash Sales) seleccionadas.');
             }
 
-            // 2. Adaptador de Datos: Búsqueda de tickets (Costo: 10 Unidades)
+            // 2. Búsqueda de los tickets seleccionados
             var rawItems = _fetchCashSalesData(cashSalesIds);
 
-            // 3. Preparar Contexto de Dominio (Configuraciones de Emisor)
+            // 3. Contexto de dominio (datos del emisor)
             var subsidiaryId = lookupData.custrecord_drt_subsidiary.length > 0 ? lookupData.custrecord_drt_subsidiary[0].value : null;
             var issuerData = _getIssuerData(subsidiaryId);
             var issueDateStr = lookupData.custrecord_drt_xml_issue_date;
@@ -131,18 +113,17 @@ define([
                 issuerRegime: issuerData.regime ? issuerData.regime.trim() : '601'
             };
 
-            // 4. Transformación a Payload Facturama (Dominio Puro)
+            // 4. Transformación al payload de Facturama
             var configData = configModule.get(subsidiaryId);
             var payload = mapper.buildFacturamaPayload(contextData, rawItems);
             var jsonId = filesAdapter.saveFile('Payload_Facturama_' + regId + '.json', payload, configData.folderIdPdf);
 
-            // 5. Timbrado mediante Adaptador HTTP (Costo: 10 Unidades)
+            // 5. Timbrado vía adaptador HTTP
             var headers = configModule.getAuthHeaders(configData.user, configData.pass);
             var apiResponse = api.postTimbrado(configData.apiPostUrl, headers, JSON.stringify(payload));
 
-            // 🛡️ Fail-Safe Default: Validar que la respuesta sea exitosa y tenga la estructura esperada
+            // Validar que la respuesta sea exitosa y tenga la estructura esperada
             if (!apiResponse || apiResponse.error_interno || apiResponse.Message || !apiResponse.Complement) {
-                // Extraemos el detalle del error del PAC (ModelState) si existe
                 var errorDetail = 'Error desconocido';
                 var failData = {
                     'custrecord_drt_status': apiResponse.Message || errorDetail,
@@ -164,7 +145,7 @@ define([
             var uuid = apiResponse.Complement.TaxStamp.Uuid;
             var rawPacDate = apiResponse.Complement.TaxStamp.Date;
 
-            // 6. Descarga y Generación de Archivos Físicos
+            // 6. Descarga y generación de archivos físicos
             var fileNamePrefix = 'FacturaGlobal_' + uuid;
 
             var xmlData = api.getFile(configData.apiGetUrl, headers, cfdiId, 'xml');
@@ -173,7 +154,7 @@ define([
             var pdfData = api.getFile(configData.apiGetUrl, headers, cfdiId, 'pdf');
             var pdfId = filesAdapter.saveFile(fileNamePrefix + '.pdf', pdfData.Content, configData.folderIdPdf);
 
-            // 7. El Puente (Mediator): Despachar tareas atómicas a la fase Reduce
+            // 7. Despachar tareas atómicas a la fase Reduce
             var successData = {
                 uuid: uuid,
                 date: rawPacDate,
@@ -190,23 +171,16 @@ define([
                 });
             }
 
-            //logger.write('2. TIMBRADO GLOBAL EXITOSO', { uuid: uuid, cantidadTickets: cashSalesIds.length });
-
         } catch (e) {
             logError('Fallo en la etapa MAP (Construcción o Timbrado)', e, { rawMapValue: mapContext.value });
-            throw e; // Protege el estado: Si falla aquí, la etapa Reduce no mutará la base de datos.
+            throw e; // Protege el estado: si falla aquí, Reduce no mutará la base de datos
         }
     }
 
-    // ==========================================
-    // 4. REDUCE (El Mutador Elástico - Fase 2)
-    // ==========================================
-
     /**
      * Actualiza cada Cash Sale con el UUID y los archivos generados.
-     * Se ejecuta de forma paralela y distribuida protegiendo los límites de Gobernanza.
-     * 
      * @param {Object} reduceContext - Provee el ID del ticket (key) y los datos de éxito (values).
+     * @returns {void}
      */
     function reduce(reduceContext) {
         var cashSaleId = reduceContext.key;
@@ -214,7 +188,6 @@ define([
         try {
             var successData = JSON.parse(reduceContext.values[0]);
 
-            // Actualización atómica de la transacción (Costo: 10 Unidades por ticket)
             var safeDate = _parsePacDate(successData.date);
             record.submitFields({
                 type: record.Type.CASH_SALE,
@@ -229,7 +202,7 @@ define([
                 options: { ignoreMandatoryFields: true }
             });
 
-            // Reenviamos metadatos agrupados al Summarize para la notificación
+            // Reenviar metadatos agrupados al Summarize para la notificación
             reduceContext.write({
                 key: successData.regId,
                 value: { xmlId: successData.xmlId, pdfId: successData.pdfId, uuid: successData.uuid, date: safeDate, jsonId: successData.jsonId }
@@ -240,15 +213,10 @@ define([
         }
     }
 
-    // ==========================================
-    // 5. SUMMARIZE (El Observador / Cierre)
-    // ==========================================
-
     /**
-     * Evalúa el resultado final del proceso distribuido y notifica a los usuarios.
-     * Implementa el Patrón Observer mediante el envío de correos con adjuntos.
-     * 
-     * @param {Object} summaryContext - Contiene las estadísticas, errores y salidas del Map/Reduce.
+     * Evalúa el resultado final del proceso y notifica a los usuarios.
+     * @param {Object} summaryContext - Estadísticas, errores y salidas del Map/Reduce.
+     * @returns {void}
      */
     function summarize(summaryContext) {
         var totalErrors = 0;
@@ -271,7 +239,7 @@ define([
         summaryContext.output.iterator().each(function (key, value) {
             regId = key;
             fileData = JSON.parse(value);
-            return false; // Solo necesitamos la metadata de un nodo, todos tienen la misma.
+            return false; // Solo se necesita la metadata de un nodo; todos comparten la misma
         });
 
         try {
@@ -288,13 +256,11 @@ define([
         }
     }
 
-    // ==========================================
-    // 6. FUNCIONES PRIVADAS (Adaptadores y Helper)
-    // ==========================================
-
     /**
-     * Recupera y formatea de forma segura los datos de la subsidiaria emisora.
+     * Recupera y formatea los datos de la subsidiaria emisora.
      * @private
+     * @param {number|string} subsidiaryId - ID interno de la subsidiaria.
+     * @returns {Object} Datos del emisor (rfc, name, zip, regime).
      */
     function _getIssuerData(subsidiaryId) {
         if (!subsidiaryId) throw new Error('Se requiere una subsidiaria para obtener los datos del Emisor.');
@@ -314,9 +280,10 @@ define([
     }
 
     /**
-     * Sanitiza el valor crudo del Multi-Select Field de NetSuite a un Arreglo JS estándar.
-     * Programación Defensiva (Fail-Safe Defaults).
+     * Sanitiza el valor crudo de un Multi-Select Field de NetSuite a un arreglo JS estándar.
      * @private
+     * @param {*} rawFieldValue - Valor crudo del campo.
+     * @returns {Array} Arreglo de IDs.
      */
     function _extractMultiSelectIds(rawFieldValue) {
         if (!rawFieldValue) return [];
@@ -329,18 +296,16 @@ define([
     }
 
     /**
-     * Repositorio: Realiza la búsqueda de los Cash Sales extraídos de la UI y suma los totales de línea.
-     * Patrón: Adaptador de Infraestructura (Protege al Dominio mediante search.create).
-     * 
+     * Busca los Cash Sales seleccionados y extrae los totales de cada línea.
      * @private
-     * @param {Array} cashSalesIds - Arreglo de IDs internos de transacciones.
-     * @returns {Array} Arreglo de objetos de línea sanitizados y listos para el Mapeador.
+     * @param {Array} cashSalesIds - IDs internos de las transacciones.
+     * @returns {Array} Objetos de línea sanitizados y listos para el mapeador.
      */
     function _fetchCashSalesData(cashSalesIds) {
         if (!cashSalesIds || cashSalesIds.length === 0) return [];
         var rawItems = [];
 
-        // 1. Filtros estrictos para ignorar líneas basura (COGS, Impuestos, Envío)
+        // Filtros estrictos para ignorar líneas basura (COGS, impuestos, envío)
         var transactionSearchFilters = [
             ['mainline', 'is', 'F'], 'AND',
             ['shipping', 'is', 'F'], 'AND',
@@ -350,12 +315,11 @@ define([
             ['internalid', 'anyof', cashSalesIds]
         ];
 
-        // 2. Definición de Columnas (Contrato Estricto)
         var colTranId = search.createColumn({ name: 'tranid' });
         var colItemName = search.createColumn({ name: 'displayname', join: 'item' });
         var colQuantity = search.createColumn({ name: 'quantity' });
         var colAmount = search.createColumn({ name: 'amount' });
-        var colDiscount = search.createColumn({ name: 'discountamount' }); // 🛡️ CORRECCIÓN: Columna real de descuento
+        var colDiscount = search.createColumn({ name: 'discountamount' });
         var colSatItemCode = search.createColumn({ name: 'custcol_mx_txn_line_sat_item_code' });
         var colTaxAmount = search.createColumn({ name: 'taxamount' });
         var colTaxRate = search.createColumn({ name: 'rate', join: 'taxitem' });
@@ -379,7 +343,6 @@ define([
             ]
         });
 
-        // 3. Mapeo Seguro
         salesSearch.run().each(function (result) {
             rawItems.push({
                 ticketNumber: result.getValue(colTranId),
@@ -395,26 +358,31 @@ define([
             });
             return true;
         });
-        //logger.write('RAW ITEMS EXTRAÍDOS DE CASH SALES', { count: rawItems.length, items: rawItems });
         return rawItems;
     }
 
     /**
      * Obtiene la fecha actual en formato ISO 8601 estricto para Facturama.
      * @private
+     * @returns {string} Fecha ISO sin milisegundos (ej. "2026-08-21T12:40:23").
      */
     function _getIsoDateString() {
         var d = new Date();
-        return d.toISOString().split('.')[0]; // Ej. "2026-08-21T12:40:23"
+        return d.toISOString().split('.')[0];
     }
 
     /**
      * Adjunta los archivos del File Cabinet y envía el correo de éxito.
      * @private
+     * @param {number|string} regId - ID del registro pivote de facturación.
+     * @param {number} xmlId - ID interno del archivo XML.
+     * @param {number} pdfId - ID interno del archivo PDF.
+     * @param {string} uuid - UUID fiscal del CFDI generado.
+     * @returns {void}
      */
     function _sendSuccessEmail(regId, xmlId, pdfId, uuid) {
         var customRecord = record.load({ type: 'customrecord_drt_reg_facturacion_interco', id: regId });
-        // En un entorno real, extraerías el correo del usuario que creó el registro o de una configuración
+        // En un entorno real se extraería el correo del usuario creador o de una configuración
         var userObj = runtime.getCurrentUser();
         var userEmail = userObj.email || 'operaciones@almetal.in'
         var recipients = [userEmail];
@@ -432,8 +400,12 @@ define([
     }
 
     /**
-     * Actualiza el registro personalizado para informar a la UI (Suitelet) del resultado final.
+     * Actualiza el registro pivote para informar a la UI (Suitelet) del resultado final.
      * @private
+     * @param {number|string} regId - ID del registro pivote de facturación.
+     * @param {Object} fileData - Metadatos de los archivos generados y UUID.
+     * @param {string} message - Mensaje de estado (actualmente no persistido).
+     * @returns {void}
      */
     function _updateCustomRecordStatus(regId, fileData, message) {
         var safeDate = _parsePacDate(fileData.date);
@@ -453,8 +425,12 @@ define([
     }
 
     /**
-     * Delegador de errores estándar (Compromise Recording).
+     * Registra un error de forma estandarizada a través del logger central.
      * @private
+     * @param {string} customMessage - Contexto de dónde ocurrió el fallo.
+     * @param {Error|Object} e - Excepción capturada.
+     * @param {Object} [contextData] - Estado relevante para reproducir el error.
+     * @returns {void}
      */
     function logError(customMessage, e, contextData) {
         var errorDetails = {
@@ -467,10 +443,10 @@ define([
     }
 
     /**
-     * Extrae el codigo del SAT de un objeto que contiene el codigo y la descripcion, separando por el caracter '-'.
-     * @param {object} lookupObj - Objeto que contiene el código y la descripción.
-     * @returns {string} El código extraído antes del primer guion.
+     * Extrae el código SAT de un objeto {text}, tomando la parte anterior al primer guion.
      * @private
+     * @param {Object} lookupObj - Objeto que contiene código y descripción.
+     * @returns {string} El código extraído.
      */
     function extractSatCode(lookupObj) {
         if (!lookupObj || lookupObj.length === 0) return '';
@@ -479,38 +455,34 @@ define([
     }
 
     /**
-     * Extrae, normaliza y formatea de forma segura una fecha capturada en la UI.
-     * Patrón: Anticorruption Layer - Aísla el motor JS de los formatos regionales impredecibles de NetSuite.
-     * 
+     * Extrae, normaliza y formatea una fecha capturada en la UI, aislándola de los formatos
+     * regionales impredecibles de NetSuite.
      * @private
-     * @param {string} rawDateStr - Cadena de texto proveniente de NetSuite (ej. "01/09/2026 6:00:00 pm").
-     * @returns {Object} Un objeto con el ISO formateado, el mes a dos dígitos y el año.
+     * @param {string} rawDateStr - Cadena proveniente de NetSuite (ej. "01/09/2026 6:00:00 pm").
+     * @returns {Object} Objeto con el ISO formateado, mes (2 dígitos) y año.
      */
     function _parseAndFormatSatDate(rawDateStr) {
-        var dateObj = new Date(); // Fallback seguro (Fecha actual del servidor)
+        var dateObj = new Date(); // Fallback seguro: fecha actual del servidor
 
         if (rawDateStr) {
             var cleanStr = rawDateStr.toLowerCase().trim();
-            // Detectamos si viene en el formato regional latino específico: "DD/MM/YYYY h:mm:ss am/pm"
             var isNetSuiteLatamFormat = /^\d{1,2}\/\d{1,2}\/\d{4}/.test(cleanStr);
 
             if (isNetSuiteLatamFormat) {
-                // 1. Desarmamos el string: ["01/09/2026", "6:00:00", "pm"]
+                // Formato regional latino: "DD/MM/YYYY h:mm:ss am/pm"
                 var parts = cleanStr.split(' ');
 
-                // 2. Extraemos Día, Mes, Año (Asumiendo formato DD/MM/YYYY de la cuenta)
                 var dateParts = parts[0].split('/');
                 var day = parseInt(dateParts[0], 10);
                 var month = parseInt(dateParts[1], 10) - 1; // JS indexa los meses de 0 a 11
                 var year = parseInt(dateParts[2], 10);
 
-                // 3. Extraemos Horas, Minutos, Segundos
                 var timeParts = parts[1] ? parts[1].split(':') : ['00', '00', '00'];
                 var hours = parseInt(timeParts[0], 10) || 0;
                 var minutes = parseInt(timeParts[1], 10) || 0;
                 var seconds = parseInt(timeParts[2], 10) || 0;
 
-                // 4. Conversión estricta a formato de 24 horas
+                // Conversión estricta a formato de 24 horas
                 var ampm = parts[2] ? parts[2].trim() : '';
                 if (ampm === 'pm' && hours < 12) {
                     hours += 12;
@@ -518,10 +490,9 @@ define([
                     hours = 0;
                 }
 
-                // Inyección estricta (Evita que JS adivine)
                 dateObj = new Date(year, month, day, hours, minutes, seconds);
             } else {
-                // Fallback por si el usuario cambia el formato de la cuenta a ISO nativo
+                // Fallback si la cuenta usa formato ISO nativo
                 var parsed = new Date(rawDateStr);
                 if (!isNaN(parsed.getTime())) {
                     dateObj = parsed;
@@ -529,7 +500,7 @@ define([
             }
         }
 
-        // 5. Reconstrucción manual exacta para el PAC (Sin depender de .toISOString)
+        // Reconstrucción manual exacta para el PAC (sin depender de .toISOString)
         var pad = function (n) { return n < 10 ? '0' + n : n; };
 
         var finalYear = dateObj.getFullYear().toString();
@@ -549,20 +520,17 @@ define([
     }
 
     /**
-     * Convierte la fecha del PAC a un objeto Date nativo de JS.
-     * Patrón: Boundary Protection - Aísla el motor JS de suposiciones de zona horaria.
-     * 
+     * Convierte la fecha del PAC a un objeto Date nativo, evitando suposiciones de zona horaria.
      * @private
      * @param {string} pacDateStr - Fecha retornada por el PAC (ej. "2018-02-27T10:46:19").
-     * @returns {Date} Objeto Date válido para la base de datos de NetSuite.
+     * @returns {Date} Objeto Date válido para NetSuite.
      */
     function _parsePacDate(pacDateStr) {
-        if (!pacDateStr) return new Date(); // Fail-Safe: Retorna la fecha actual si viene vacío
+        if (!pacDateStr) return new Date(); // Fallback: fecha actual si viene vacío
 
-        // 1. Separamos fecha y hora en el delimitador "T"
         var parts = pacDateStr.split('T');
-        var dateParts = parts[0].split('-'); // Resulta en ["2018", "02", "27"]
-        var timeParts = parts[1].split(':'); // Resulta en ["10", "46", "19"]
+        var dateParts = parts[0].split('-');
+        var timeParts = parts[1].split(':');
 
         var year = parseInt(dateParts[0], 10);
         var month = parseInt(dateParts[1], 10) - 1; // JS indexa los meses de 0 a 11
@@ -572,7 +540,7 @@ define([
         var minutes = parseInt(timeParts[1], 10) || 0;
         var seconds = parseInt(timeParts[2], 10) || 0;
 
-        // 2. Construcción segura: Instancia la fecha en el tiempo local exacto de los números provistos
+        // Instancia la fecha en el tiempo local exacto de los números provistos
         return new Date(year, month, day, hours, minutes, seconds);
     }
 
@@ -583,17 +551,3 @@ define([
         summarize: summarize
     };
 });
-/**
- * feat(global-invoice): implementar orquestador map/reduce completo con inyección de PDF y validaciones
- * Descripción (Body):
- * Se consolidó la arquitectura definitiva del Orquestador Map/Reduce para Facturación Global sustituyendo la topología monolítica anterior:
- * * 🔌 Parametrización Abierta (Open/Closed): Se inyectó el parámetro dinámico `PARAM_TEMPLATE_ID` (`custscript_sads_fama_pdf_template`), permitiendo a los administradores del sistema intercambiar la plantilla FreeMarker (PDF) de las facturas globales desde la UI sin modificar el código fuente.
- * * 🛡️ Adaptadores Seguros (Fail-Safe Defaults): Se integraron los adaptadores privados `_fetchCashSalesData` y `_extractMultiSelectIds` que garantizan la sanitización de los objetos extraídos del framework y una consulta optimizada y segura a la base de datos (Search) aislando la memoria.
- * * 📥 Manejo del Contexto Emisor: Se construyó la función `_getIssuerData` la cual realiza un *lookup* eficiente (1 Unidad) a la subsidiaria operativa para construir el nodo SAT Emisor de forma dinámica y precisa.
- * * 📬 Notificación Nativa (Observer Pattern): Se completó el motor de `_sendSuccessEmail`, cargando dinámicamente los registros *XML* y *PDF* creados por el módulo de archivos, transmitiéndolos eficientemente al usuario a través del cliente de correo interno de NetSuite.
- * * 🧩 Se implemento un submitfields por si el PAC responde con algun error.
- * * 🧪 Validación de Respuesta PAC: Se reforzó la verificación de la respuesta del PAC, asegurando que los campos `Complement` y `TaxStamp` estén presentes antes de proceder con la generación de archivos y actualización de registros.
- * * Implementacion de funcion `_parseAndFormatSatDate` para normalizar y formatear fechas provenientes de la UI, garantizando compatibilidad con el PAC y evitando errores de zona horaria.
- * * Implementacion de funcion `_parsePacDate` para convertir la fecha del PAC a un objeto Date nativo de JS, protegiendo el motor JS de suposiciones de zona horaria.
- * * 📝 Documentación Exhaustiva: Se añadieron comentarios detallados en cada función, describiendo su propósito, parámetros y comportamiento esperado, facilitando la comprensión y mantenimiento del código.
- */

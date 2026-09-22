@@ -1,14 +1,12 @@
 /**
  * @NApiVersion 2.0
  * @NModuleScope Public
- * * Módulo: Configuración y Autenticación (Repository Pattern / Infrastructure Adapter)
+ *
+ * Módulo: Configuración y autenticación del PAC por subsidiaria.
  */
 define(['N/search', 'N/encode'], function(search, encode) {
     'use strict';
 
-    // ==========================================
-    // 1. CONSTANTES 
-    // ==========================================
     var REC_TYPE = 'customrecord_sads_fama_config';
     
     var FLD = {
@@ -26,19 +24,13 @@ define(['N/search', 'N/encode'], function(search, encode) {
         FLD_ID_XML: 'custrecord_sads_fama_folderid_xml'
     };
 
-    // ==========================================
-    // 2. API PÚBLICA (Repositorio)
-    // ==========================================
-    
     /**
-     * Obtiene la configuración de Facturama desde la base de datos (NetSuite Custom Record) 
-     * para una subsidiaria específica.
-     * * @param {number|string} subsidiaryId - El ID interno de la subsidiaria.
-     * @returns {Object} Un objeto con las credenciales, URLs de API y mapeo de plantillas PDF.
-     * @throws {Error} Si no se proporciona el subsidiaryId, si no se encuentra un registro activo, o si faltan datos críticos.
+     * Obtiene la configuración de Facturama (Custom Record) para una subsidiaria específica.
+     * @param {number|string} subsidiaryId - ID interno de la subsidiaria.
+     * @returns {Object} Credenciales, URLs de API, IDs de carpeta y mapeo de plantillas PDF.
+     * @throws {Error} Si falta el subsidiaryId, no hay registro activo o faltan datos críticos.
      */
     function get(subsidiaryId) {
-        // Guard Clause (Falla rápido si el orquestador no envía subsidiaria)
         if (!subsidiaryId) {
             throw new Error('SubsidiaryId es obligatorio para obtener la configuración.');
         }
@@ -63,7 +55,6 @@ define(['N/search', 'N/encode'], function(search, encode) {
 
         var row = results[0];
 
-        // Extracción limpia usando nuestro diccionario de constantes
         var configData = {
             user: row.getValue(FLD.USER),
             pass: row.getValue(FLD.PASS),
@@ -80,21 +71,20 @@ define(['N/search', 'N/encode'], function(search, encode) {
             }
         };
 
-        // Fail-Safe Defaults: Validamos que los datos extraídos no sean un cascarón vacío
         _validateCriticalConfig(configData, subsidiaryId);
 
         return configData;
     }
 
     /**
-     * Genera las cabeceras HTTP de autorización (Basic Auth) requeridas para las peticiones a la API del PAC.
-     * * @param {string} user - El nombre de usuario de la cuenta de Facturama.
-     * @param {string} pass - La contraseña de la cuenta de Facturama.
-     * @returns {Object} Un objeto con las cabeceras 'Authorization' y 'Content-Type'.
-     * @throws {Error} Si las credenciales proporcionadas son nulas o indefinidas.
+     * Genera las cabeceras HTTP de autorización (Basic Auth) para las peticiones a la API del PAC.
+     * @param {string} user - Usuario de la cuenta de Facturama.
+     * @param {string} pass - Contraseña de la cuenta de Facturama.
+     * @returns {Object} Cabeceras 'Authorization' y 'Content-Type'.
+     * @throws {Error} Si las credenciales son nulas o indefinidas.
      */
     function getAuthHeaders(user, pass) {
-        // Prevención de inyección de valores 'undefined' en la codificación Base64
+        // Evita inyectar 'undefined' en la codificación Base64
         if (!user || !pass) {
             throw new Error('Credenciales incompletas. Imposible generar cabeceras de autorización HTTP.');
         }
@@ -111,17 +101,13 @@ define(['N/search', 'N/encode'], function(search, encode) {
         };
     }
 
-    // ==========================================
-    // 3. FUNCIONES PRIVADAS (Reglas de Negocio / Validaciones)
-    // ==========================================
-    
     /**
-     * Asegura que el objeto de configuración extraído contenga todos los campos vitales 
-     * para operar correctamente antes de entregarlo al orquestador.
-     * * @private
-     * @param {Object} config - El objeto de configuración mapeado desde la búsqueda de NetSuite.
-     * @param {number|string} subId - El ID de la subsidiaria (usado para inyectar contexto en el error).
+     * Verifica que la configuración extraída contenga todos los campos vitales antes de entregarla.
+     * @private
+     * @param {Object} config - Objeto de configuración mapeado desde la búsqueda.
+     * @param {number|string} subId - ID de la subsidiaria (contexto para el error).
      * @throws {Error} Si falta algún campo requerido (user, pass, apiPostUrl, apiGetUrl).
+     * @returns {void}
      */
     function _validateCriticalConfig(config, subId) {
         var missing = [];
@@ -132,7 +118,6 @@ define(['N/search', 'N/encode'], function(search, encode) {
         if (!config.apiGetUrl) missing.push('URL API Descarga XML');
 
         if (missing.length > 0) {
-            // Se propaga un error descriptivo que el orquestador registrará fácilmente
             throw new Error('La configuración para la subsidiaria (' + subId + ') está incompleta. Faltan los campos vitales: ' + missing.join(', '));
         }
     }

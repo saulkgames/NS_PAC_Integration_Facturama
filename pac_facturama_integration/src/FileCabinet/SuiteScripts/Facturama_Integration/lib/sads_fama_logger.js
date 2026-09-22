@@ -1,32 +1,26 @@
 /**
  * @NApiVersion 2.0
  * @NModuleScope Public
- * * Módulo: Logger Personalizado (Infraestructura / Adapter)
- * Patrones: Factory, Strategy (Serialización segura)
+ *
+ * Módulo: Logger centralizado. Persiste los logs en un Custom Record y desborda a archivo
+ * cuando el contenido excede el límite de texto.
  */
 define(['N/record', 'N/log', 'N/file'], function(record, log, file) {
     'use strict';
 
-    // ==========================================
-    // 1. CONSTANTES (Eliminación de Magic Strings)
-    // ==========================================
     var CONSTANTS = {
         RECORD_TYPE: 'customrecord_sads_fama_logger',
         FLD_TITLE: 'custrecord_sads_fama_log_title',
         FLD_MESSAGE: 'custrecord_sads_fama_log_message',
-        FOLDER_ID: -15, // TODO: Idealmente debería venir de sads_fama_config a futuro
+        FOLDER_ID: -15, // TODO: idealmente debería venir de sads_fama_config a futuro
         MAX_CHAR_LIMIT: 3900
     };
 
-    // ==========================================
-    // 2. API PÚBLICA (El Puerto de Entrada)
-    // ==========================================
-    
     /**
-     * Función principal de registro (logging) para depuración y auditoría de scripts.
-     * Intercepta mensajes largos y los convierte automáticamente en archivos adjuntos.
-     * * @param {string} title - El título del log (se truncará a 300 caracteres si excede el límite).
-     * @param {string|Object|null} messageData - El contenido a registrar. Puede ser una cadena de texto o un objeto complejo.
+     * Registra un mensaje para depuración y auditoría. Si el contenido excede el límite de
+     * caracteres, lo guarda como archivo adjunto y deja una referencia en el registro.
+     * @param {string} title - Título del log (se trunca a 300 caracteres).
+     * @param {string|Object|null} messageData - Contenido a registrar (texto u objeto).
      * @returns {void}
      */
     function write(title, messageData) {
@@ -37,7 +31,7 @@ define(['N/record', 'N/log', 'N/file'], function(record, log, file) {
             var fileId = null;
             var finalMessage = parsedMessage;
 
-            // Lógica de desbordamiento (Overflow Strategy)
+            // Desbordamiento a archivo cuando el mensaje excede el límite
             if (parsedMessage.length > CONSTANTS.MAX_CHAR_LIMIT) {
                 var isJsonObj = typeof messageData === 'object' && messageData !== null;
                 fileId = _createLogAttachment(safeTitle, parsedMessage, isJsonObj);
@@ -46,7 +40,6 @@ define(['N/record', 'N/log', 'N/file'], function(record, log, file) {
                                ' chars).\n\nSe ha generado un archivo adjunto con ID interno: ' + fileId;
             }
 
-            // Persistencia del Log
             var logInternalId = _createCustomRecord(safeTitle, finalMessage);
 
             if (fileId) {
@@ -54,8 +47,8 @@ define(['N/record', 'N/log', 'N/file'], function(record, log, file) {
             }
 
         } catch (e) {
-            // FALLBACK ABSOLUTO (Fail-Safe Defaults)
-            // Si todo falla, no podemos dejar de registrar el error crítico. Usamos el log nativo de NetSuite.
+            // Fallback absoluto: si el logger custom falla, no se puede perder el error crítico,
+            // así que se delega al log nativo de NetSuite.
             var errorStack = e.stack || (typeof e.getStackTrace === 'function' ? e.getStackTrace().join('\n') : 'Sin stack trace');
             log.error({
                 title: 'CRÍTICO: Fallo en Custom Logger (' + (title || 'Sin Título') + ')',
@@ -64,26 +57,22 @@ define(['N/record', 'N/log', 'N/file'], function(record, log, file) {
         }
     }
 
-    // ==========================================
-    // 3. FUNCIONES PRIVADAS (Principio de Responsabilidad Única - SRP)
-    // ==========================================
-
     /**
-     * Sanitiza el título del log para asegurar que cumpla con los límites de la base de datos.
-     * * @private
-     * @param {string} title - El título original enviado al logger.
-     * @returns {string} El título sanitizado y truncado a un máximo de 300 caracteres.
+     * Sanitiza el título para que cumpla con los límites de la base de datos.
+     * @private
+     * @param {string} title - Título original enviado al logger.
+     * @returns {string} Título sanitizado y truncado a 300 caracteres.
      */
     function _sanitizeTitle(title) {
         return (title || 'Log sin título').substring(0, 300);
     }
 
     /**
-     * Serializador Seguro: Previene colapsos (TypeError) causados por Referencias Circulares 
-     * comunes en objetos nativos de JS o NetSuite.
-     * * @private
-     * @param {*} data - Cualquier tipo de dato que se intente registrar.
-     * @returns {string} Una representación segura en cadena del dato proporcionado.
+     * Serializa de forma segura, previniendo colapsos por referencias circulares comunes en
+     * objetos nativos de JS o NetSuite.
+     * @private
+     * @param {*} data - Cualquier dato que se intente registrar.
+     * @returns {string} Representación segura en cadena del dato.
      */
     function _safeStringify(data) {
         if (data === null) return 'null';
@@ -91,33 +80,31 @@ define(['N/record', 'N/log', 'N/file'], function(record, log, file) {
         if (typeof data !== 'object') return String(data);
 
         try {
-            // Patrón de Caché para detectar referencias circulares
+            // Caché para detectar referencias circulares
             var cache = [];
             var result = JSON.stringify(data, function(key, value) {
                 if (typeof value === 'object' && value !== null) {
                     if (cache.indexOf(value) !== -1) {
-                        // En lugar de crashear, advertimos la estructura circular
                         return '[Referencia Circular Detectada]';
                     }
                     cache.push(value);
                 }
                 return value;
             }, 2);
-            cache = null; // Garbage Collection amigable
+            cache = null;
             return result;
         } catch (e) {
-            // Degradación elegante: Si aún así falla, devolvemos lo que podamos
             return 'Objeto no parseable (Fallo de serialización estricta): ' + e.message;
         }
     }
 
     /**
-     * Crea un archivo físico en el File Cabinet de NetSuite cuando el log excede el límite de texto.
-     * * @private
-     * @param {string} title - El título base para nombrar el archivo.
-     * @param {string} content - El contenido extenso a guardar.
-     * @param {boolean} isJson - Indica si el contenido debe guardarse con extensión .json o .txt.
-     * @returns {number} El ID interno del archivo generado.
+     * Crea un archivo en el File Cabinet cuando el log excede el límite de texto.
+     * @private
+     * @param {string} title - Título base para nombrar el archivo.
+     * @param {string} content - Contenido extenso a guardar.
+     * @param {boolean} isJson - Indica si se guarda con extensión .json o .txt.
+     * @returns {number} ID interno del archivo generado.
      */
     function _createLogAttachment(title, content, isJson) {
         var timestamp = new Date().getTime();
@@ -136,11 +123,11 @@ define(['N/record', 'N/log', 'N/file'], function(record, log, file) {
     }
 
     /**
-     * Genera el registro personalizado en la base de datos de NetSuite para indexar el log.
-     * * @private
-     * @param {string} title - El título sanitizado del log.
-     * @param {string} message - El mensaje o el aviso de desbordamiento (overflow).
-     * @returns {number} El ID interno del Custom Record creado.
+     * Crea el Custom Record que indexa el log en la base de datos.
+     * @private
+     * @param {string} title - Título sanitizado del log.
+     * @param {string} message - Mensaje o aviso de desbordamiento.
+     * @returns {number} ID interno del Custom Record creado.
      */
     function _createCustomRecord(title, message) {
         var logRecord = record.create({ type: CONSTANTS.RECORD_TYPE });
@@ -151,10 +138,10 @@ define(['N/record', 'N/log', 'N/file'], function(record, log, file) {
     }
 
     /**
-     * Vincula (attach) un archivo del File Cabinet al registro personalizado del log para fácil acceso.
-     * * @private
-     * @param {number} fileId - El ID interno del archivo generado.
-     * @param {number} logId - El ID interno del registro personalizado (Custom Record).
+     * Vincula un archivo del File Cabinet al Custom Record del log.
+     * @private
+     * @param {number} fileId - ID interno del archivo generado.
+     * @param {number} logId - ID interno del Custom Record.
      * @returns {void}
      */
     function _attachFile(fileId, logId) {
@@ -166,12 +153,3 @@ define(['N/record', 'N/log', 'N/file'], function(record, log, file) {
 
     return { write: write };
 });
-/**
- * refactor(logger): aplicar SRP, serialización segura y agregar documentación JSDoc
- * Descripción (Body):
- * Se refactorizó el adaptador de infraestructura sads_fama_logger.js para incrementar su robustez y mantenibilidad, aplicando principios SOLID y de diseño seguro:
- * * 🛡️ Diseño Fail-Safe (_safeStringify): Se mitigó un riesgo crítico donde JSON.stringify causaba un colapso del sistema al intentar serializar objetos con referencias circulares. Se implementó una caché interna que neutraliza el error registrando un [Referencia Circular Detectada].
- * * 🧹 Clean Code (SRP): Se descompuso la función write en métodos privados atómicos (_createLogAttachment, _createCustomRecord, _attachFile), aislando las responsabilidades (File System vs. Database Records).
- * * ⚙️ Mejora del Fallback: En caso de fallo total del custom logger (ej. límite de cuota en el File Cabinet), la excepción delegada al sistema nativo (log.error) ahora captura correctamente el stack trace y contexto para evitar la pérdida del Compromise Recording.
- * * 📚 Documentación (JSDoc): Se añadieron etiquetas de documentación estándar JSDoc a todas las funciones de la API pública y soporte interno, definiendo tipos, parámetros, y retornos esperados, facilitando el mantenimiento y habilitando el IntelliSense en los IDEs.
- */

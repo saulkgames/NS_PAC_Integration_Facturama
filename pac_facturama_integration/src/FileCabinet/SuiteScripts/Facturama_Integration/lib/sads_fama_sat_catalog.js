@@ -9,9 +9,6 @@
 define(['N/search'], function (search) {
     'use strict';
 
-    // ==========================================
-    // 1. CONSTANTES
-    // ==========================================
     var PPD_LIST_VALUE = '4';
     var PPD_TEXT_PREFIX = 'PPD';
 
@@ -24,10 +21,6 @@ define(['N/search'], function (search) {
         NO_OBJETO: '01',
         SI_OBJETO: '02'
     };
-
-    // ==========================================
-    // 2. API PÚBLICA
-    // ==========================================
 
     /**
      * Determina si el Método de Pago SAT de una factura es PPD (Pago en Parcialidades o Diferido).

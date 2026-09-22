@@ -1,14 +1,12 @@
 /**
  * @NApiVersion 2.0
  * @NModuleScope Public
- * * Módulo: Gestor de Archivos y Renderizado (File System Adapter)
+ *
+ * Módulo: Gestor de archivos del File Cabinet y renderizado de PDF certificado.
  */
 define(['N/file', 'N/encode', 'N/render', './sads_fama_logger'], function (file, encode, render, logger) {
     'use strict';
 
-    // ==========================================
-    // 1. CONSTANTES (Clean Code: Evitar Magic Numbers)
-    // ==========================================
     var CONSTANTS = {
         TARGET_FOLDER_ID: 412704, // Carpeta de Attachments por defecto
         DATA_SOURCE_ALIAS: 'custom',
@@ -17,17 +15,14 @@ define(['N/file', 'N/encode', 'N/render', './sads_fama_logger'], function (file,
 
     };
 
-    // ==========================================
-    // 2. API PÚBLICA (Puertos de Salida)
-    // ==========================================
-
     /**
-     * Decodifica una cadena Base64 a UTF-8 y guarda el resultado como un archivo XML, PDF o JSON en el File Cabinet.
-     * Implementa un Patrón de Seguridad Fail-Safe Defaults (Falla rápido si los datos son inválidos o corruptos).
-     * @param {string} fileName - El nombre que se le asignará al archivo en NetSuite.
-     * @param {string} baseContent - El contenido del archivo.
-     * @returns {number} El ID interno (internalid) del archivo guardado en el File Cabinet.
-     * @throws {Error} Si el contenido Base64 está vacío o si falla la decodificación nativa del motor de NetSuite.
+     * Decodifica el contenido y lo guarda como archivo XML, PDF o JSON en el File Cabinet.
+     * El tipo se determina por la extensión del nombre de archivo.
+     * @param {string} fileName - Nombre del archivo en NetSuite (define el tipo por su extensión).
+     * @param {string|Object} baseContent - Contenido del archivo (Base64 para XML, objeto para JSON).
+     * @param {number|string} [targetFolderId] - Carpeta destino; usa CONSTANTS.TARGET_FOLDER_ID si se omite.
+     * @returns {number} ID interno del archivo guardado.
+     * @throws {Error} Si faltan parámetros, el tipo no está soportado o falla la decodificación.
      */
     function saveFile(fileName, baseContent, targetFolderId) {
         var nsFileType;
@@ -37,7 +32,6 @@ define(['N/file', 'N/encode', 'N/render', './sads_fama_logger'], function (file,
         var isXML = fileName.toLowerCase().indexOf('.xml') !== -1;
         var isJSON = fileName.toLowerCase().indexOf('.json') !== -1;
 
-        // Validación de parámetros críticos
         if (!fileName) {
             throw new Error('El nombre del archivo (fileName) es obligatorio para guardar el archivo.');
         }
@@ -83,19 +77,21 @@ define(['N/file', 'N/encode', 'N/render', './sads_fama_logger'], function (file,
             return newFile.save();
         } catch (error) {
             logError('Fallo al guardar docuemnto', error, { fileName: fileName });
-            throw error; // Propagamos al orquestador para que aborte la transacción
+            throw error; // Se propaga al orquestador para que aborte la transacción
         }
     }
 
     /**
-     * Renderiza un PDF de la transacción uniendo los datos estándar de NetSuite y los datos fiscales del PAC.
-     * @param {Object} txnRecord - El objeto record de la transacción principal cargada (ej. Invoice).
-     * @param {Object|null} customerRecord - El objeto record del cliente cargado (opcional).
-     * @param {number|string} pdfTemplateId - El ID interno de la plantilla avanzada de PDF/HTML (FreeMarker/BFO).
-     * @param {Object} extraFields - Objeto con la metadata extraída del XML (UUID, cadena original, sellos, etc.).
-     * @param {string} fileName - El nombre que se le asignará al archivo PDF generado.
-     * @returns {number} El ID interno (internalid) del archivo PDF guardado en el File Cabinet.
-     * @throws {Error} Si faltan parámetros obligatorios o si el motor de renderizado falla por plantillas mal formadas.
+     * Renderiza un PDF de la transacción combinando los datos estándar de NetSuite y los datos
+     * fiscales del PAC.
+     * @param {Object} txnRecord - Record de la transacción principal cargada (ej. Invoice).
+     * @param {Object|null} customerRecord - Record del cliente cargado (opcional).
+     * @param {number|string} pdfTemplateId - ID interno de la plantilla avanzada de PDF/HTML.
+     * @param {Object} extraFields - Metadata extraída del XML (UUID, cadena original, sellos, etc.).
+     * @param {string} fileName - Nombre del archivo PDF generado.
+     * @param {number|string} [targetFolderId] - Carpeta destino; usa CONSTANTS.TARGET_FOLDER_ID si se omite.
+     * @returns {number} ID interno del archivo PDF guardado.
+     * @throws {Error} Si faltan parámetros obligatorios o falla el motor de renderizado.
      */
     function generateCertifiedPdf(txnRecord, customerRecord, pdfTemplateId, extraFields, fileName, targetFolderId) {
         try {
@@ -106,14 +102,12 @@ define(['N/file', 'N/encode', 'N/render', './sads_fama_logger'], function (file,
             var renderer = render.create();
             renderer.setTemplateById({ id: pdfTemplateId });
 
-            // Inyección de registros estándar de NetSuite
             renderer.addRecord({ templateName: CONSTANTS.TEMPLATE_RECORD, record: txnRecord });
 
             if (customerRecord) {
                 renderer.addRecord({ templateName: CONSTANTS.TEMPLATE_CUSTOMER, record: customerRecord });
             }
 
-            // Inyección de Datos Custom (Datos del PAC / CFDI)
             var customData = {
                 certData: extraFields || {}
             };
@@ -132,26 +126,21 @@ define(['N/file', 'N/encode', 'N/render', './sads_fama_logger'], function (file,
             return pdfFile.save();
 
         } catch (error) {
-            // Compromise Recording: Guardamos el contexto exacto de qué plantilla y registro falló
             logError('Fallo al generar PDF Certificado', error, {
                 fileName: fileName,
                 templateId: pdfTemplateId,
                 transactionId: txnRecord ? txnRecord.id : 'N/A'
             });
-            throw error; // Propagamos al orquestador
+            throw error; // Se propaga al orquestador
         }
     }
 
-    // ==========================================
-    // 3. FUNCIONES PRIVADAS (Soporte)
-    // ==========================================
-
     /**
-     * Estandariza la captura de errores delegando al Logger Central (Compromise Recording).
-     * * @private
-     * @param {string} customMessage - Mensaje contextual indicando en qué paso falló el sistema.
-     * @param {Error|Object} e - El objeto de error interceptado.
-     * @param {Object} [contextData] - Datos adicionales de contexto para facilitar el rastro de la auditoría.
+     * Estandariza la captura de errores delegando al logger central.
+     * @private
+     * @param {string} customMessage - Contexto de dónde ocurrió el fallo.
+     * @param {Error|Object} e - Objeto de error interceptado.
+     * @param {Object} [contextData] - Datos adicionales de contexto para la auditoría.
      * @returns {void}
      */
     function logError(customMessage, e, contextData) {
@@ -169,12 +158,3 @@ define(['N/file', 'N/encode', 'N/render', './sads_fama_logger'], function (file,
         generateCertifiedPdf: generateCertifiedPdf
     };
 });
-/**
- * refactor(file-adapter): aplicar fail-safe defaults, blindar renderizado de PDF y agregar JSDoc
- * Descripción (Body):
- * Se refactorizó el adaptador de infraestructura sads_fama_files.js para interactuar de forma segura con el File Cabinet y el motor de renderizado:
- * * 🛡️ Fail-Safe Defaults: Se eliminó un comportamiento peligroso en saveFile que permitía guardar cadenas Base64 crudas con extensión .xml en caso de fallar la decodificación UTF-8. Ahora aborta la operación y propaga el error (Fail Fast).
- * * 🩺 Compromise Recording: Se integró el módulo central de logging (sads_fama_logger.js). Se añadieron bloques try/catch a la generación del PDF para atrapar excepciones del motor FreeMarker, registrando el ID de la plantilla y de la transacción para facilitar auditorías.
- * * 🧹 Clean Code: Se encapsularon los "Magic Numbers/Strings" (IDs de carpetas y alias de plantillas) en un diccionario CONSTANTS para documentar la intención de las variables.
- * * 📚 Documentación (JSDoc): Se incorporaron firmas de funciones estandarizadas en JSDoc para facilitar la lectura del código por otros desarrolladores e inicializar el soporte de IntelliSense en los IDEs, documentando parámetros esperados y tipos de retorno para las operaciones del sistema de archivos.
- */

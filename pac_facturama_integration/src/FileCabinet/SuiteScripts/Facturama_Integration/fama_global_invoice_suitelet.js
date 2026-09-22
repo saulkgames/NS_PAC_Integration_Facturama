@@ -2,13 +2,10 @@
  * @NApiVersion 2.x
  * @NScriptType Suitelet
  * @NModuleScope Public
- * 
- * SADS Facturama - Adaptador de Entrada (Driving Adapter / UI)
- * 
- * Arquitectura: Hexagonal (Ports and Adapters)
- * Descripción: Interfaz de usuario para la Facturación Global. Recolecta la intención 
- * del usuario, persiste los datos en un DTO (Custom Record) y delega la ejecución 
- * asíncrona al Orquestador (Map/Reduce) cumpliendo el Principio de Responsabilidad Única.
+ *
+ * SADS Facturama - Interfaz de usuario de Facturación Global.
+ * Recolecta la selección del usuario, la persiste en un Custom Record y delega la
+ * ejecución asíncrona al orquestador Map/Reduce.
  */
 define([
     'N/ui/serverWidget', 
@@ -23,9 +20,6 @@ define([
 ], function (ui, runtime, error, task, redirect, message, record, search, lib) {
     'use strict';
 
-    // ==========================================
-    // 1. CONSTANTES DEL SISTEMA (Clean Code)
-    // ==========================================
     var CONSTANTS = {
         RECORDS: {
             CFDI_USAGE: 'customrecord_mx_sat_cfdi_usage',
@@ -41,13 +35,11 @@ define([
         }
     };
 
-    // ==========================================
-    // 2. MÉTODOS DE LA INTERFAZ DE USUARIO
-    // ==========================================
-
     /**
-     * Construye y renderiza el formulario visual para el usuario (Fase GET).
-     * @param {Object} context - El contexto inyectado por el framework de NetSuite.
+     * Construye y renderiza el formulario visual para el usuario (fase GET).
+     * @private
+     * @param {Object} context - Contexto inyectado por el framework de NetSuite.
+     * @returns {void}
      */
     function createForm(context) {
         var oScript = context.request.parameters;
@@ -58,7 +50,7 @@ define([
             title: oLabels.form
         });
 
-        // 1. Manejo de Mensajes de Estado (UX)
+        // Mensajes de estado
         if (oScript.custparam_message === 'processed') {
             form.addPageInitMessage({
                 type: message.Type.INFORMATION,
@@ -73,20 +65,17 @@ define([
             });
         }
 
-        // 2. Enlace al Script de Cliente (Client Script)
+        // Enlace al Client Script
         var scriptId = lib.getFilebyName('fama_global_invoice_client.js');
         if (scriptId) {
             form.clientScriptFileId = scriptId;
         }
 
-        // 3. Construcción de Campos del Formulario
         _buildFormFields(form, oScript, oLabels);
 
-        // 4. Construcción y Llenado de la Sublista de Transacciones
         var sublist = _buildSublist(form, oLabels);
         _populateSublist(sublist, oScript);
 
-        // 5. Botones de Acción
         var strFuncName = 'reloadForm("' + (oScript.script || '') + '","' + (oScript.deploy || '') + '")';
         form.addButton({
             id: 'custpage_search',
@@ -101,13 +90,10 @@ define([
         context.response.writePage(form);
     }
 
-    // ==========================================
-    // 3. CONTROLADOR DE PETICIONES (API Entry Point)
-    // ==========================================
-
     /**
-     * Punto de entrada principal del Suitelet. Enruta la petición según el verbo HTTP.
-     * @param {Object} context - Objeto de contexto de la petición y respuesta.
+     * Punto de entrada del Suitelet. Enruta la petición según el verbo HTTP.
+     * @param {Object} context - Contexto de la petición y la respuesta.
+     * @returns {void}
      */
     function onRequest(context) {
         if (context.request.method === 'GET') {
@@ -117,20 +103,17 @@ define([
         }
     }
 
-    // ==========================================
-    // 4. FUNCIONES PRIVADAS (Responsabilidad Única - SRP)
-    // ==========================================
-
     /**
-     * Procesa el envío del formulario, guarda el estado y dispara el Orquestador.
+     * Procesa el envío del formulario, guarda el estado y dispara el orquestador Map/Reduce.
      * @private
-     * @param {Object} obj - Los parámetros capturados desde la petición POST.
+     * @param {Object} obj - Parámetros capturados desde la petición POST.
+     * @returns {void}
      */
     function _handlePostRequest(obj) {
         var recIdFacturacion = null;
 
         try {
-            // 1. Validar y Persistir la intención del usuario (Crear el Custom Record)
+            // 1. Validar y persistir la intención del usuario (crear el Custom Record)
             if (obj.custpage_arreglo) {
                 var customRecFacturacion = record.create({
                     type: CONSTANTS.RECORDS.INTERCO_INVOICE,
@@ -156,7 +139,7 @@ define([
                 log.audit("Registro Pivote Creado", "ID: " + recIdFacturacion);
             }
 
-            // 2. Invocar el Orquestador (Mediator) mediante Arquitectura Desacoplada (KISS)
+            // 2. Invocar el orquestador Map/Reduce
             var scriptTask = task.create({
                 taskType: task.TaskType.MAP_REDUCE
             });
@@ -164,7 +147,7 @@ define([
             scriptTask.scriptId = CONSTANTS.ORCHESTRATOR.SCRIPT_ID;
             scriptTask.deploymentId = CONSTANTS.ORCHESTRATOR.DEPLOY_ID;
             
-            // Inyección exclusiva de la "Llave Maestra" al Orquestador
+            // Única llave pivote transmitida al orquestador
             scriptTask.params = {
                 'custscript_sads_fama_reg_fact_id': recIdFacturacion
             };
@@ -172,7 +155,7 @@ define([
             var scriptTaskId = scriptTask.submit();
             log.audit("Orquestador Invocado Exitosamente", "Task ID: " + scriptTaskId);
 
-            // 3. Redirección y Notificación al Usuario
+            // 3. Redirección y notificación al usuario
             if (recIdFacturacion) {
                 redirect.toSuitelet({
                     scriptId: 'customscript_fama_global_invoice_sl',
@@ -191,7 +174,6 @@ define([
             }
 
         } catch (err) {
-            // 🛡️ Compromise Recording: Extracción segura de errores y prevención de objetos vacíos
             var errorDetails = err.stack ? err.stack : (err.message || err.toString());
             log.error({ title: 'Fallo al invocar Map/Reduce', details: errorDetails });
             throw error.create({ 
@@ -204,6 +186,10 @@ define([
     /**
      * Construye dinámicamente los campos del formulario.
      * @private
+     * @param {Object} form - Formulario del Suitelet.
+     * @param {Object} params - Parámetros de la petición (valores por defecto).
+     * @param {Object} oLabels - Diccionario de etiquetas traducidas.
+     * @returns {void}
      */
     function _buildFormFields(form, params, oLabels) {
         form.addField({ id: 'custpage_dateini', type: ui.FieldType.DATE, label: oLabels.label5 })
@@ -255,8 +241,11 @@ define([
     }
 
     /**
-     * Define la estructura de columnas de la sublista.
+     * Define la estructura de columnas de la sublista de transacciones.
      * @private
+     * @param {Object} form - Formulario del Suitelet.
+     * @param {Object} oLabels - Diccionario de etiquetas traducidas.
+     * @returns {Object} La sublista creada.
      */
     function _buildSublist(form, oLabels) {
         var sublist = form.addSublist({
@@ -280,8 +269,11 @@ define([
     }
 
     /**
-     * Extrae los datos desde la librería y los inyecta en la sublista.
+     * Extrae las transacciones desde la librería y las inyecta en la sublista.
      * @private
+     * @param {Object} sublist - Sublista a poblar.
+     * @param {Object} params - Parámetros de filtro capturados en la UI.
+     * @returns {void}
      */
     function _populateSublist(sublist, params) {
         try {
@@ -315,12 +307,3 @@ define([
         onRequest: onRequest
     };
 });
-/**
- * refactor(ui-adapter): optimizar legibilidad, erradicar código muerto e integrar orquestador map/reduce
- * Descripción (Body):
- * Se reestructuró el adaptador de entrada (Suitelet) aplicando principios de Clean Code y Hexagonal Architecture:
- * * 🧹 Erradicación de Deuda Técnica: Se eliminaron extensos bloques de código comentado y constantes huérfanas de despliegues obsoletos (DRY y KISS), mejorando drásticamente la legibilidad del archivo.
- * * 🏗️ Modularización SRP: Se descompuso la función monolítica `createForm` en submétodos semánticos privados (`_buildFormFields`, `_buildSublist`, `_populateSublist`), delegando las responsabilidades de construcción visual y extracción de datos.
- * * 🛡️ Inversión de Control (IoC): Se sustituyó el obsoleto enrutamiento al `Scheduled Script` por la instanciación de la nueva topología `Map/Reduce`, reduciendo el acoplamiento al transmitir una única llave pivote (`custscript_sads_fama_reg_fact_id`).
- * * 🩺 Fail-Safe Logging: Se blindó la captura de excepciones en el bloque POST, garantizando la extracción del `stack trace` nativo del entorno para prevenir silenciamientos por fallos de serialización de objetos de error vacíos.
- */

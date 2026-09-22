@@ -1,16 +1,12 @@
 /**
  * @NApiVersion 2.0
  * @NModuleScope Public
- * 
- * Módulo: Mapeador de Factura Global (Domain Layer / Core)
- * Responsabilidad: Construir el payload JSON exacto para Facturama CFDI 4.0 Global
+ *
+ * Módulo: Mapeador de Factura Global. Construye el payload JSON exacto para Facturama CFDI 4.0.
  */
 define([], function () {
     'use strict';
 
-    // ==========================================
-    // 1. CONSTANTES DEL DOMINIO SAT (Globales 4.0)
-    // ==========================================
     var SAT_GLOBAL = {
         RFC: 'XAXX010101000',
         NAME: 'PUBLICO EN GENERAL',
@@ -18,15 +14,12 @@ define([], function () {
         REGIME: '616'
     };
 
-    // ==========================================
-    // 2. API PÚBLICA
-    // ==========================================
-
     /**
      * Construye el JSON final para enviar a Facturama respetando estrictamente su esquema.
-     * @param {Object} ctx - Metadatos de la cabecera (Periodicidad, Meses, Año, Configuración de Subsidiaria).
-     * @param {Array} rawItems - Arreglo de líneas/tickets obtenidos de NetSuite.
+     * @param {Object} ctx - Metadatos de cabecera (periodicidad, meses, año, datos del emisor).
+     * @param {Array} rawItems - Líneas/tickets obtenidos de NetSuite.
      * @returns {Object} Payload JSON listo para la petición HTTP.
+     * @throws {Error} Si no se proporcionan datos suficientes.
      */
     function buildFacturamaPayload(ctx, rawItems) {
         if (!ctx || !rawItems || rawItems.length === 0) {
@@ -68,29 +61,19 @@ define([], function () {
         return payload;
     }
 
-    // ==========================================
-    // 3. FUNCIONES PRIVADAS (Transformación de Datos)
-    // ==========================================
-
     /**
-      * Mapeador puro (Adaptador de Salida). 
-      * Su única responsabilidad es ensamblar el JSON requerido por Facturama.
-      * 
-      * @param {Array} rawItems - Arreglo de líneas obtenidas de NetSuite.
-      * @returns {Array} Arreglo de objetos 'Item' listos para el payload.
-      * @private
-      */
+     * Ensambla el arreglo de nodos 'Item' requerido por Facturama a partir de las líneas de NetSuite.
+     * @private
+     * @param {Array} rawItems - Líneas obtenidas de NetSuite.
+     * @returns {Array} Objetos 'Item' listos para el payload.
+     */
     function _buildItems(rawItems) {
         var items = [];
 
         for (var i = 0; i < rawItems.length; i++) {
-            // 1. Sanitización
             var cleanData = _sanitizeRowData(rawItems[i]);
-
-            // 2. Ejecución de Reglas de Negocio (Dominio)
             var fiscalData = _calculateFiscalValues(cleanData);
 
-            // 3. Mapeo estricto del contrato (JSON)
             var itemNode = {
                 "ProductCode": "01010101",
                 "IdentificationNumber": cleanData.ticketNumber + "-" + cleanData.itemDescription,
@@ -122,12 +105,10 @@ define([], function () {
     }
 
     /**
-     * Filtro de Frontera (Anticorruption Layer).
-     * Extrae, parsea y protege contra valores nulos o indefinidos del ERP.
-     * 
+     * Extrae, parsea y protege contra valores nulos o indefinidos provenientes del ERP.
+     * @private
      * @param {Object} row - Fila cruda de NetSuite.
      * @returns {Object} Diccionario con datos limpios y tipados.
-     * @private
      */
     function _sanitizeRowData(row) {
         var rawTaxRate = parseFloat(row.taxrate) || 0;
@@ -146,11 +127,13 @@ define([], function () {
     }
 
     /**
-     * Motor de Cálculo de Dominio (Top-Down Reverse Engineering).
-     * Aplica el Patrón Estrategia y Fail-Fast para garantizar la invariante del SAT.
-     * @param {Object} data - Diccionario de datos sanitizados.
-     * @returns {Object} Nodos financieros perfectamente cuadrados para el PAC.
+     * Calcula base, impuesto, subtotal y total de la línea garantizando la invariante del SAT.
+     * Si la matemática del ERP ya cuadra, se usa tal cual; si el ERP redondeó, se recalcula desde
+     * el total. Si la discrepancia de impuesto supera la tolerancia, falla rápido (registro corrupto).
      * @private
+     * @param {Object} data - Diccionario de datos sanitizados.
+     * @returns {Object} Nodos financieros cuadrados para el PAC.
+     * @throws {Error} Si la discrepancia entre el impuesto del ERP y el calculado es insalvable.
      */
     function _calculateFiscalValues(data) {
         var TOLERANCIA_MAXIMA = 0.05;
@@ -201,12 +184,12 @@ define([], function () {
     }
 
     /**
-     * Utilidad para evitar errores de precisión de punto flotante nativos de JavaScript.
-     * (Ej. Evita que 0.1 + 0.2 retorne 0.30000000000000004)
+     * Redondea evitando los errores de precisión de punto flotante nativos de JavaScript
+     * (ej. evita que 0.1 + 0.2 retorne 0.30000000000000004).
+     * @private
      * @param {number} num - Número a redondear.
      * @param {number} decimals - Cantidad de decimales deseada.
-     * @returns {number} Número redondeado a la cantidad de decimales especificada.
-     * @private
+     * @returns {number} Número redondeado.
      */
     function _round(num, decimals) {
         var multiplier = Math.pow(10, decimals);
@@ -217,5 +200,3 @@ define([], function () {
         buildFacturamaPayload: buildFacturamaPayload
     };
 });
-// Correcion de decimales, redondeados a 6 decimales para cumplir con el esquema de Facturama CFDI 4.0 Global, evitando errores de validación en la API de Facturama.
-// Agregada estrategia para impuesto y subtotal basado en el total cuando el erp redondee los montos y genere discrepancias matemáticas. Se implementa un patrón de Fail-Fast para detectar inconsistencias graves en los registros contables.

@@ -20,7 +20,9 @@ define([
     };
 
     /**
-     * @param {Object} context
+     * Tras crear/editar la factura, calcula y persiste el ObjetoImp SAT a nivel cabecera.
+     * @param {Object} context - Contexto del User Event.
+     * @returns {void}
      */
     function afterSubmit(context) {
         if (context.type !== context.UserEventType.CREATE && context.type !== context.UserEventType.EDIT) {

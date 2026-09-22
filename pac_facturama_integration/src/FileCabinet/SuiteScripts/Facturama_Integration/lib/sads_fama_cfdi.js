@@ -1,15 +1,12 @@
 /**
  * @NApiVersion 2.0
  * @NModuleScope Public
- * 
- * Módulo: Constructor de Campos Fiscales
+ *
+ * Módulo: Constructor de los campos fiscales del CFDI timbrado.
  */
 define(['N/encode', 'N/xml', './sads_fama_logger'], function (encode, xml, logger) {
     'use strict';
 
-    // ==========================================
-    // 1. CONSTANTES (Evitar Magic Strings - Clean Code)
-    // ==========================================
     var FIELDS = {
         EDOC_CERTIFIED: 'custbody_psg_ei_certified_edoc',
         UUID: 'custbody_mx_cfdi_uuid',
@@ -26,26 +23,21 @@ define(['N/encode', 'N/xml', './sads_fama_logger'], function (encode, xml, logge
 
     };
 
-    // ==========================================
-    // 2. API PÚBLICA (Hexagonal Architecture: Puertos)
-    // ==========================================
     /**
-     * Funcion principal del modulo CFDI. Construye un objeto que sera enviado al plugIn Type para concluir con el proceso de actualizacion de campos 
-     *  que corresponden al CFDI timbrado.
-     * @param {Object} originalPayload - PlugInContext || Transaccion Record Data
-     * @param {Object} facturamaData - PAC Response Body Parsed
-     * @param {Number} xmlFileId - El id interno del archivo XML guardado en el File Cabinet
-     * @param {Number} cfdiId - El id interno de la transacción en el servidor del PAC
-     * @param {String} xmlContent - El contenido del archivo XML en Base64 (opcional, solo si se requiere extraer el NoCertificado)
-     * @returns {object} - Un objeto con los campos fiscales listos para actualizar en la transacción
-     * 
-     * Nota: Se implementa un control de retorno seguro. Si ocurre un error en la construcción de los campos, se loguea el error y se devuelve lo que se haya podido mapear.
+     * Construye el objeto con los campos fiscales del CFDI timbrado para actualizar la transacción.
+     * Si ocurre un error, se registra y se devuelve lo que se haya logrado mapear para no
+     * interrumpir el flujo del llamador.
+     * @param {Object} originalPayload - Payload original (PlugInContext o datos de la transacción).
+     * @param {Object} facturamaData - Cuerpo de la respuesta del PAC ya parseado.
+     * @param {number} xmlFileId - ID interno del archivo XML guardado en el File Cabinet.
+     * @param {number} cfdiId - ID interno de la transacción en el servidor del PAC.
+     * @param {string} [xmlContent] - Contenido del XML en Base64 (para extraer el NoCertificado).
+     * @returns {Object} Campos fiscales listos para actualizar en la transacción.
      */
     function buildExtraFields(originalPayload, facturamaData, xmlFileId, cfdiId, xmlContent) {
         logger.write('Funcion buildExtraFields en ejecucion', { cfdiId: cfdiId });
 
-        // Inicializamos fields desde el principio. Si algo falla a la mitad, 
-        // devolveremos lo que hayamos logrado construir (Cumpliendo tu requerimiento de retorno)
+        // Se inicializa vacío para poder devolver lo construido si algo falla a mitad del proceso
         var fields = {};
 
         try {
@@ -77,7 +69,6 @@ define(['N/encode', 'N/xml', './sads_fama_logger'], function (encode, xml, logge
                 }
             }
 
-            // Extracción del número de certificado
             if (facturamaData && facturamaData.Issuer && facturamaData.Issuer.SerialNumber) {
                 fields[FIELDS.ISSUER_SERIAL] = facturamaData.Issuer.SerialNumber;
             } else if (xmlContent) {
@@ -98,24 +89,19 @@ define(['N/encode', 'N/xml', './sads_fama_logger'], function (encode, xml, logge
             return fields;
 
         } catch (mainError) {
-            // Manejador centralizado de la función principal
             logError('CRITICO: Fallo al construir campos extra', mainError, { cfdiId: cfdiId });
-            // Devolvemos lo que se haya logrado mapear para no interrumpir el flujo del caller
+            // Se devuelve lo mapeado para no interrumpir el flujo del llamador
             return fields;
         }
     }
 
-    // ==========================================
-    // 3. FUNCIONES PRIVADAS (Clean Architecture)
-    // ==========================================
-
     /**
-     * Factory Pattern para estandarizar el registro de errores.
-     * Analiza si es un error nativo de JS o un SuiteScript Error.
-     * *@private
-     * @param {string} customMessage - Mensaje contextual
-     * @param {Error} e - El objeto de error capturado
-     * @param {Object} contextData - Datos adicionales para reproducir el fallo
+     * Estandariza el registro de errores, soportando errores nativos de JS y de SuiteScript.
+     * @private
+     * @param {string} customMessage - Mensaje contextual.
+     * @param {Error|Object} e - Objeto de error capturado.
+     * @param {Object} [contextData] - Datos adicionales para reproducir el fallo.
+     * @returns {void}
      */
     function logError(customMessage, e, contextData) {
         var errorDetails = {
@@ -138,6 +124,3 @@ define(['N/encode', 'N/xml', './sads_fama_logger'], function (encode, xml, logge
         buildExtraFields: buildExtraFields
     };
 });
-//Camibio de uso de REGEX POR N/XML PARA MANIPULAR DE MEJOR MANERA EL XML Y OBTENER EL NUMERO DE CERTIFICADO DEL EMISOR.
-//Agregado un control de retorno seguro y un logger.write para capturar toda la pila de ejecucion, response, mensaje y codigo de error. Esto es para poder capturar errores de comunicación con el PAC y poder analizarlos posteriormente.
-//MODULARIZACION DE FUNCIONES PARA MEJORAR LA LECTURA Y MANTENIMIENTO DEL CODIGO.

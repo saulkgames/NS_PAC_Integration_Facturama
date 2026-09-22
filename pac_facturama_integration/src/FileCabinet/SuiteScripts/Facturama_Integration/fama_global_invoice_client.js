@@ -2,13 +2,9 @@
  * @NApiVersion 2.x
  * @NScriptType ClientScript
  * @NModuleScope Public
- * 
- * SADS Facturama - Adaptador de Entrada (Frontend / UI)
- * 
- * Arquitectura: Hexagonal (Ports and Adapters)
- * Descripción: Controla la interactividad en el navegador del usuario. Valida las 
- * reglas de negocio antes de permitir el envío al servidor (Fail-Safe) y manipula 
- * el DOM dinámicamente para recalcular totales (Observer Pattern).
+ *
+ * SADS Facturama - Lógica de cliente del Suitelet de Facturación Global.
+ * Valida las reglas de negocio antes del envío y recalcula los totales de la sublista.
  */
 define(['N/currentRecord', 'N/url', 'N/format', 'N/ui/message', 'N/log'],
 
@@ -16,24 +12,23 @@ define(['N/currentRecord', 'N/url', 'N/format', 'N/ui/message', 'N/log'],
         'use strict';
 
         /**
-         * Evento de inicialización de la página.
+         * Evento de inicialización de la página. Hook vacío por diseño.
          * @param {Object} context - Contexto de ejecución proveído por NetSuite.
+         * @returns {void}
          */
         function pageInit(context) {
-            // Inicialización vacía por diseño. Se deja el hook preparado (Open/Closed Principle).
+            // Inicialización vacía por diseño; se deja el hook preparado.
         }
 
         /**
-         * Actúa como Guardián de Frontera (Gatekeeper) validando los datos antes de hacer el POST.
-         * Aplica el principio Fail-Safe Defaults de Saltzer & Schroeder.
-         * 
+         * Valida los datos del formulario antes de permitir el POST al servidor.
          * @param {Object} context - Contexto del evento de guardado.
-         * @returns {boolean} Retorna true si los datos son válidos; false para bloquear el envío.
+         * @returns {boolean} true si los datos son válidos; false para bloquear el envío.
          */
         function saveRecord(context) {
             var rec = currentRecord.get();
 
-            // 1. Validaciones de Campos Obligatorios (Reglas de Negocio SAT)
+            // 1. Campos obligatorios (reglas de negocio SAT)
             if (!rec.getValue('custpage_usecfdi')) {
                 showMessage('Capture el valor para el campo Uso de CFDI.');
                 return false;
@@ -59,7 +54,7 @@ define(['N/currentRecord', 'N/url', 'N/format', 'N/ui/message', 'N/log'],
                 return false;
             }
 
-            // 2. Validación de UI: Existencia de líneas
+            // 2. Existencia de líneas en la sublista
             var sublistName = 'custpage_transactions';
             var rows = rec.getLineCount({ sublistId: sublistName });
 
@@ -68,8 +63,7 @@ define(['N/currentRecord', 'N/url', 'N/format', 'N/ui/message', 'N/log'],
                 return false;
             }
 
-            // 3. 🛡️ BUGFIX (Defensa en Profundidad): Validación de Selección Real
-            // Evita que se cree un registro pivote fantasma si el usuario no seleccionó ninguna casilla
+            // 3. Evita crear un registro pivote fantasma si no se marcó ninguna casilla
             var arregloFacturas = rec.getValue('custpage_arreglo');
             if (!arregloFacturas || arregloFacturas.length === 0) {
                 showMessage('Por favor, seleccione al menos una transacción marcando la casilla de verificación.');
@@ -80,10 +74,10 @@ define(['N/currentRecord', 'N/url', 'N/format', 'N/ui/message', 'N/log'],
         }
 
         /**
-         * Captura los filtros de la pantalla y recarga el Suitelet realizando una petición GET.
-         * 
-         * @param {string} scId - El Script ID del Suitelet.
-         * @param {string} dpId - El Deployment ID del Suitelet.
+         * Captura los filtros de la pantalla y recarga el Suitelet mediante una petición GET.
+         * @param {string} scId - Script ID del Suitelet.
+         * @param {string} dpId - Deployment ID del Suitelet.
+         * @returns {void}
          */
         function reloadForm(scId, dpId) {
             var rec = currentRecord.get();
@@ -91,7 +85,6 @@ define(['N/currentRecord', 'N/url', 'N/format', 'N/ui/message', 'N/log'],
             var endDate = '';
             var created = '';
 
-            // Formateo seguro de fechas
             if (rec.getValue('custpage_dateini')) {
                 trandate = format.format({
                     value: rec.getValue('custpage_dateini'),
@@ -117,7 +110,6 @@ define(['N/currentRecord', 'N/url', 'N/format', 'N/ui/message', 'N/log'],
             var meses = rec.getValue('custpage_meses') || null;
             var anio = rec.getValue('custpage_anio');
 
-            // Construcción dinámica de la URL (Aísla la lógica de enrutamiento)
             var scriptUrl = url.resolveScript({
                 scriptId: scId,
                 deploymentId: dpId,
@@ -137,16 +129,16 @@ define(['N/currentRecord', 'N/url', 'N/format', 'N/ui/message', 'N/log'],
                 }
             });
 
-            // Evitamos que el navegador pregunte si el usuario quiere abandonar la página
+            // Evita que el navegador pregunte si el usuario quiere abandonar la página
             window.onbeforeunload = null; 
             window.location.href = scriptUrl;
         }
 
         /**
-         * Muestra notificaciones visuales nativas de NetSuite al usuario (UX).
-         * 
-         * @param {string} msg - El texto a mostrar en la advertencia.
-         * @param {number} [time=3000] - Tiempo en milisegundos que el mensaje permanecerá visible.
+         * Muestra notificaciones visuales nativas de NetSuite al usuario.
+         * @param {string} msg - Texto a mostrar en la advertencia.
+         * @param {number} [time=3000] - Milisegundos que el mensaje permanecerá visible.
+         * @returns {void}
          */
         function showMessage(msg, time) {
             if (!msg) return;
@@ -165,13 +157,13 @@ define(['N/currentRecord', 'N/url', 'N/format', 'N/ui/message', 'N/log'],
         }
 
         /**
-         * Implementa el Patrón Observer (GoF). Escucha los cambios en la sublista 
-         * para recalcular en tiempo real el importe total y actualizar el arreglo de IDs.
-         * 
-         * @param {Object} context - Objeto de contexto inyectado por NetSuite.
+         * Escucha los cambios en la sublista para recalcular el importe total y el arreglo
+         * de IDs de las transacciones seleccionadas.
+         * @param {Object} context - Contexto inyectado por NetSuite.
          * @param {Record} context.currentRecord - Referencia al registro actual en memoria.
          * @param {string} context.sublistId - ID de la sublista modificada.
          * @param {string} context.fieldId - ID del campo modificado.
+         * @returns {void}
          */
         function fieldChanged(context) {
             var currentRecord = context.currentRecord;
@@ -181,7 +173,7 @@ define(['N/currentRecord', 'N/url', 'N/format', 'N/ui/message', 'N/log'],
             var counter = 0;
             var idInternoFacturas = [];
 
-            // Solo recalculamos si el usuario hace clic en el checkbox 'custpage_validar'
+            // Solo se recalcula al marcar/desmarcar el checkbox 'custpage_validar'
             if (sublistName === 'custpage_transactions' && sublistFieldName === 'custpage_validar') {
                 var lineasTotal = currentRecord.getLineCount({ sublistId: "custpage_transactions" });
 
@@ -211,7 +203,6 @@ define(['N/currentRecord', 'N/url', 'N/format', 'N/ui/message', 'N/log'],
                     }
                 }
 
-                // Actualizamos los campos de cabecera con los resultados consolidados
                 if (counter > 0) {
                     currentRecord.setValue({
                         fieldId: 'custpage_importe',
@@ -220,10 +211,10 @@ define(['N/currentRecord', 'N/url', 'N/format', 'N/ui/message', 'N/log'],
 
                     currentRecord.setValue({
                         fieldId: 'custpage_arreglo',
-                        value: idInternoFacturas.join(',') // Garantizamos serialización consistente
+                        value: idInternoFacturas.join(',')
                     });
                 } else {
-                    // Si desmarcó todo, reseteamos a cero
+                    // Si desmarcó todo, se resetea a cero
                     currentRecord.setValue({
                         fieldId: 'custpage_importe',
                         value: 0
@@ -241,7 +232,7 @@ define(['N/currentRecord', 'N/url', 'N/format', 'N/ui/message', 'N/log'],
             pageInit: pageInit,
             saveRecord: saveRecord,
             fieldChanged: fieldChanged,
-            // Funciones personalizadas que son llamadas desde botones en la UI
+            // Función personalizada invocada desde un botón de la UI
             reloadForm: reloadForm 
         };
     });

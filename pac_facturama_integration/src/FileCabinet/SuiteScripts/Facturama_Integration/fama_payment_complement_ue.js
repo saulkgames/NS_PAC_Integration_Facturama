@@ -3,20 +3,17 @@
  * @NScriptType UserEventScript
  * @NModuleScope Public
  *
- * SADS Facturama - Generador de Payload de Complemento de Pago
- * Responsabilidad: al guardar un Customer Payment, identificar las facturas PPD aplicadas,
- * calcular los campos especiales del nodo "RelatedDocuments" (Facturama CFDI Complemento de
- * Pago) y persistir el JSON resultante en el propio pago (custbody_sads_fama_cpago_payload)
- * para que el orquestador de timbrado lo consuma sin recalcular.
+ * SADS Facturama - Generador del payload de Complemento de Pago.
+ * Al guardar un Customer Payment, identifica las facturas PPD aplicadas, calcula los campos del
+ * nodo "RelatedDocuments" (Facturama CFDI Complemento de Pago) y persiste el JSON en el pago
+ * (custbody_sads_fama_cpago_payload) para que el orquestador de timbrado lo consuma sin recalcular.
  *
- * Alcance por política interna: solo se generan RelatedDocuments para facturas cuyo
- * custbody_mx_txn_sat_payment_term resuelva a PPD. Las líneas aplicadas a facturas PUE se
- * omiten del arreglo.
+ * Alcance: solo se generan RelatedDocuments para facturas cuyo custbody_mx_txn_sat_payment_term
+ * resuelva a PPD; las líneas aplicadas a facturas PUE se omiten.
  *
- * Nota de diseño: los errores se registran (sads_fama_logger) pero NO se relanzan. Un fallo en
- * este cálculo no debe bloquear el guardado del pago (afterSubmit propaga excepciones como
- * rollback de toda la transacción). Un PPD sin payload generado debe detectarse por monitoreo
- * externo (búsqueda guardada), no impidiendo el registro del cobro.
+ * Diseño: los errores se registran (sads_fama_logger) pero NO se relanzan. Un fallo aquí no debe
+ * bloquear el guardado del pago (afterSubmit propaga excepciones como rollback de la transacción).
+ * Un PPD sin payload debe detectarse por monitoreo externo, no impidiendo el registro del cobro.
  */
 define([
     'N/record',
@@ -35,12 +32,10 @@ define([
     var ROUND_MONEY = 2;
     var ROUND_RATE = 6;
 
-    // ==========================================
-    // 1. ENTRY POINT
-    // ==========================================
-
     /**
-     * @param {Object} context
+     * Tras crear/editar el pago, construye y persiste el payload de Complemento de Pago.
+     * @param {Object} context - Contexto del User Event.
+     * @returns {void}
      */
     function afterSubmit(context) {
         if (context.type !== context.UserEventType.CREATE && context.type !== context.UserEventType.EDIT) {
@@ -97,14 +92,12 @@ define([
         }
     }
 
-    // ==========================================
-    // 2. LECTURA DEL PAGO ACTUAL (Sublista 'apply')
-    // ==========================================
-
     /**
-     * Lee la sublista 'apply' del pago y agrupa por factura (una factura puede tener más
-     * de una línea aplicada dentro del mismo pago).
+     * Lee la sublista 'apply' del pago y agrupa los importes por factura (una factura puede tener
+     * más de una línea aplicada dentro del mismo pago).
      * @private
+     * @param {Record} paymentRecord - Registro del Customer Payment.
+     * @returns {Array} Arreglo de { invoiceId, amountPaid }.
      */
     function _getAppliedInvoiceCandidates(paymentRecord) {
         var lineCount = paymentRecord.getLineCount({ sublistId: SUBLIST_APPLY });
@@ -129,15 +122,13 @@ define([
         return Object.keys(byInvoice).map(function (id) { return byInvoice[id]; });
     }
 
-    // ==========================================
-    // 3. DATOS BASE DE LAS FACTURAS (SuiteQL)
-    // ==========================================
-
     /**
+     * Obtiene los datos de cabecera de las facturas aplicadas vía SuiteQL.
      * Columnas confirmadas contra el bundle nativo "Mexico Compliance" (custbody_mx_cfdi_*,
      * custbody_mx_txn_sat_payment_term, currency, exchangerate, foreigntotal).
-     * @param {*} invoiceIds 
      * @private
+     * @param {Array} invoiceIds - IDs internos de las facturas.
+     * @returns {Object} Mapa { invoiceId: datosDeFactura }.
      */
     function _fetchInvoiceHeaderData(invoiceIds) {
         var idList = invoiceIds.join(',');
@@ -175,17 +166,18 @@ define([
     }
 
     /**
-     * Historial de pagos previos YA CERTIFICADOS (custbody_mx_cfdi_uuid IS NOT NULL) ligados a
-     * cada factura, excluyendo explícitamente el pago actual. Patrón validado contra el bundle
-     * nativo "Mexico Compliance" (ver AppliedTransactions._fulfillAppliedTransactionObject /
-     * SUITEQL.CUSTOMER_PAYMENT.INVOICES_DATA), que usa exactamente este filtro para calcular
-     * "times_paid_invoice". Al contar solo pagos ya timbrados, el pago actual (que aún no tiene
-     * UUID en este punto del ciclo de vida) queda fuera del conteo sin ambigüedad de timing.
+     * Calcula, por factura, el conteo y monto acumulado de pagos previos YA CERTIFICADOS
+     * (custbody_mx_cfdi_uuid IS NOT NULL), excluyendo el pago actual.
      *
-     * El monto acumulado de cada pago previo se lee cargando el registro (record.load) y
-     * sumando su propia sublista 'apply' para esta factura, en vez de asumir un nombre de
-     * columna SuiteQL no verificado para el enlace pago-factura-monto.
+     * Contar solo pagos timbrados deja fuera al pago actual (que aún no tiene UUID en este punto
+     * del ciclo) sin ambigüedad de timing; es el mismo criterio que usa el bundle nativo
+     * "Mexico Compliance" para "times_paid_invoice". El monto acumulado se obtiene cargando cada
+     * pago previo y sumando su propia sublista 'apply' para esta factura, en vez de asumir un
+     * nombre de columna SuiteQL no verificado para el enlace pago-factura-monto.
      * @private
+     * @param {Object} invoicesById - Mapa de facturas a enriquecer (se muta en el lugar).
+     * @param {number|string} currentPaymentId - ID del pago en proceso, a excluir del conteo.
+     * @returns {void}
      */
     function _fillPreviousPaymentsHistory(invoicesById, currentPaymentId) {
         var invoiceIds = Object.keys(invoicesById);
@@ -229,6 +221,13 @@ define([
         });
     }
 
+    /**
+     * Suma el importe que un pago aplicó a una factura específica (sublista 'apply').
+     * @private
+     * @param {Record} paymentRecord - Registro del Customer Payment.
+     * @param {number|string} invoiceId - ID de la factura a consultar.
+     * @returns {number} Importe total aplicado a esa factura.
+     */
     function _amountAppliedToInvoice(paymentRecord, invoiceId) {
         var lineCount = paymentRecord.getLineCount({ sublistId: SUBLIST_APPLY });
         var total = 0;
@@ -246,12 +245,15 @@ define([
         return total;
     }
 
-    // ==========================================
-    // 4. CONSTRUCCIÓN DEL NODO RelatedDocuments
-    // ==========================================
-
     /**
+     * Construye un nodo RelatedDocuments para una factura aplicada.
      * @private
+     * @param {Object} invoiceData - Datos de cabecera e historial de la factura.
+     * @param {number} amountPaid - Importe pagado en esta parcialidad.
+     * @param {string} paymentCurrency - Moneda del pago.
+     * @param {number|string} paymentId - ID del pago en proceso.
+     * @returns {Object} Nodo RelatedDocuments para el payload de Facturama.
+     * @throws {Error} Si el saldo anterior de la primera parcialidad no cuadra con el total.
      */
     function _buildRelatedDocument(invoiceData, amountPaid, paymentCurrency, paymentId) {
         var previousBalance = _round(invoiceData.foreignTotal - invoiceData.amountPreviouslyPaid, ROUND_MONEY);
@@ -259,8 +261,8 @@ define([
         var outstandingBalance = _round(previousBalance - amountPaid, ROUND_MONEY);
         if (outstandingBalance < 0) outstandingBalance = 0; // Tolerancia a redondeo; no debe quedar negativo.
 
-        // Invariante fiscal: en la primera parcialidad, el saldo anterior debe igualar el total
-        // de la factura. Fail-Fast si no cuadra (mismo criterio que sads_fama_global_mapper.js).
+        // Invariante fiscal: en la primera parcialidad el saldo anterior debe igualar el total de
+        // la factura. Fail-Fast si no cuadra (mismo criterio que sads_fama_global_mapper.js).
         if (partialityNumber === 1 && Math.abs(previousBalance - invoiceData.foreignTotal) > 0.05) {
             throw new Error(
                 'FAIL-FAST: Saldo anterior inconsistente en la primera parcialidad de la factura ' +
@@ -299,11 +301,13 @@ define([
     }
 
     /**
-     * Prorratea el impuesto (IVA) de la factura relacionada en proporción al monto pagado en
-     * esta parcialidad, siguiendo el mismo criterio que el bundle nativo
-     * (AppliedTransactions._correctAmountsToRealPayments): multiplier = amountPaid / total.
-     * Simplificado a un único renglón de IVA, consistente con sads_fama_global_mapper.js.
+     * Prorratea el IVA de la factura relacionada en proporción al monto pagado en esta parcialidad
+     * (multiplier = amountPaid / total), mismo criterio que el bundle nativo. Simplificado a un
+     * único renglón de IVA, consistente con sads_fama_global_mapper.js.
      * @private
+     * @param {Object} invoiceData - Datos de cabecera de la factura.
+     * @param {number} amountPaid - Importe pagado en esta parcialidad.
+     * @returns {Array} Arreglo de impuestos prorrateados (vacío si la factura no tiene IVA).
      */
     function _buildProratedTaxes(invoiceData, amountPaid) {
         var multiplier = invoiceData.foreignTotal > 0 ? (amountPaid / invoiceData.foreignTotal) : 0;
@@ -332,10 +336,14 @@ define([
         }];
     }
 
-    // ==========================================
-    // 5. PERSISTENCIA
-    // ==========================================
-
+    /**
+     * Persiste el payload de Complemento de Pago en el registro del pago.
+     * @private
+     * @param {number|string} paymentId - ID del Customer Payment.
+     * @param {Record} paymentRecord - Registro del pago (para comparar el valor actual).
+     * @param {Array} relatedDocuments - Nodos RelatedDocuments a serializar.
+     * @returns {void}
+     */
     function _persistPayload(paymentId, paymentRecord, relatedDocuments) {
         var newPayload = JSON.stringify(relatedDocuments);
         var currentPayload = paymentRecord.getValue({ fieldId: FIELDS.PAYLOAD });
@@ -361,15 +369,24 @@ define([
         });
     }
 
-    // ==========================================
-    // 6. UTILIDADES
-    // ==========================================
-
+    /**
+     * Redondea un número a la cantidad de decimales indicada.
+     * @private
+     * @param {number} num - Número a redondear.
+     * @param {number} decimals - Cantidad de decimales.
+     * @returns {number} Número redondeado.
+     */
     function _round(num, decimals) {
         var multiplier = Math.pow(10, decimals);
         return Math.round(num * multiplier) / multiplier;
     }
 
+    /**
+     * Devuelve los elementos únicos de un arreglo preservando el orden.
+     * @private
+     * @param {Array} arr - Arreglo de entrada.
+     * @returns {Array} Arreglo sin duplicados.
+     */
     function _unique(arr) {
         var seen = {};
         var result = [];
