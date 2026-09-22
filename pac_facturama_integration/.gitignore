@@ -38,3 +38,19 @@ Thumbs.db
 
 # Project config
 project.json
+
+# --------------------------------------------------------------------------
+# Datos sensibles / credenciales (ver docs/development-log.md, entrada 2026-09-08)
+# --------------------------------------------------------------------------
+# customrecord_sads_fama_config.xml debe seguir versionado (define el custom record
+# que usa el conector), pero NUNCA debe volver a exportarse con datos de INSTANCIA
+# (usuario, contraseña, URLs del PAC). Si se corre `suitecloud object:import` sobre
+# ese objeto, verificar el diff antes de comitear y retirar cualquier nodo de
+# instancia con credenciales reales antes del commit.
+.env
+.env.*
+*.pem
+*.key
+*credentials*.json
+*secrets*
+

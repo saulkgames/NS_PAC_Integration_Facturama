@@ -1,0 +1,18 @@
+<usereventscript scriptid="customscript_sads_fama_invoice_ue">
+  <description>Cachea el ObjetoImp (SAT) de la factura en custbody_sads_fama_tax_object para su reuso posterior por el Complemento de Pago.</description>
+  <isinactive>F</isinactive>
+  <name>Facturama - Cacheo Tax Object en Factura</name>
+  <notifyadmins>F</notifyadmins>
+  <notifyemails></notifyemails>
+  <notifyowner>T</notifyowner>
+  <scriptfile>[/SuiteScripts/Facturama_Integration/fama_invoice_tax_object_ue.js]</scriptfile>
+  <scriptdeployments>
+    <scriptdeployment scriptid="customdeploy_sads_fama_invoice_ue">
+      <allroles>T</allroles>
+      <isdeployed>T</isdeployed>
+      <loglevel>DEBUG</loglevel>
+      <recordtype>INVOICE</recordtype>
+      <status>RELEASED</status>
+    </scriptdeployment>
+  </scriptdeployments>
+</usereventscript>

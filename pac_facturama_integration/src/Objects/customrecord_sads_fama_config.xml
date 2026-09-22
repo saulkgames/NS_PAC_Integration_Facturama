@@ -577,20 +577,36 @@
     </customrecordcustomfield>
   </customrecordcustomfields>
   <instances>
-    <instance scriptid="val_8908228_5490848_347">
+    <instance scriptid="val_8391540_5490848_sb1_162">
       <custrecord_sads_fama_env>T</custrecord_sads_fama_env>
       <custrecord_sads_fama_folderid_pdf>412708</custrecord_sads_fama_folderid_pdf>
       <custrecord_sads_fama_folderid_xml>412708</custrecord_sads_fama_folderid_xml>
-      <custrecord_sads_fama_pass>ItPfP810520Jx0</custrecord_sads_fama_pass>
-      <custrecord_sads_fama_sub>[ACCOUNT_SPECIFIC_VALUE]</custrecord_sads_fama_sub>
+      <custrecord_sads_fama_pass>ItPfP810520Jx0.-</custrecord_sads_fama_pass>
+      <custrecord_sads_fama_sub>4</custrecord_sads_fama_sub>
+      <custrecord_sads_fama_tmpl_cm>[scriptid=custtmpl_creditmemo_certified_pdf_template]</custrecord_sads_fama_tmpl_cm>
+      <custrecord_sads_fama_tmpl_cp>[scriptid=custtmpl_payment_certified_pdf_template]</custrecord_sads_fama_tmpl_cp>
+      <custrecord_sads_fama_tmpl_cs>[scriptid=custtmpl_167_5490848_sb1_764]</custrecord_sads_fama_tmpl_cs>
+      <custrecord_sads_fama_tmpl_if>[scriptid=custtmpl_itemfulfillment_certified_pdf]</custrecord_sads_fama_tmpl_if>
+      <custrecord_sads_fama_tmpl_inv>[scriptid=custtmpl_invoice_certified_pdf_template]</custrecord_sads_fama_tmpl_inv>
+      <custrecord_sads_fama_url_api>https://apisandbox.facturama.mx/api-lite/3/cfdis</custrecord_sads_fama_url_api>
+      <custrecord_sads_fama_url_api_getfile>https://apisandbox.facturama.mx/cfdi/{type}/issuedLite/{id}</custrecord_sads_fama_url_api_getfile>
+      <custrecord_sads_fama_user>AlmetalSistemas</custrecord_sads_fama_user>
+      <isinactive>F</isinactive>
+    </instance>
+    <instance scriptid="val_8908228_5490848_347">
+      <custrecord_sads_fama_env>F</custrecord_sads_fama_env>
+      <custrecord_sads_fama_folderid_pdf>412712</custrecord_sads_fama_folderid_pdf>
+      <custrecord_sads_fama_folderid_xml>412712</custrecord_sads_fama_folderid_xml>
+      <custrecord_sads_fama_pass>ItPfP810520Jx0.-</custrecord_sads_fama_pass>
+      <custrecord_sads_fama_sub>3</custrecord_sads_fama_sub>
       <custrecord_sads_fama_tmpl_cm>[scriptid=custtmpl_creditmemo_certified_pdf_template]</custrecord_sads_fama_tmpl_cm>
       <custrecord_sads_fama_tmpl_cp>[scriptid=custtmpl_payment_certified_pdf_template]</custrecord_sads_fama_tmpl_cp>
       <custrecord_sads_fama_tmpl_cs>[scriptid=custtmpl_cashsale_certified_pdf_template]</custrecord_sads_fama_tmpl_cs>
       <custrecord_sads_fama_tmpl_if>[scriptid=custtmpl_itemfulfillment_certified_pdf]</custrecord_sads_fama_tmpl_if>
       <custrecord_sads_fama_tmpl_inv>[scriptid=custtmpl_invoice_certified_pdf_template]</custrecord_sads_fama_tmpl_inv>
-      <custrecord_sads_fama_url_api>https://api.facturama.mx/api-lite/3/cfdis</custrecord_sads_fama_url_api>
-      <custrecord_sads_fama_url_api_getfile>https://api.facturama.mx/cfdi/{type}/issuedLite/{id}</custrecord_sads_fama_url_api_getfile>
-      <custrecord_sads_fama_user>SistemasAlmetal</custrecord_sads_fama_user>
+      <custrecord_sads_fama_url_api>https://apisandbox.facturama.mx/api-lite/3/cfdis</custrecord_sads_fama_url_api>
+      <custrecord_sads_fama_url_api_getfile>https://apisandbox.facturama.mx/cfdi/{type}/issuedLite/{id}</custrecord_sads_fama_url_api_getfile>
+      <custrecord_sads_fama_user>AlmetalSistemas</custrecord_sads_fama_user>
       <isinactive>F</isinactive>
     </instance>
   </instances>

@@ -9,24 +9,17 @@
   <scriptfile>[/SuiteScripts/Facturama_Integration/fama_global_invoice_suitelet.js]</scriptfile>
   <scriptdeployments>
     <scriptdeployment scriptid="customdeploy_fama_global_invoice_sl">
-      <allemployees>T</allemployees>
+      <allemployees>F</allemployees>
       <allpartners>F</allpartners>
       <allroles>F</allroles>
-      <audslctrole>ADMINISTRATOR|[scriptid=customrole1021]|[scriptid=customrole1024]|[scriptid=customrole1028]|[scriptid=customrole1022]|[scriptid=customrole1071]|[scriptid=customrole1029]|[scriptid=customrole1023]|[scriptid=customrole1035]|[scriptid=customrole1026]|[scriptid=customrole1030]|[scriptid=customrolealm_cordinador]|[scriptid=customrole1081]</audslctrole>
-      <audsubsidiary>[ACCOUNT_SPECIFIC_VALUE]|[ACCOUNT_SPECIFIC_VALUE]|[ACCOUNT_SPECIFIC_VALUE]|[ACCOUNT_SPECIFIC_VALUE]|[ACCOUNT_SPECIFIC_VALUE]|[ACCOUNT_SPECIFIC_VALUE]|[ACCOUNT_SPECIFIC_VALUE]|[ACCOUNT_SPECIFIC_VALUE]|[ACCOUNT_SPECIFIC_VALUE]|[ACCOUNT_SPECIFIC_VALUE]|[ACCOUNT_SPECIFIC_VALUE]|[ACCOUNT_SPECIFIC_VALUE]</audsubsidiary>
+      <audslctrole></audslctrole>
       <eventtype></eventtype>
       <isdeployed>T</isdeployed>
       <isonline>F</isonline>
       <loglevel>DEBUG</loglevel>
-      <runasrole>ADMINISTRATOR</runasrole>
-      <status>RELEASED</status>
+      <runasrole></runasrole>
+      <status>TESTING</status>
       <title>Global Invoice Suitelet - Facturama</title>
-      <links>
-        <link>
-          <linkcategory>BASICTRANSACTIONSSALES</linkcategory>
-          <linklabel>Procesar Factura Global FAMA</linklabel>
-        </link>
-      </links>
     </scriptdeployment>
   </scriptdeployments>
 </suitelet>

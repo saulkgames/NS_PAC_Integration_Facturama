@@ -1,0 +1,18 @@
+<usereventscript scriptid="customscript_sads_fama_payment_ue">
+  <description>Calcula el arreglo RelatedDocuments del Complemento de Pago (facturas PPD aplicadas) y lo persiste en custbody_sads_fama_cpago_payload.</description>
+  <isinactive>F</isinactive>
+  <name>Facturama - Payload Complemento de Pago</name>
+  <notifyadmins>F</notifyadmins>
+  <notifyemails></notifyemails>
+  <notifyowner>T</notifyowner>
+  <scriptfile>[/SuiteScripts/Facturama_Integration/fama_payment_complement_ue.js]</scriptfile>
+  <scriptdeployments>
+    <scriptdeployment scriptid="customdeploy_sads_fama_payment_ue">
+      <allroles>T</allroles>
+      <isdeployed>T</isdeployed>
+      <loglevel>DEBUG</loglevel>
+      <recordtype>CUSTOMERPAYMENT</recordtype>
+      <status>RELEASED</status>
+    </scriptdeployment>
+  </scriptdeployments>
+</usereventscript>
