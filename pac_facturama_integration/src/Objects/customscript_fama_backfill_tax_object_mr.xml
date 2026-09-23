@@ -1,0 +1,22 @@
+<mapreducescript scriptid="customscript_fama_backfill_tax_object_mr">
+  <description>Backfill: calcula y persiste custbody_sads_fama_tax_object en facturas existentes que no lo tienen poblado. Ejecución manual (Save and Execute), no programada.</description>
+  <isinactive>F</isinactive>
+  <name>Facturama - Backfill Tax Object</name>
+  <notifyadmins>F</notifyadmins>
+  <notifyemails></notifyemails>
+  <notifyowner>T</notifyowner>
+  <scriptfile>[/SuiteScripts/Facturama_Integration/fama_backfill_tax_object_mr.js]</scriptfile>
+  <scriptdeployments>
+    <scriptdeployment scriptid="customdeploy_fama_backfill_tax_object_mr">
+      <buffersize>1</buffersize>
+      <concurrencylimit>1</concurrencylimit>
+      <isdeployed>T</isdeployed>
+      <loglevel>DEBUG</loglevel>
+      <queueallstagesatonce>T</queueallstagesatonce>
+      <runasrole>ADMINISTRATOR</runasrole>
+      <status>NOTSCHEDULED</status>
+      <title>Facturama - Backfill Tax Object</title>
+      <yieldaftermins>60</yieldaftermins>
+    </scriptdeployment>
+  </scriptdeployments>
+</mapreducescript>

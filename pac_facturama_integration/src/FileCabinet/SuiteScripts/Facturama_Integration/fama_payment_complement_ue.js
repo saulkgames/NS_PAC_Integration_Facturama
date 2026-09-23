@@ -54,26 +54,38 @@ define([
                 return;
             }
 
-            var invoiceIds = candidates.map(function (c) { return c.invoiceId; });
+            // Filtro inicial por Método de Pago SAT: es habitual que un mismo Customer Payment
+            // cierre facturas PUE (venta de contado, ya fiscalmente completa desde su propia
+            // emisión) junto con facturas PPD. Las PUE no requieren Complemento de Pago ante el
+            // SAT, solo necesitan quedar registradas en NetSuite. Se descartan aquí, ANTES de la
+            // consulta de cabecera y del historial de pagos previos (que incluye record.load por
+            // cada pago previo certificado), para no gastar esa gobernanza en facturas que de
+            // todos modos se iban a excluir del payload.
+            var ppdCandidates = _filterPPDCandidates(candidates);
+            if (ppdCandidates.length === 0) {
+                logger.write('fama_payment_complement_ue: sin facturas PPD aplicadas (filtro inicial)', {
+                    paymentId: paymentId,
+                    facturasAplicadas: candidates.length
+                });
+                return;
+            }
+
+            var invoiceIds = ppdCandidates.map(function (c) { return c.invoiceId; });
             var invoicesById = _fetchInvoiceHeaderData(invoiceIds);
             _fillPreviousPaymentsHistory(invoicesById, paymentId);
 
             var relatedDocuments = [];
-            for (var i = 0; i < candidates.length; i++) {
-                var invoiceData = invoicesById[candidates[i].invoiceId];
+            for (var i = 0; i < ppdCandidates.length; i++) {
+                var invoiceData = invoicesById[ppdCandidates[i].invoiceId];
                 if (!invoiceData) {
                     logger.write('fama_payment_complement_ue: factura no encontrada vía SuiteQL', {
                         paymentId: paymentId,
-                        invoiceId: candidates[i].invoiceId
+                        invoiceId: ppdCandidates[i].invoiceId
                     });
                     continue;
                 }
 
-                if (!satCatalog.isPPD(invoiceData.paymentTermId, invoiceData.paymentTermText)) {
-                    continue; // Factura PUE: fuera de alcance para Complemento de Pago.
-                }
-
-                relatedDocuments.push(_buildRelatedDocument(invoiceData, candidates[i].amountPaid, paymentCurrency, paymentId));
+                relatedDocuments.push(_buildRelatedDocument(invoiceData, ppdCandidates[i].amountPaid, paymentCurrency, paymentId));
             }
 
             if (relatedDocuments.length === 0) {
@@ -120,6 +132,37 @@ define([
         }
 
         return Object.keys(byInvoice).map(function (id) { return byInvoice[id]; });
+    }
+
+    /**
+     * Filtro inicial: de las facturas aplicadas, conserva solo las que son PPD, con la consulta
+     * más barata posible (únicamente el método de pago SAT, ninguna otra columna). Se ejecuta
+     * antes que cualquier otra consulta para no gastar gobernanza en facturas PUE que de todos
+     * modos quedarían fuera del Complemento de Pago.
+     * @private
+     * @param {Array} candidates - Arreglo de { invoiceId, amountPaid } de _getAppliedInvoiceCandidates.
+     * @returns {Array} Subconjunto de `candidates` cuyas facturas son PPD.
+     */
+    function _filterPPDCandidates(candidates) {
+        var idList = candidates.map(function (c) { return c.invoiceId; }).join(',');
+
+        var sql =
+            "SELECT t.id AS id, t.custbody_mx_txn_sat_payment_term AS paymentterm_id, " +
+            "BUILTIN.DF(t.custbody_mx_txn_sat_payment_term) AS paymentterm_text " +
+            "FROM transaction t WHERE t.id IN (" + idList + ")";
+
+        var rows = query.runSuiteQL({ query: sql }).asMappedResults();
+
+        var ppdInvoiceIds = {};
+        rows.forEach(function (row) {
+            if (satCatalog.isPPD(row.paymentterm_id, row.paymentterm_text)) {
+                ppdInvoiceIds[row.id] = true;
+            }
+        });
+
+        return candidates.filter(function (c) {
+            return !!ppdInvoiceIds[c.invoiceId];
+        });
     }
 
     /**
@@ -313,7 +356,7 @@ define([
         var multiplier = invoiceData.foreignTotal > 0 ? (amountPaid / invoiceData.foreignTotal) : 0;
 
         var sql =
-            "SELECT SUM(ttd.taxbasis) AS base, SUM(ttd.taxamount) AS tax, MAX(ttd.taxrate) AS rate " +
+            "SELECT SUM(ttd.basetaxamount) AS base, SUM(ttd.taxamount) AS tax, MAX(ttd.taxrate) AS rate " +
             "FROM transactionLine tl " +
             "JOIN transactionTaxDetail ttd ON tl.id = ttd.line AND tl.transaction = ttd.transaction " +
             "WHERE tl.transaction = " + invoiceData.invoiceId;
