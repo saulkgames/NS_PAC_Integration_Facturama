@@ -35,7 +35,9 @@ define([
             type: search.Type.INVOICE,
             filters: [
                 ['mainline', 'is', 'T'], 'AND',
-                [FIELDS.TAX_OBJECT, 'isempty', '']
+                [FIELDS.TAX_OBJECT, 'isempty', ''],
+                'AND',
+                ['trandate', 'within', '01/01/2026'],
             ],
             columns: ['internalid']
         });

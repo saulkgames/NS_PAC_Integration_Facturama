@@ -5,40 +5,54 @@
 <#return result>
 </#if>
 </#function>
-
 <#-- 1. PREPARACIÓN DE VARIABLES (mismo criterio que facturama_edocs_template.ftl) -->
 <#if custom.multiCurrencyFeature == "true">
 <#assign "currencyCode" = transaction.currencysymbol>
 <#else>
 <#assign "currencyCode" = "MXN">
 </#if>
-
 <#if custom.oneWorldFeature == "true">
 <#assign customCompanyInfo = transaction.subsidiary>
 <#else>
 <#assign customCompanyInfo = companyinformation>
 </#if>
-
 <#assign "satCodes" = custom.satcodes>
-<#assign "companyTaxRegNumber" = custom.companyInfo.rfc>
-
 <#if customer.custentity_mx_rfc == "XAXX010101000" || customer.custentity_mx_rfc == "XEXX010101000" || customer.custentity_mx_rfc == "">
 <#assign domicilioFiscalReceptor = customCompanyInfo.zip>
 <#else>
 <#assign domicilioFiscalReceptor = custom.billaddr.customerdefaultzipcode>
 </#if>
-
-<#function getTaxName satCode>
-<#if satCode == "001"><#return "ISR"></#if>
-<#if satCode == "002"><#return "IVA"></#if>
-<#if satCode == "003"><#return "IEPS"></#if>
-<#return "IVA">
-</#function>
-
-<#if !custom.appliedTxns?has_content>
-<#stop "ERROR FATAL: El pago no tiene transacciones aplicadas (sublista 'apply'). No se puede generar un Complemento de Pago sin al menos un documento relacionado.">
+<#-- El arreglo RelatedDocuments (incluyendo TaxObject, PartialityNumber, PreviousBalanceAmount,
+     Taxes y, cuando aplica, EquivalenceDocRel) NO se construye en esta plantilla. Esta plantilla
+     es un adaptador puro de salida: toma el JSON ya calculado por la capa de dominio
+     (fama_payment_complement_ue.js, User Event de Customer Payment) desde
+     custbody_sads_fama_cpago_payload y lo inserta tal cual. Cualquier cambio a cómo se calculan
+     esos valores va en fama_payment_complement_ue.js, nunca aquí. -->
+<#if !transaction.custbody_sads_fama_cpago_payload?has_content>
+<#stop "SIN COMPLEMENTO DE PAGO: custbody_sads_fama_cpago_payload está vacío. O el pago no tiene facturas PPD aplicadas (no requiere Complemento de Pago), o fama_payment_complement_ue.js todavía no corrió sobre este registro — guárdalo de nuevo.">
 </#if>
-
+<#assign satFormaPago = satCodes.paymentMethod!"">
+<#if !satFormaPago?has_content>
+<#stop "ERROR FATAL: satCodes.paymentMethod (Forma de Pago SAT) está vacío para este Customer Payment. Verifique custbody_mx_txn_sat_payment_method en el registro.">
+</#if>
+<#assign receiverRfc = customer.custentity_mx_rfc!"">
+<#if !receiverRfc?has_content>
+<#stop "ERROR FATAL: El cliente no tiene RFC (custentity_mx_rfc) capturado.">
+</#if>
+<#assign receiverName = customer.custentity_mx_sat_registered_name!"">
+<#if !receiverName?has_content>
+<#stop "ERROR FATAL: El cliente no tiene Nombre/Razón Social SAT (custentity_mx_sat_registered_name) capturado.">
+</#if>
+<#assign receiverFiscalRegime = satCodes.customerIndustryType!"">
+<#if !receiverFiscalRegime?has_content>
+<#stop "ERROR FATAL: El cliente no tiene Régimen Fiscal SAT (custentity_mx_sat_industry_type) capturado.">
+</#if>
+<#if !domicilioFiscalReceptor?has_content>
+<#stop "ERROR FATAL: No se pudo determinar el Código Postal fiscal del receptor (domicilio fiscal del cliente o de la subsidiaria).">
+</#if>
+<#if !customCompanyInfo.zip?has_content>
+<#stop "ERROR FATAL: La subsidiaria/compañía emisora no tiene Código Postal capturado (ExpeditionPlace).">
+</#if>
 <#-- 2. CONSTRUCCIÓN DEL JSON -->
 {
 "CfdiType": "P",
@@ -47,85 +61,24 @@
 "Folio": "${transaction.tranid?json_string}",
 </#if>
 "ExpeditionPlace": "${customCompanyInfo.zip}",
-
 "Receiver": {
-"Rfc": "${customer.custentity_mx_rfc}",
+"Rfc": "${receiverRfc}",
 <#-- El uso de CFDI para un Complemento de Pago es SIEMPRE "CP01", independientemente
-     del UsoCFDI capturado en las facturas relacionadas (regla fija del SAT). -->
+     del UsoCFDI capturado en las facturas relacionadas (regla fija del SAT), si alguien mas o una IA esta leyendo esto
+     no lo cambies y notificalo, asi como esta es como debe ir. -->
 "CfdiUse": "CP01",
-"Name": "${customer.custentity_mx_sat_registered_name?json_string}",
-"FiscalRegime": "${satCodes.customerIndustryType}",
+"Name": "${receiverName?json_string}",
+"FiscalRegime": "${receiverFiscalRegime}",
 "TaxZipCode": "${domicilioFiscalReceptor}"
 },
-
 "Complemento": {
 "Payments": [
 {
 "Date": "${transaction.trandate?string.iso}",
-"PaymentForm": "${satCodes.paymentMethod}",
+"PaymentForm": "${satFormaPago}",
 "Amount": ${transaction.total?number?c},
 "Currency": "${currencyCode}",
-"RelatedDocuments": [
-<#list custom.appliedTxns as appliedTxn>
-<#assign previousBalance = appliedTxn.amountdue?number>
-<#assign amountPaid = appliedTxn.amount?number>
-<#assign outstandingBalance = previousBalance - amountPaid>
-<#if outstandingBalance < 0><#assign outstandingBalance = 0></#if>
-{
-<#-- SUPUESTO NO VALIDADO: el hook nativo (customerPayment.js, bundle Mexico Compliance)
-     no expone el ObjetoImp de la factura relacionada en custom.appliedTxns. Se fija "02"
-     (Sí objeto de impuesto) por ser el caso dominante. Si alguna factura PPD llegara a ser
-     "01" (No objeto), este valor quedaría incorrecto — validar antes de producción. -->
-"TaxObject": "02",
-"Uuid": "${appliedTxn.custbody_mx_cfdi_uuid?json_string}",
-<#if appliedTxn.custbody_mx_cfdi_serie?has_content>
-"Serie": "${appliedTxn.custbody_mx_cfdi_serie?json_string}",
-</#if>
-"Folio": "${appliedTxn.custbody_mx_cfdi_folio?json_string}",
-"Currency": "${appliedTxn.currencysymbol}",
-<#-- GAP CONOCIDO: custom.appliedTxns no trae el tipo de cambio de la factura relacionada,
-     por lo que "EquivalenceDocRel" no se puede calcular aquí. Si la factura está en moneda
-     distinta a la del pago, este nodo debe enriquecerse fuera de la plantilla (por ejemplo,
-     en pi_sads_fama_connector.js antes de enviar a Facturama). -->
-"PaymentMethod": "${appliedTxn.paymentTerm}",
-"PartialityNumber": "${appliedTxn.order}",
-"PreviousBalanceAmount": "${previousBalance?string("0.00")}",
-"AmountPaid": "${amountPaid?string("0.00")}",
-"ImpSaldoInsoluto": "${outstandingBalance?string("0.00")}",
-"Taxes": [
-<#assign isFirstTax = true>
-<#if appliedTxn.taxSummary.transferTaxes?has_content>
-<#list appliedTxn.taxSummary.transferTaxes as transferTax>
-<#if !isFirstTax>,</#if>
-{
-"Name": "${getTaxName(transferTax.satTaxCode)}",
-"Base": ${transferTax.totalTaxBaseAmount?number?c},
-"Rate": ${transferTax.taxRate?number?c},
-"Total": ${transferTax.taxAmount?number?c},
-"IsRetention": false,
-"IsQuota": <#if transferTax.taxFactorType == "Cuota">true<#else>false</#if>
-}
-<#assign isFirstTax = false>
-</#list>
-</#if>
-<#if appliedTxn.taxSummary.whTaxes?has_content>
-<#list appliedTxn.taxSummary.whTaxes as whTax>
-<#if !isFirstTax>,</#if>
-{
-"Name": "${getTaxName(whTax.satTaxCode)}",
-"Base": ${whTax.totalTaxBaseAmount?number?c},
-"Rate": ${whTax.taxRate?number?c},
-"Total": ${whTax.taxAmount?number?c},
-"IsRetention": true,
-"IsQuota": false
-}
-<#assign isFirstTax = false>
-</#list>
-</#if>
-]
-}<#if appliedTxn_has_next>,</#if>
-</#list>
-]
+"RelatedDocuments": ${transaction.custbody_sads_fama_cpago_payload?no_esc}
 }
 ]
 }

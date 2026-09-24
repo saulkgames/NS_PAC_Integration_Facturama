@@ -93,6 +93,12 @@ define([
                 return;
             }
 
+            // Fail-Fast: no se persiste nada que no pase la validación. custbody_sads_fama_cpago_payload
+            // ya no se re-verifica en ningún otro punto de la cadena (pi_sads_fama_connector.js dejó de
+            // enriquecer/validar tras la consolidación); este es el único filtro antes de que la
+            // plantilla lo transporte tal cual hacia Facturama.
+            _validateRelatedDocuments(relatedDocuments, paymentId);
+
             _persistPayload(paymentId, context.newRecord, relatedDocuments);
 
         } catch (e) {
@@ -178,7 +184,7 @@ define([
 
         var sql =
             "SELECT t.id AS id, t.custbody_mx_cfdi_uuid AS uuid, t.custbody_mx_cfdi_serie AS serie, " +
-            "t.custbody_mx_cfdi_folio AS folio, BUILTIN.DF(t.currency) AS currencyname, " +
+            "t.custbody_mx_cfdi_folio AS folio, t.tranid AS tranid, BUILTIN.DF(t.currency) AS currencyname, " +
             "t.exchangerate AS exchangerate, t.foreigntotal AS foreigntotal, " +
             "t.custbody_mx_txn_sat_payment_term AS paymentterm_id, " +
             "BUILTIN.DF(t.custbody_mx_txn_sat_payment_term) AS paymentterm_text, " +
@@ -189,11 +195,16 @@ define([
 
         var invoicesById = {};
         rows.forEach(function (row) {
+            // Fallback: algunas facturas no tienen custbody_mx_cfdi_serie/folio poblados aunque
+            // ya estén timbradas. El tranid ("B1653380") ya trae la combinación Serie+Folio;
+            // se descompone en letras iniciales (Serie) y dígitos (Folio) cuando ambos vienen vacíos.
+            var serieFolio = (!row.serie && !row.folio) ? _decomposeTranId(row.tranid) : null;
+
             invoicesById[row.id] = {
                 invoiceId: row.id,
                 uuid: row.uuid,
-                serie: row.serie,
-                folio: row.folio,
+                serie: serieFolio ? serieFolio.serie : row.serie,
+                folio: serieFolio ? serieFolio.folio : row.folio,
                 currency: row.currencyname,
                 exchangerate: parseFloat(row.exchangerate) || 1,
                 foreignTotal: parseFloat(row.foreigntotal) || 0,
@@ -347,6 +358,16 @@ define([
      * Prorratea el IVA de la factura relacionada en proporción al monto pagado en esta parcialidad
      * (multiplier = amountPaid / total), mismo criterio que el bundle nativo. Simplificado a un
      * único renglón de IVA, consistente con sads_fama_global_mapper.js.
+     *
+     * NOTA: no se usa transactionTaxDetail.basetaxamount para la Base. Ese campo no es la base
+     * gravable (esa es taxbasis, ya removido en esta cuenta) — por el patrón de valores obtenidos
+     * en producción (Base idéntica a Total, ambas en el importe del impuesto) todo indica que
+     * representa el importe del impuesto en moneda base, no una base gravable. La Base se deriva
+     * matemáticamente de Tax/Rate, que es la relación que el propio SAT exige de cualquier forma.
+     *
+     * taxamount llega en negativo desde SuiteQL (convención contable de NetSuite para el lado de
+     * la línea, no el importe cobrado); se normaliza con Math.abs, mismo patrón que ya usa
+     * sads_fama_global_mapper.js para discountamount.
      * @private
      * @param {Object} invoiceData - Datos de cabecera de la factura.
      * @param {number} amountPaid - Importe pagado en esta parcialidad.
@@ -356,7 +377,7 @@ define([
         var multiplier = invoiceData.foreignTotal > 0 ? (amountPaid / invoiceData.foreignTotal) : 0;
 
         var sql =
-            "SELECT SUM(ttd.basetaxamount) AS base, SUM(ttd.taxamount) AS tax, MAX(ttd.taxrate) AS rate " +
+            "SELECT SUM(ttd.taxamount) AS tax, MAX(ttd.taxrate) AS rate " +
             "FROM transactionLine tl " +
             "JOIN transactionTaxDetail ttd ON tl.id = ttd.line AND tl.transaction = ttd.transaction " +
             "WHERE tl.transaction = " + invoiceData.invoiceId;
@@ -366,9 +387,9 @@ define([
             return [];
         }
 
-        var base = _round((parseFloat(rows[0].base) || 0) * multiplier, ROUND_MONEY);
-        var tax = _round((parseFloat(rows[0].tax) || 0) * multiplier, ROUND_MONEY);
-        var rate = _round(parseFloat(rows[0].rate) || 0, ROUND_RATE);
+        var tax = _round(Math.abs(parseFloat(rows[0].tax) || 0) * multiplier, ROUND_MONEY);
+        var rate = _round(Math.abs(parseFloat(rows[0].rate) || 0), ROUND_RATE);
+        var base = rate > 0 ? _round(tax / rate, ROUND_MONEY) : 0;
 
         return [{
             "Total": tax,
@@ -377,6 +398,147 @@ define([
             "Rate": rate,
             "IsRetention": false
         }];
+    }
+
+    /**
+     * Valida que el arreglo RelatedDocuments esté completo y bien tipado antes de persistirlo.
+     * No es una revalidación fiscal (eso ya lo hace _buildRelatedDocument) sino una red de
+     * seguridad estructural: detecta strings vacíos, valores no numéricos, NaN silencioso
+     * (JSON.stringify convierte NaN/Infinity en null sin avisar) y arreglos vacíos donde no
+     * deberían estarlo, antes de que la plantilla FreeMarker transporte el JSON sin más filtros.
+     *
+     * Recolecta TODOS los errores encontrados (no se detiene en el primero) y los reporta en un
+     * solo registro vía sads_fama_logger, para diagnosticar de una sola corrida en vez de una
+     * excepción a la vez. Solo al final, si hubo al menos un error, se lanza una excepción
+     * resumen (Fail-Fast: no se persiste un payload que no pasó la validación completa).
+     * @private
+     * @param {Array} relatedDocuments - Nodos RelatedDocuments ya construidos.
+     * @param {number|string} paymentId - ID del pago, para contexto en el log y el mensaje de error.
+     * @returns {void}
+     * @throws {Error} Si se encontró al menos un error de validación.
+     */
+    function _validateRelatedDocuments(relatedDocuments, paymentId) {
+        var UUID_REGEX = /^[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}$/;
+        var REQUIRED_STRING_FIELDS = [
+            'TaxObject', 'Uuid', 'Folio', 'Currency', 'PaymentMethod',
+            'PartialityNumber', 'PreviousBalanceAmount', 'AmountPaid', 'ImpSaldoInsoluto'
+        ];
+        var NUMERIC_STRING_FIELDS = ['PreviousBalanceAmount', 'AmountPaid', 'ImpSaldoInsoluto'];
+
+        var errors = [];
+
+        function fail(index, message) {
+            errors.push('RelatedDocument #' + index + ': ' + message);
+        }
+
+        function isEmpty(value) {
+            return value === null || value === undefined || String(value).trim() === '';
+        }
+
+        if (!Array.isArray(relatedDocuments) || relatedDocuments.length === 0) {
+            errors.push('El pago no generó ningún RelatedDocument.');
+        } else {
+            relatedDocuments.forEach(function (doc, index) {
+                REQUIRED_STRING_FIELDS.forEach(function (field) {
+                    if (isEmpty(doc[field])) {
+                        fail(index, 'la propiedad "' + field + '" está vacía o ausente.');
+                    }
+                });
+
+                if (!isEmpty(doc.Uuid) && !UUID_REGEX.test(doc.Uuid)) {
+                    fail(index, 'el Uuid "' + doc.Uuid + '" tiene un formato inválido.');
+                }
+
+                NUMERIC_STRING_FIELDS.forEach(function (field) {
+                    if (isEmpty(doc[field])) return; // ya reportado arriba, evita mensaje duplicado
+                    var num = parseFloat(doc[field]);
+                    if (isNaN(num) || !isFinite(num)) {
+                        fail(index, '"' + field + '" = "' + doc[field] + '" no es un número válido.');
+                    }
+                });
+
+                if (!isEmpty(doc.PartialityNumber)) {
+                    var partialityNumber = parseInt(doc.PartialityNumber, 10);
+                    if (isNaN(partialityNumber) || partialityNumber < 1) {
+                        fail(index, 'PartialityNumber inválido: "' + doc.PartialityNumber + '".');
+                    }
+                }
+
+                if (!isEmpty(doc.PaymentMethod) && doc.PaymentMethod !== 'PPD') {
+                    fail(index, 'PaymentMethod "' + doc.PaymentMethod + '"; se esperaba "PPD".');
+                }
+
+                if (!Array.isArray(doc.Taxes)) {
+                    fail(index, '"Taxes" ausente o con formato inválido (se esperaba un arreglo).');
+                } else {
+                    // TaxObject "02" (Sí objeto de impuesto) sin ningún renglón de Taxes es una
+                    // inconsistencia: o falta el impuesto, o el ObjetoImp está mal calculado.
+                    if (doc.TaxObject === '02' && doc.Taxes.length === 0) {
+                        fail(index, 'declara TaxObject "02" (sí objeto de impuesto) pero Taxes llegó vacío.');
+                    }
+
+                    doc.Taxes.forEach(function (tax, taxIndex) {
+                        ['Total', 'Base', 'Rate'].forEach(function (field) {
+                            var value = tax[field];
+                            if (typeof value !== 'number' || isNaN(value) || !isFinite(value)) {
+                                fail(index, 'el impuesto #' + taxIndex + ' tiene "' + field + '" = ' +
+                                    JSON.stringify(value) + ', que no es un número válido.');
+                            }
+                        });
+                        if (isEmpty(tax.Name)) {
+                            fail(index, 'el impuesto #' + taxIndex + ' no tiene "Name".');
+                        }
+                    });
+                }
+
+                if (doc.EquivalenceDocRel !== undefined) {
+                    var equivalence = doc.EquivalenceDocRel;
+                    if (typeof equivalence !== 'number' || isNaN(equivalence) || !isFinite(equivalence) || equivalence <= 0) {
+                        fail(index, 'EquivalenceDocRel inválido: ' + JSON.stringify(equivalence) + '.');
+                    }
+                }
+            });
+        }
+
+        if (errors.length === 0) {
+            return;
+        }
+
+        logger.write('ERROR: fama_payment_complement_ue - validación de RelatedDocuments falló', {
+            paymentId: paymentId,
+            cantidadErrores: errors.length,
+            errores: errors,
+            relatedDocumentsRecibidos: relatedDocuments
+        });
+
+        throw new Error(
+            'FAIL-FAST: El pago ' + paymentId + ' tiene ' + errors.length +
+            ' error(es) de validación en RelatedDocuments. Ver el detalle completo en sads_fama_logger.'
+        );
+    }
+
+    /**
+     * Descompone un tranid como "B1653380" en su Serie ("B") y Folio ("1653380"), para usarlo
+     * como respaldo cuando custbody_mx_cfdi_serie/folio no están poblados en la factura aunque
+     * ya esté timbrada.
+     * @private
+     * @param {string} tranId - Número de transacción de NetSuite (tranid).
+     * @returns {{serie: (string|null), folio: (string|null)}}
+     */
+    function _decomposeTranId(tranId) {
+        if (!tranId) {
+            return { serie: null, folio: null };
+        }
+
+        var match = String(tranId).match(/^([A-Za-z\-]*)(\d+)$/);
+        if (!match) {
+            return { serie: null, folio: String(tranId) };
+        }
+
+        return {
+            serie: match[1] || null,
+            folio: match[2]
+        };
     }
 
     /**
