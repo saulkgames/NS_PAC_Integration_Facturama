@@ -71,3 +71,19 @@ El Complemento de Pago es el frente activo: el cálculo de `RelatedDocuments` ya
 ## Supuestos
 
 - Esta descripción se actualizó a partir de la estructura de archivos y la bitácora de desarrollo existentes en el repositorio al 2026-09-23; no se verificó contra el entorno NetSuite en vivo.
+
+## Qué necesitas hacer en la PC de casa
+
+Una sola vez, al llegar:
+
+**git pull** — trae el código, CLAUDE.md, la bitácora actualizada y (una vez que confirmes el punto de arriba) el README.
+**cd pac_facturama_integration && npm install** — solo si quieres correr la suite de Jest ahí; no es necesario para seguir depurando en NetSuite.
+suitecloud account:setup — solo si quieres correr project:validate/deploy desde esa PC; la autenticación de SuiteCloud CLI es por máquina, no viaja con git.
+Lo que NO necesitas hacer nada especial: el bug que estás depurando (la generación del E-Document del Customer Payment) vive en el sandbox de NetSuite, no en tu PC — la cuenta, el registro de prueba (2052106) y su Historial de Auditoría están exactamente igual sin importar desde qué máquina te conectes.
+
+¿Puedes hacer el cambio "como si nada"?
+Para el código: sí, sin condiciones — git no depende de rutas absolutas.
+
+Para mí (Claude Code) como asistente: no del todo. Una sesión nueva en esa PC no tiene memoria de esta conversación — no recuerdo lo que discutimos hoy a menos que lo lea de algún lado. Por eso actualicé CLAUDE.md (convenciones que debo seguir) y la bitácora (docs/development-log.md, con el estado exacto de hoy: qué se corrigió, qué se probó, qué sigue fallando). Con esos dos archivos ya en el repo, una sesión nueva puede reconstruir el contexto si se lo pides explícitamente — por ejemplo, abrir con algo como "sigamos con el bug del Complemento de Pago, lee docs/development-log.md (entrada del 2026-09-23) y CLAUDE.md antes de continuar".
+
+No es memoria idéntica, pero es más confiable: no depende de que la conversación no se corte ni de que uses la misma PC — el estado real queda escrito en el repo, no en mi cabeza.
