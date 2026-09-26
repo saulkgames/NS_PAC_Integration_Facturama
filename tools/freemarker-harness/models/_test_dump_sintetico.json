@@ -1,0 +1,26 @@
+{
+  "custom": {
+    "loggedUserName": "John Doe",
+    "multiCurrencyFeature": "true",
+    "companyInfo": { "rfc": "AAA010101AAA" },
+    "satcodes": { "paymentMethod": "03", "customerIndustryType": null },
+    "appliedTxns": [
+      {
+        "id": "12345",
+        "amount": 116.00,
+        "custbody_mx_cfdi_uuid": "12345678-1234-1234-1234-123456789012",
+        "order": 1,
+        "isRetention": false,
+        "createdDate": { "__date__": "2026-09-19" },
+        "taxSummary": {
+          "transferTaxes": [
+            { "taxAmount": 16.00, "totalTaxBaseAmount": 100.00, "taxRate": 0.16 }
+          ],
+          "whTaxes": []
+        }
+      }
+    ],
+    "emptyHash": {},
+    "emptyArray": []
+  }
+}

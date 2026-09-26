@@ -1,0 +1,29 @@
+{
+  "transaction": {
+    "custbody_mx_customer_rfc": "ELR130619R85",
+    "custbody_mx_txn_sat_payment_method": "23",
+    "custbody_sads_fama_cpago_payload": "[{\"TaxObject\":\"02\",\"Uuid\":\"a63a6675-9fba-44a2-8d35-7ee29496edf2\",\"Serie\":\"B\",\"Folio\":\"1653380\",\"Currency\":\"MXN\",\"PaymentMethod\":\"PPD\",\"PartialityNumber\":\"1\",\"PreviousBalanceAmount\":\"3536.62\",\"AmountPaid\":\"1536.62\",\"ImpSaldoInsoluto\":\"2000.00\",\"Taxes\":[{\"Total\":211.95,\"Name\":\"IVA\",\"Base\":1324.69,\"Rate\":0.16,\"IsRetention\":false}]},{\"TaxObject\":\"02\",\"Uuid\":\"11057b5b-7504-4cc5-a677-358f6e8ae637\",\"Serie\":\"B\",\"Folio\":\"1653381\",\"Currency\":\"MXN\",\"PaymentMethod\":\"PPD\",\"PartialityNumber\":\"1\",\"PreviousBalanceAmount\":\"2027.68\",\"AmountPaid\":\"1027.68\",\"ImpSaldoInsoluto\":\"1000.00\",\"Taxes\":[{\"Total\":141.75,\"Name\":\"IVA\",\"Base\":885.94,\"Rate\":0.16,\"IsRetention\":false}]}]",
+    "trandate": { "__date__": "2026-09-19" },
+    "tranid": "192537",
+    "payment": 2564.30,
+    "total": 2564.30,
+    "currencysymbol": "MXN",
+    "subsidiary": {
+      "zip": "81460",
+      "custrecord_mx_sat_registered_name": "PROVEEDORA DE FIERRO Y PERFILES",
+      "custrecord_mx_sat_industry_type": "601",
+      "custrecord_alm_subsidiaria_rfc": "PFP810520JX0"
+    }
+  },
+  "customer": {
+    "custentity_mx_sat_registered_name": "ESPACIOS LR",
+    "custentity_mx_sat_industry_type": "601"
+  },
+  "custom": {
+    "oneWorldFeature": "true",
+    "multiCurrencyFeature": "true",
+    "billaddr": { "customerdefaultzipcode": "81400" },
+    "companyInfo": { "rfc": "PFP810520JX0" }
+  },
+  "companyinformation": {}
+}

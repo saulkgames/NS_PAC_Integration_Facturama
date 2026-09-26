@@ -58,7 +58,8 @@
     "totalRetencionesIVA": 0.00,
     "totalRetencionesIEPS": 0.00
   }
-},
+}
+
 {
   "custom": {
     // ID: Obtenido de la sesión de NetSuite (nsRuntime.getCurrentUser().name)

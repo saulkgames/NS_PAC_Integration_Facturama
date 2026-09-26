@@ -51,5 +51,15 @@ Este proyecto distingue deliberadamente entre dos posturas ante un error, según
   Usa `node --check <archivo>` para validar sintaxis antes de dar un cambio por terminado.
 - `suitecloud project:validate` (local y `--server` contra la cuenta) para objetos SDF antes de
   desplegar.
+- **Plantillas FreeMarker (`.ftl`)**: antes de pegar cualquier cambio en NetSuite, valídalo con el
+  harness local en `tools/freemarker-harness/` (`README.md` ahí tiene el uso completo). Reconstruye
+  un modelo de datos JSON a partir de los XML reales de la transacción y sus registros
+  relacionados, y corre `java -jar target/freemarker-harness.jar <plantilla> <modelo>`. Esto
+  atrapa errores de sintaxis FreeMarker y JSON inválido con mensajes precisos, algo que el editor
+  de plantillas de NetSuite no ofrece (solo dice "no es un archivo JSON/XML con formato correcto",
+  sin detalle).
 - No asumas que un fix funciona sin confirmación del usuario en sandbox — varias veces en este
-  proyecto una hipótesis razonable resultó no ser la causa real del error.
+  proyecto una hipótesis razonable resultó no ser la causa real del error. El harness local reduce
+  cuántas rondas de "prueba en sandbox y repórtame el error" hacen falta, pero no las elimina: el
+  motor real de NetSuite puede resolver algunos campos de forma distinta a un modelo reconstruido
+  a mano.

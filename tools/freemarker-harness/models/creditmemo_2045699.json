@@ -1,0 +1,99 @@
+{
+  "transaction": {
+    "tranid": "2941",
+    "transactionnumber": "CUSTCRED2941",
+    "trandate": { "__date__": "2026-03-18" },
+    "currencysymbol": "MXN",
+    "exchangerate": 1,
+    "custbody_mx_customer_rfc": "RELE961202EQ0",
+    "custbody_mx_cfdi_serie": "",
+    "custbody_mx_cfdi_folio": "",
+    "terms": "",
+    "item": [
+      {
+        "quantity": "2",
+        "units": "PZA",
+        "item": "Tablero 149 3' x 8' Franja Largo Continuar Cal.20",
+        "description": "Tablero 149 3' x 8' Franja Largo Continuar Cal.20",
+        "custcol_pfp_codigoarticulo_": "TBLC149308C20",
+        "custcol_mx_txn_line_sat_item_code": "1848",
+        "custcol_mx_txn_line_sat_tax_object": "2",
+        "custcol_mx_txn_line_sat_cust_req_num": ""
+      }
+    ],
+    "recmachcustrecord_mx_rcs_orig_trans": [
+      { "custrecord_mx_rcs_uuid": "493df8f6-c341-45d1-b43d-4d82b4c4fa3e" }
+    ],
+    "subsidiary": {
+      "zip": "81460",
+      "custrecord_mx_sat_registered_name": "PROVEEDORA DE FIERRO Y PERFILES",
+      "custrecord_mx_sat_industry_type": "1",
+      "custrecord_alm_subsidiaria_rfc": "PFP810520JX0"
+    }
+  },
+  "customer": {
+    "isperson": "T",
+    "custentity_mx_rfc": "RELE961202EQ0",
+    "custentity_mx_sat_registered_name": "EDITH RENDON LOPEZ",
+    "billcountry": "MX",
+    "defaulttaxreg": ""
+  },
+  "companyinformation": {},
+  "custom": {
+    "multiCurrencyFeature": "true",
+    "oneWorldFeature": "true",
+    "loggedUserName": "Silvia Solangel Sauceda Solano",
+    "companyInfo": { "rfc": "PFP810520JX0" },
+    "billaddr": { "customerdefaultzipcode": "81430", "countrycode": "MX" },
+    "satcodes": {
+      "paymentMethod": "23",
+      "paymentTerm": "PUE",
+      "proofType": "E",
+      "industryType": "601",
+      "customerIndustryType": "612",
+      "cfdiUsage": "G02",
+      "exportType": "01",
+      "items": [
+        { "itemCode": "30102304", "taxObject": "02" }
+      ]
+    },
+    "relatedCfdis": {
+      "types": ["03"],
+      "cfdis": {
+        "k0": [ { "index": "0" } ]
+      }
+    },
+    "summary": {
+      "subtotal": 1137.85,
+      "totalDiscount": 0,
+      "includesWHTaxesWNotZeroBase": "false",
+      "includesTransferTaxesWNotZeroBase": "true",
+      "byTaxObject": {
+        "totalAmount": 1319.91,
+        "totalNonWithHoldTaxAmt": 182.06,
+        "totalWithHoldTaxAmt": 0
+      },
+      "transferTaxesWNotZeroBase": [
+        { "totalTaxBaseAmount": 1137.85, "taxAmountByTaxObject": 182.06, "satTaxCode": "002", "taxRate": 0.16, "taxFactorType": "Tasa" }
+      ],
+      "whTaxesWNotZeroBase": []
+    },
+    "items": [
+      {
+        "line": "0",
+        "type": "InvtPart",
+        "satUnitCode": "H87",
+        "amount": "1137.85",
+        "rate": "568.9265",
+        "totalDiscount": "0",
+        "parts": [],
+        "taxes": {
+          "taxItems": [
+            { "taxBaseAmount": "1137.85", "taxAmount": "182.06", "satTaxCode": "002", "taxRate": "0.16", "taxFactorType": "Tasa" }
+          ],
+          "whTaxItems": []
+        }
+      }
+    ]
+  }
+}

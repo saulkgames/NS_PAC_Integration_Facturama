@@ -44,10 +44,18 @@ define([
             if (!rawPayload) throw new Error('eInvoiceContent vacío provisto por el framework.');
             
             var originalPayload = apiModule.safeParse(rawPayload);
+            logger.write('orig', originalPayload);
+            // Fail-Fast (ver CLAUDE.md): safeParse devuelve el string original sin tocar cuando
+            // JSON.parse falla (no null, no excepción) — sin esta guarda, un eInvoiceContent que
+            // no sea JSON se reenvía tal cual al PAC, que lo rechaza con un 400 genérico
+            // ("Unexpected character... <") sin pista de la causa real.
+            if (typeof originalPayload === 'string') {
+                throw new Error('eInvoiceContent no es JSON válido. Inicio del contenido recibido: ' + rawPayload.substring(0, 300));
+            }
             var txnType = plugInContext.transaction.tranType || plugInContext.transaction.type;
 
             // Paso 2: Obtención de configuración
-            var txnLookup = search.lookupFields({
+            var txnLookup = search.lookupFields({   
                 type: search.Type.TRANSACTION,
                 id: txnId,
                 columns: ['subsidiary', 'tranid']
@@ -60,6 +68,21 @@ define([
 
             var configData = configModule.get(txnLookup.subsidiary[0].value);
             var headers = configModule.getAuthHeaders(configData.user, configData.pass);
+
+            // Diagnóstico: el PAC reportó "Unexpected character... <, line 0, position 0" para
+            // esta transacción — es decir, recibió algo que no arranca en '{'/'['. Registra el
+            // payload TAL COMO SE VA A ENVIAR (no lo que mostró el preview de generación), para
+            // distinguir "el contenido ya venía mal desde eInvoiceContent" de "algo lo altera
+            // entre la generación y este POST". Nunca se registra 'headers' completo — contiene
+            // el Authorization en Base64 (ver nota de seguridad en sads_fama_api.js).
+            logger.write('2. PAYLOAD A ENVIAR AL PAC', {
+                transactionId: txnId,
+                longitud: rawPayload.length,
+                primeros150: rawPayload.substring(0, 150),
+                ultimos50: rawPayload.substring(Math.max(0, rawPayload.length - 50)),
+                contentType: headers['Content-Type'],
+                urlDestino: configData.apiPostUrl
+            });
 
             // Paso 3: Comunicación con el PAC (fuga de abstracción mantenida por compatibilidad)
             var postResp = https.post({ url: configData.apiPostUrl, headers: headers, body: rawPayload });
