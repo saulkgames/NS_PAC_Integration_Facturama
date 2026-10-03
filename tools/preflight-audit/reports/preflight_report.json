@@ -1,0 +1,2076 @@
+{
+  "meta": {
+    "generatedAt": "2026-10-03T18:20:07.206Z",
+    "scriptVersion": "1.0.0",
+    "scope": "local",
+    "projectDir": "pac_facturama_integration",
+    "node": "v22.17.0"
+  },
+  "summary": {
+    "verdict": "NO LISTO",
+    "counts": {
+      "BLOQUEANTE": 2,
+      "ALTA": 7,
+      "MEDIA": 10,
+      "INFO": 9
+    }
+  },
+  "git": {
+    "available": true,
+    "branch": "main",
+    "head": "7ad2f99",
+    "tagsAtHead": [],
+    "changesInSrc": [
+      {
+        "code": "M",
+        "file": "pac_facturama_integration/src/FileCabinet/SuiteScripts/Facturama_Integration/lib/sads_fama_sat_catalog.js"
+      },
+      {
+        "code": "??",
+        "file": "pac_facturama_integration/src/FileCabinet/SuiteScripts/Facturama_Integration/fama_factura_cartaporte_complement_ue.js"
+      },
+      {
+        "code": "??",
+        "file": "pac_facturama_integration/src/FileCabinet/SuiteScripts/Facturama_Integration/fama_traslado_complement_ue.js"
+      },
+      {
+        "code": "??",
+        "file": "pac_facturama_integration/src/FileCabinet/SuiteScripts/Facturama_Integration/lib/sads_fama_carta_porte_mapper.js"
+      },
+      {
+        "code": "??",
+        "file": "pac_facturama_integration/src/Objects/custbody_sads_fama_cartaporte_payload.xml"
+      },
+      {
+        "code": "??",
+        "file": "pac_facturama_integration/src/Objects/customscript_sads_fama_factura_cp_ue.xml"
+      },
+      {
+        "code": "??",
+        "file": "pac_facturama_integration/src/Objects/customscript_sads_fama_traslado_ue.xml"
+      }
+    ],
+    "changesOutsideSrc": [
+      {
+        "code": "??",
+        "file": "pac_facturama_integration/test/sads_fama_sat_catalog.test.js"
+      }
+    ]
+  },
+  "checklistLocal": [
+    {
+      "id": "P-01",
+      "tarea": "Versión congelada en git (sin cambios en src/ y con tag en HEAD)",
+      "estado": "FALLA",
+      "evidencia": "7 archivos con cambios; tags en HEAD: ninguno"
+    },
+    {
+      "id": "P-02",
+      "tarea": "authId de despliegue distinto de sandbox",
+      "estado": "REVISAR",
+      "evidencia": "defaultAuthId = Almetal_SB"
+    },
+    {
+      "id": "P-03",
+      "tarea": "Objetos SDF sin instancias con credenciales ni identificadores de sandbox",
+      "estado": "FALLA",
+      "evidencia": "2 instancias con campos de credenciales; 3 referencias a sandbox"
+    },
+    {
+      "id": "P-04",
+      "tarea": "File Cabinet sin archivos que no sean código",
+      "estado": "FALLA",
+      "evidencia": "1 archivos"
+    },
+    {
+      "id": "P-06 (parcial)",
+      "tarea": "IDs hardcodeados identificados para verificar en producción",
+      "estado": "REVISAR",
+      "evidencia": "CONST_SUBSIDIARY = 9; TARGET_FOLDER_ID = 412704; PPD_LIST_VALUE = 4; BUNDLE_ID = 436209"
+    },
+    {
+      "id": "P-07 (parcial)",
+      "tarea": "Manifest sin objetos de sandbox",
+      "estado": "FALLA",
+      "evidencia": "1 de sandbox; 1 con id de cuenta/bundle"
+    },
+    {
+      "id": "ESTR-01",
+      "tarea": "Todo scriptfile de SDF existe y no hay dependencias locales rotas ni ciclos",
+      "estado": "PASA",
+      "evidencia": "3 niveles de dependencia; 0 ciclos"
+    },
+    {
+      "id": "ESTR-02",
+      "tarea": "Identificadores propios (_sads_) definidos y campos dentro de alcance",
+      "estado": "PASA",
+      "evidencia": "0 sin definir; 0 fuera de alcance"
+    },
+    {
+      "id": "ESTR-03",
+      "tarea": "Mapper de dominio sin módulos N/*",
+      "estado": "PASA",
+      "evidencia": "/SuiteScripts/Facturama_Integration/lib/sads_fama_carta_porte_mapper.js"
+    },
+    {
+      "id": "D-07 (parcial)",
+      "tarea": "Scripts sin objeto SDF identificados (creación manual)",
+      "estado": "REVISAR",
+      "evidencia": "/SuiteScripts/Facturama_Integration/pi_sads_fama_connector.js"
+    }
+  ],
+  "findings": [
+    {
+      "severity": "BLOQUEANTE",
+      "area": "SDF",
+      "id": "INSTANCIA_CON_CREDENCIALES",
+      "message": "customrecord_sads_fama_config: la instancia val_8391540_5490848_sb1_162 lleva campos de credenciales dentro del objeto SDF (valores no impresos)",
+      "evidence": "campos: custrecord_sads_fama_pass, custrecord_sads_fama_user",
+      "checklist": "P-03"
+    },
+    {
+      "severity": "BLOQUEANTE",
+      "area": "SDF",
+      "id": "INSTANCIA_CON_CREDENCIALES",
+      "message": "customrecord_sads_fama_config: la instancia val_8908228_5490848_347 lleva campos de credenciales dentro del objeto SDF (valores no impresos)",
+      "evidence": "campos: custrecord_sads_fama_pass, custrecord_sads_fama_user",
+      "checklist": "P-03"
+    },
+    {
+      "severity": "ALTA",
+      "area": "Git",
+      "id": "CAMBIOS_SIN_COMMIT",
+      "message": "7 archivos de src/ con cambios sin commit",
+      "evidence": "M pac_facturama_integration/src/FileCabinet/SuiteScripts/Facturama_Integration/lib/sads_fama_sat_catalog.js; ?? pac_facturama_integration/src/FileCabinet/SuiteScripts/Facturama_Integration/fama_factura_cartaporte_complement_ue.js; ?? pac_facturama_integration/src/FileCabinet/SuiteScripts/Facturama_Integration/fama_traslado_complement_ue.js; ?? pac_facturama_integration/src/FileCabinet/SuiteScripts/Facturama_Integration/lib/sads_fama_carta_porte_mapper.js; ?? pac_facturama_integration/src/Objects/custbody_sads_fama_cartaporte_payload.xml; ?? pac_facturama_integration/src/Objects/customscript_sads_fama_factura_cp_ue.xml; ?? pac_facturama_integration/src/Objects/customscript_sads_fama_traslado_ue.xml",
+      "checklist": "P-01"
+    },
+    {
+      "severity": "ALTA",
+      "area": "HARDCODE",
+      "id": "ID_HARDCODEADO",
+      "message": "CONST_SUBSIDIARY = 9: verificar su equivalente en producción",
+      "evidence": "/SuiteScripts/Facturama_Integration/fama_global_invoice_library.js:11",
+      "checklist": "P-06"
+    },
+    {
+      "severity": "ALTA",
+      "area": "HARDCODE",
+      "id": "ID_HARDCODEADO",
+      "message": "TARGET_FOLDER_ID = 412704: verificar su equivalente en producción",
+      "evidence": "/SuiteScripts/Facturama_Integration/lib/sads_fama_files.js:11",
+      "checklist": "P-06"
+    },
+    {
+      "severity": "ALTA",
+      "area": "SDF",
+      "id": "INSTANCIA_ATADA_A_SANDBOX",
+      "message": "customrecord_sads_fama_config: la instancia val_8391540_5490848_sb1_162 tiene identificador de sandbox",
+      "evidence": "",
+      "checklist": "P-03"
+    },
+    {
+      "severity": "ALTA",
+      "area": "Manifest",
+      "id": "MANIFEST_OBJETO_DE_SANDBOX",
+      "message": "El manifest depende de un objeto con identificador de sandbox",
+      "evidence": "custtmpl_167_5490848_sb1_764",
+      "checklist": "P-07"
+    },
+    {
+      "severity": "ALTA",
+      "area": "SDF",
+      "id": "REFERENCIA_A_SANDBOX",
+      "message": "customrecord_sads_fama_config (instancia val_8391540_5490848_sb1_162) referencia un objeto de sandbox",
+      "evidence": "custtmpl_167_5490848_sb1_764",
+      "checklist": "P-03"
+    },
+    {
+      "severity": "ALTA",
+      "area": "SDF",
+      "id": "SCRIPT_SIN_OBJETO_SDF",
+      "message": "/SuiteScripts/Facturama_Integration/pi_sads_fama_connector.js (plugintypeimpl) no tiene objeto SDF: se crea y asocia a mano en la cuenta destino",
+      "evidence": "",
+      "checklist": "D-07"
+    },
+    {
+      "severity": "MEDIA",
+      "area": "Despliegue",
+      "id": "ARCHIVO_NO_CODIGO_EN_FILECABINET",
+      "message": "deploy.xml incluye ~/FileCabinet/*: este archivo viajaría a producción",
+      "evidence": "/SuiteScripts/Diccionario_pac_facturama_integration.txt",
+      "checklist": "P-04"
+    },
+    {
+      "severity": "MEDIA",
+      "area": "Deployment",
+      "id": "DEPLOYMENT_EN_TESTING",
+      "message": "customscript_fama_global_invoice_sl/customdeploy_fama_global_invoice_sl está en TESTING (solo corre para el propietario)",
+      "evidence": "",
+      "checklist": "D-10"
+    },
+    {
+      "severity": "MEDIA",
+      "area": "HARDCODE",
+      "id": "ID_HARDCODEADO",
+      "message": "BUNDLE_ID = 436209: verificar su equivalente en producción",
+      "evidence": "/SuiteScripts/Facturama_Integration/pi_sads_fama_connector.js:22",
+      "checklist": "P-06"
+    },
+    {
+      "severity": "MEDIA",
+      "area": "HARDCODE",
+      "id": "ID_HARDCODEADO",
+      "message": "PPD_LIST_VALUE = 4: verificar su equivalente en producción",
+      "evidence": "/SuiteScripts/Facturama_Integration/lib/sads_fama_sat_catalog.js:18",
+      "checklist": "P-06"
+    },
+    {
+      "severity": "MEDIA",
+      "area": "Deployment",
+      "id": "LOGLEVEL_DEBUG",
+      "message": "7 deployments en nivel DEBUG",
+      "evidence": "customdeploy_fama_backfill_tax_object_mr, customdeploy_fama_global_invoice_sl, customdeploy_sads_fama_factura_cp_ue, customdeploy_sads_fama_invoice_ue, customdeploy_sads_fama_mr_global_orch, customdeploy_sads_fama_payment_ue, customdeploy_sads_fama_traslado_ue",
+      "checklist": "V-12"
+    },
+    {
+      "severity": "MEDIA",
+      "area": "Manifest",
+      "id": "MANIFEST_OBJETO_CON_ID_DE_CUENTA",
+      "message": "El manifest depende de un objeto con identificador numérico de cuenta/bundle",
+      "evidence": "custtab_7_4346104_208",
+      "checklist": "P-07"
+    },
+    {
+      "severity": "MEDIA",
+      "area": "SDF",
+      "id": "REFERENCIA_CON_ID_DE_CUENTA",
+      "message": "custbody_sads_edocuments_package referencia un objeto con identificador de cuenta/bundle",
+      "evidence": "custtab_7_4346104_208",
+      "checklist": "P-07"
+    },
+    {
+      "severity": "MEDIA",
+      "area": "SDF",
+      "id": "REFERENCIA_CON_ID_DE_CUENTA",
+      "message": "custbody_sads_fama_cfdi_resp_id referencia un objeto con identificador de cuenta/bundle",
+      "evidence": "custtab_7_4346104_208",
+      "checklist": "P-07"
+    },
+    {
+      "severity": "MEDIA",
+      "area": "Deployment",
+      "id": "SUITELET_SIN_AUDIENCIA",
+      "message": "customscript_fama_global_invoice_sl/customdeploy_fama_global_invoice_sl no tiene audiencia definida",
+      "evidence": "",
+      "checklist": "D-10"
+    },
+    {
+      "severity": "MEDIA",
+      "area": "HARDCODE",
+      "id": "URL_LITERAL",
+      "message": "URL literal en código",
+      "evidence": "/SuiteScripts/Facturama_Integration/lib/sads_fama_cfdi.js:63 | var qrUrl = 'https://verificacfdi.facturaelectronica.sat.gob.mx/default.aspx?id=' +",
+      "checklist": "P-06"
+    },
+    {
+      "severity": "INFO",
+      "area": "SDF",
+      "id": "CLIENTSCRIPT_SIN_OBJETO",
+      "message": "/SuiteScripts/Facturama_Integration/fama_global_invoice_client.js se enlaza por nombre de archivo desde otro script",
+      "evidence": "",
+      "checklist": ""
+    },
+    {
+      "severity": "INFO",
+      "area": "Deployment",
+      "id": "FECHA_INICIO_PASADA",
+      "message": "customscript_sads_fama_mr_global_orch/customdeploy_sads_fama_mr_global_orch tiene fecha de inicio pasada",
+      "evidence": "2026-08-22",
+      "checklist": ""
+    },
+    {
+      "severity": "INFO",
+      "area": "HARDCODE",
+      "id": "ID_HARDCODEADO",
+      "message": "AUTHOR_ID = -5 (id de sistema)",
+      "evidence": "/SuiteScripts/Facturama_Integration/sads_fama_mr_global_orchestrator.js:27",
+      "checklist": "P-06"
+    },
+    {
+      "severity": "INFO",
+      "area": "HARDCODE",
+      "id": "ID_HARDCODEADO",
+      "message": "FOLDER_ID = -15 (id de sistema)",
+      "evidence": "/SuiteScripts/Facturama_Integration/lib/sads_fama_logger.js:15",
+      "checklist": "P-06"
+    },
+    {
+      "severity": "INFO",
+      "area": "HARDCODE",
+      "id": "LITERAL_SANDBOX",
+      "message": "Literal que sugiere dependencia de sandbox",
+      "evidence": "/SuiteScripts/Facturama_Integration/fama_payment_complement_ue.js:346 | // ASUNCIÓN NO VALIDADA EN SANDBOX: se calcula como 1/exchangerate de la factura,",
+      "checklist": "P-06"
+    },
+    {
+      "severity": "INFO",
+      "area": "Dependencias",
+      "id": "MENCION_ABREVIADA_DE_ID_PROPIO",
+      "message": "custrecord_sads_fama es prefijo de un id definido (probable mención en texto)",
+      "evidence": "template:facturama_customerpayment_template.ftl",
+      "checklist": ""
+    },
+    {
+      "severity": "INFO",
+      "area": "Plantillas",
+      "id": "PLANTILLAS_CANDIDATAS_DUPLICADAS",
+      "message": "Varias plantillas con CfdiType/NameId I/1: confirmar cuál se carga en producción",
+      "evidence": "facturama_cashsale_template.ftl, facturama_edocs_template.ftl, facturama_invoice_template.ftl",
+      "checklist": "D-08"
+    },
+    {
+      "severity": "INFO",
+      "area": "Deployment",
+      "id": "RUNASROLE",
+      "message": "customscript_fama_backfill_tax_object_mr/customdeploy_fama_backfill_tax_object_mr se ejecuta como ADMINISTRATOR",
+      "evidence": "",
+      "checklist": ""
+    },
+    {
+      "severity": "INFO",
+      "area": "Deployment",
+      "id": "RUNASROLE",
+      "message": "customscript_sads_fama_mr_global_orch/customdeploy_sads_fama_mr_global_orch se ejecuta como ADMINISTRATOR",
+      "evidence": "",
+      "checklist": ""
+    }
+  ],
+  "inventory": {
+    "sdfObjects": [
+      {
+        "scriptid": "customrecord_sads_fama_config",
+        "type": "customrecordtype",
+        "name": "Subsidiaria FAMA",
+        "file": "Objects/customrecord_sads_fama_config.xml",
+        "scriptfile": null,
+        "fieldtype": null,
+        "appliesTo": [],
+        "subtab": null,
+        "recordFields": 13,
+        "instances": [
+          {
+            "scriptid": "val_8391540_5490848_sb1_162",
+            "fieldTags": [
+              "custrecord_sads_fama_env",
+              "custrecord_sads_fama_folderid_pdf",
+              "custrecord_sads_fama_folderid_xml",
+              "custrecord_sads_fama_pass",
+              "custrecord_sads_fama_sub",
+              "custrecord_sads_fama_tmpl_cm",
+              "custrecord_sads_fama_tmpl_cp",
+              "custrecord_sads_fama_tmpl_cs",
+              "custrecord_sads_fama_tmpl_if",
+              "custrecord_sads_fama_tmpl_inv",
+              "custrecord_sads_fama_url_api",
+              "custrecord_sads_fama_url_api_getfile",
+              "custrecord_sads_fama_user",
+              "isinactive"
+            ],
+            "credentialTags": [
+              "custrecord_sads_fama_pass",
+              "custrecord_sads_fama_user"
+            ],
+            "sandboxBound": true
+          },
+          {
+            "scriptid": "val_8908228_5490848_347",
+            "fieldTags": [
+              "custrecord_sads_fama_env",
+              "custrecord_sads_fama_folderid_pdf",
+              "custrecord_sads_fama_folderid_xml",
+              "custrecord_sads_fama_pass",
+              "custrecord_sads_fama_sub",
+              "custrecord_sads_fama_tmpl_cm",
+              "custrecord_sads_fama_tmpl_cp",
+              "custrecord_sads_fama_tmpl_cs",
+              "custrecord_sads_fama_tmpl_if",
+              "custrecord_sads_fama_tmpl_inv",
+              "custrecord_sads_fama_url_api",
+              "custrecord_sads_fama_url_api_getfile",
+              "custrecord_sads_fama_user",
+              "isinactive"
+            ],
+            "credentialTags": [
+              "custrecord_sads_fama_pass",
+              "custrecord_sads_fama_user"
+            ],
+            "sandboxBound": false
+          }
+        ],
+        "deployments": []
+      },
+      {
+        "scriptid": "customrecord_sads_fama_logger",
+        "type": "customrecordtype",
+        "name": "log_title",
+        "file": "Objects/customrecord_sads_fama_logger.xml",
+        "scriptfile": null,
+        "fieldtype": null,
+        "appliesTo": [],
+        "subtab": null,
+        "recordFields": 4,
+        "instances": [],
+        "deployments": []
+      },
+      {
+        "scriptid": "customscript_fama_backfill_tax_object_mr",
+        "type": "mapreducescript",
+        "name": "Facturama - Backfill Tax Object",
+        "file": "Objects/customscript_fama_backfill_tax_object_mr.xml",
+        "scriptfile": "/SuiteScripts/Facturama_Integration/fama_backfill_tax_object_mr.js",
+        "fieldtype": null,
+        "appliesTo": [],
+        "subtab": null,
+        "recordFields": 0,
+        "instances": [],
+        "deployments": [
+          {
+            "scriptid": "customdeploy_fama_backfill_tax_object_mr",
+            "status": "NOTSCHEDULED",
+            "isdeployed": "T",
+            "isinactive": null,
+            "recordtype": null,
+            "allroles": null,
+            "allemployees": null,
+            "audslctrole": null,
+            "loglevel": "DEBUG",
+            "runasrole": "ADMINISTRATOR",
+            "startdate": null
+          }
+        ]
+      },
+      {
+        "scriptid": "customscript_sads_fama_mr_global_orch",
+        "type": "mapreducescript",
+        "name": "Global Invoice MR - Facturama",
+        "file": "Objects/customscript_sads_fama_mr_global_orch.xml",
+        "scriptfile": "/SuiteScripts/Facturama_Integration/sads_fama_mr_global_orchestrator.js",
+        "fieldtype": null,
+        "appliesTo": [],
+        "subtab": null,
+        "recordFields": 0,
+        "instances": [],
+        "deployments": [
+          {
+            "scriptid": "customdeploy_sads_fama_mr_global_orch",
+            "status": "NOTSCHEDULED",
+            "isdeployed": "T",
+            "isinactive": null,
+            "recordtype": null,
+            "allroles": null,
+            "allemployees": null,
+            "audslctrole": null,
+            "loglevel": "DEBUG",
+            "runasrole": "ADMINISTRATOR",
+            "startdate": "2026-08-22"
+          }
+        ]
+      },
+      {
+        "scriptid": "customscript_fama_global_invoice_sl",
+        "type": "suitelet",
+        "name": "Global Invoice Suitelet - Facturama",
+        "file": "Objects/customscript_fama_global_invoice_sl.xml",
+        "scriptfile": "/SuiteScripts/Facturama_Integration/fama_global_invoice_suitelet.js",
+        "fieldtype": null,
+        "appliesTo": [],
+        "subtab": null,
+        "recordFields": 0,
+        "instances": [],
+        "deployments": [
+          {
+            "scriptid": "customdeploy_fama_global_invoice_sl",
+            "status": "TESTING",
+            "isdeployed": "T",
+            "isinactive": null,
+            "recordtype": null,
+            "allroles": "F",
+            "allemployees": "F",
+            "audslctrole": "",
+            "loglevel": "DEBUG",
+            "runasrole": "",
+            "startdate": null
+          }
+        ]
+      },
+      {
+        "scriptid": "custbody_sads_edocuments_package",
+        "type": "transactionbodycustomfield",
+        "name": "Paquete de Electronic Documents",
+        "file": "Objects/custbody_sads_edocuments_package.xml",
+        "scriptfile": null,
+        "fieldtype": "SELECT",
+        "appliesTo": [
+          "bodysale"
+        ],
+        "subtab": "[scriptid=custtab_7_4346104_208]",
+        "recordFields": 0,
+        "instances": [],
+        "deployments": []
+      },
+      {
+        "scriptid": "custbody_sads_fama_cartaporte_payload",
+        "type": "transactionbodycustomfield",
+        "name": "Facturama Carta Porte Payload",
+        "file": "Objects/custbody_sads_fama_cartaporte_payload.xml",
+        "scriptfile": null,
+        "fieldtype": "CLOBTEXT",
+        "appliesTo": [
+          "bodyitemfulfillment",
+          "bodysale"
+        ],
+        "subtab": "[scriptid=custtab_mx_cfdi_data]",
+        "recordFields": 0,
+        "instances": [],
+        "deployments": []
+      },
+      {
+        "scriptid": "custbody_sads_fama_cfdi_resp_id",
+        "type": "transactionbodycustomfield",
+        "name": "CFDI ID",
+        "file": "Objects/custbody_sads_fama_cfdi_resp_id.xml",
+        "scriptfile": null,
+        "fieldtype": "TEXT",
+        "appliesTo": [
+          "bodycustomerpayment",
+          "bodyitemfulfillment",
+          "bodysale",
+          "bodytransferorder"
+        ],
+        "subtab": "[scriptid=custtab_7_4346104_208]",
+        "recordFields": 0,
+        "instances": [],
+        "deployments": []
+      },
+      {
+        "scriptid": "custbody_sads_fama_cpago_payload",
+        "type": "transactionbodycustomfield",
+        "name": "Facturama Complemento Pago Payload",
+        "file": "Objects/custbody_sads_fama_cpago_payload.xml",
+        "scriptfile": null,
+        "fieldtype": "TEXTAREA",
+        "appliesTo": [
+          "bodycustomerpayment"
+        ],
+        "subtab": "[scriptid=custtab_mx_cfdi_data]",
+        "recordFields": 0,
+        "instances": [],
+        "deployments": []
+      },
+      {
+        "scriptid": "custbody_sads_fama_req_id",
+        "type": "transactionbodycustomfield",
+        "name": "Facturama ID",
+        "file": "Objects/custbody_sads_fama_req_id.xml",
+        "scriptfile": null,
+        "fieldtype": "TEXT",
+        "appliesTo": [
+          "bodysale"
+        ],
+        "subtab": "[scriptid=custtab_mx_cfdi_data]",
+        "recordFields": 0,
+        "instances": [],
+        "deployments": []
+      },
+      {
+        "scriptid": "custbody_sads_fama_tax_object",
+        "type": "transactionbodycustomfield",
+        "name": "Facturama Tax Object (ObjetoImp)",
+        "file": "Objects/custbody_sads_fama_tax_object.xml",
+        "scriptfile": null,
+        "fieldtype": "TEXT",
+        "appliesTo": [
+          "bodysale"
+        ],
+        "subtab": "[scriptid=custtab_mx_cfdi_data]",
+        "recordFields": 0,
+        "instances": [],
+        "deployments": []
+      },
+      {
+        "scriptid": "customscript_sads_fama_factura_cp_ue",
+        "type": "usereventscript",
+        "name": "Facturama - Payload Carta Porte Factura",
+        "file": "Objects/customscript_sads_fama_factura_cp_ue.xml",
+        "scriptfile": "/SuiteScripts/Facturama_Integration/fama_factura_cartaporte_complement_ue.js",
+        "fieldtype": null,
+        "appliesTo": [],
+        "subtab": null,
+        "recordFields": 0,
+        "instances": [],
+        "deployments": [
+          {
+            "scriptid": "customdeploy_sads_fama_factura_cp_ue",
+            "status": "RELEASED",
+            "isdeployed": "T",
+            "isinactive": null,
+            "recordtype": "INVOICE",
+            "allroles": "T",
+            "allemployees": null,
+            "audslctrole": null,
+            "loglevel": "DEBUG",
+            "runasrole": null,
+            "startdate": null
+          }
+        ]
+      },
+      {
+        "scriptid": "customscript_sads_fama_invoice_ue",
+        "type": "usereventscript",
+        "name": "Facturama - Cacheo Tax Object en Factura",
+        "file": "Objects/customscript_sads_fama_invoice_ue.xml",
+        "scriptfile": "/SuiteScripts/Facturama_Integration/fama_invoice_tax_object_ue.js",
+        "fieldtype": null,
+        "appliesTo": [],
+        "subtab": null,
+        "recordFields": 0,
+        "instances": [],
+        "deployments": [
+          {
+            "scriptid": "customdeploy_sads_fama_invoice_ue",
+            "status": "RELEASED",
+            "isdeployed": "T",
+            "isinactive": null,
+            "recordtype": "INVOICE",
+            "allroles": "T",
+            "allemployees": null,
+            "audslctrole": null,
+            "loglevel": "DEBUG",
+            "runasrole": null,
+            "startdate": null
+          }
+        ]
+      },
+      {
+        "scriptid": "customscript_sads_fama_payment_ue",
+        "type": "usereventscript",
+        "name": "Facturama - Payload Complemento de Pago",
+        "file": "Objects/customscript_sads_fama_payment_ue.xml",
+        "scriptfile": "/SuiteScripts/Facturama_Integration/fama_payment_complement_ue.js",
+        "fieldtype": null,
+        "appliesTo": [],
+        "subtab": null,
+        "recordFields": 0,
+        "instances": [],
+        "deployments": [
+          {
+            "scriptid": "customdeploy_sads_fama_payment_ue",
+            "status": "RELEASED",
+            "isdeployed": "T",
+            "isinactive": null,
+            "recordtype": "CUSTOMERPAYMENT",
+            "allroles": "T",
+            "allemployees": null,
+            "audslctrole": null,
+            "loglevel": "DEBUG",
+            "runasrole": null,
+            "startdate": null
+          }
+        ]
+      },
+      {
+        "scriptid": "customscript_sads_fama_traslado_ue",
+        "type": "usereventscript",
+        "name": "Facturama - Payload Carta Porte Traslado",
+        "file": "Objects/customscript_sads_fama_traslado_ue.xml",
+        "scriptfile": "/SuiteScripts/Facturama_Integration/fama_traslado_complement_ue.js",
+        "fieldtype": null,
+        "appliesTo": [],
+        "subtab": null,
+        "recordFields": 0,
+        "instances": [],
+        "deployments": [
+          {
+            "scriptid": "customdeploy_sads_fama_traslado_ue",
+            "status": "RELEASED",
+            "isdeployed": "T",
+            "isinactive": null,
+            "recordtype": "ITEMFULFILLMENT",
+            "allroles": "T",
+            "allemployees": null,
+            "audslctrole": null,
+            "loglevel": "DEBUG",
+            "runasrole": null,
+            "startdate": null
+          }
+        ]
+      }
+    ],
+    "files": [
+      {
+        "path": "/SuiteScripts/Facturama_Integration/fama_global_invoice_client.js",
+        "bytes": 9103,
+        "apiVersion": "2.x",
+        "scriptType": "ClientScript",
+        "nativeModules": [
+          "N/currentRecord",
+          "N/format",
+          "N/log",
+          "N/ui/message",
+          "N/url"
+        ],
+        "localDeps": [],
+        "level": 0,
+        "sdfObject": null
+      },
+      {
+        "path": "/SuiteScripts/Facturama_Integration/fama_global_invoice_library.js",
+        "bytes": 9011,
+        "apiVersion": "2.x",
+        "scriptType": null,
+        "nativeModules": [
+          "N/config",
+          "N/log",
+          "N/record",
+          "N/search"
+        ],
+        "localDeps": [],
+        "level": 0,
+        "sdfObject": null
+      },
+      {
+        "path": "/SuiteScripts/Facturama_Integration/lib/sads_fama_carta_porte_mapper.js",
+        "bytes": 12745,
+        "apiVersion": "2.1",
+        "scriptType": null,
+        "nativeModules": [],
+        "localDeps": [],
+        "level": 0,
+        "sdfObject": null
+      },
+      {
+        "path": "/SuiteScripts/Facturama_Integration/lib/sads_fama_config.js",
+        "bytes": 4929,
+        "apiVersion": "2.0",
+        "scriptType": null,
+        "nativeModules": [
+          "N/encode",
+          "N/search"
+        ],
+        "localDeps": [],
+        "level": 0,
+        "sdfObject": null
+      },
+      {
+        "path": "/SuiteScripts/Facturama_Integration/lib/sads_fama_global_mapper.js",
+        "bytes": 7494,
+        "apiVersion": "2.0",
+        "scriptType": null,
+        "nativeModules": [],
+        "localDeps": [],
+        "level": 0,
+        "sdfObject": null
+      },
+      {
+        "path": "/SuiteScripts/Facturama_Integration/lib/sads_fama_logger.js",
+        "bytes": 6111,
+        "apiVersion": "2.0",
+        "scriptType": null,
+        "nativeModules": [
+          "N/file",
+          "N/log",
+          "N/record"
+        ],
+        "localDeps": [],
+        "level": 0,
+        "sdfObject": null
+      },
+      {
+        "path": "/SuiteScripts/Facturama_Integration/lib/sads_fama_response_handler.js",
+        "bytes": 4326,
+        "apiVersion": "2.0",
+        "scriptType": null,
+        "nativeModules": [],
+        "localDeps": [],
+        "level": 0,
+        "sdfObject": null
+      },
+      {
+        "path": "/SuiteScripts/Facturama_Integration/lib/sads_fama_sat_catalog.js",
+        "bytes": 7753,
+        "apiVersion": "2.1",
+        "scriptType": null,
+        "nativeModules": [
+          "N/search"
+        ],
+        "localDeps": [],
+        "level": 0,
+        "sdfObject": null
+      },
+      {
+        "path": "/SuiteScripts/Facturama_Integration/fama_backfill_tax_object_mr.js",
+        "bytes": 4175,
+        "apiVersion": "2.1",
+        "scriptType": "MapReduceScript",
+        "nativeModules": [
+          "N/record",
+          "N/search"
+        ],
+        "localDeps": [
+          "/SuiteScripts/Facturama_Integration/lib/sads_fama_sat_catalog.js",
+          "/SuiteScripts/Facturama_Integration/lib/sads_fama_logger.js"
+        ],
+        "level": 1,
+        "sdfObject": "customscript_fama_backfill_tax_object_mr"
+      },
+      {
+        "path": "/SuiteScripts/Facturama_Integration/fama_factura_cartaporte_complement_ue.js",
+        "bytes": 18980,
+        "apiVersion": "2.1",
+        "scriptType": "UserEventScript",
+        "nativeModules": [
+          "N/query",
+          "N/record"
+        ],
+        "localDeps": [
+          "/SuiteScripts/Facturama_Integration/lib/sads_fama_logger.js",
+          "/SuiteScripts/Facturama_Integration/lib/sads_fama_carta_porte_mapper.js",
+          "/SuiteScripts/Facturama_Integration/lib/sads_fama_sat_catalog.js"
+        ],
+        "level": 1,
+        "sdfObject": "customscript_sads_fama_factura_cp_ue"
+      },
+      {
+        "path": "/SuiteScripts/Facturama_Integration/fama_global_invoice_suitelet.js",
+        "bytes": 13587,
+        "apiVersion": "2.x",
+        "scriptType": "Suitelet",
+        "nativeModules": [
+          "N/error",
+          "N/record",
+          "N/redirect",
+          "N/runtime",
+          "N/search",
+          "N/task",
+          "N/ui/message",
+          "N/ui/serverWidget"
+        ],
+        "localDeps": [
+          "/SuiteScripts/Facturama_Integration/fama_global_invoice_library.js"
+        ],
+        "level": 1,
+        "sdfObject": "customscript_fama_global_invoice_sl"
+      },
+      {
+        "path": "/SuiteScripts/Facturama_Integration/fama_invoice_tax_object_ue.js",
+        "bytes": 2100,
+        "apiVersion": "2.1",
+        "scriptType": "UserEventScript",
+        "nativeModules": [
+          "N/record"
+        ],
+        "localDeps": [
+          "/SuiteScripts/Facturama_Integration/lib/sads_fama_sat_catalog.js",
+          "/SuiteScripts/Facturama_Integration/lib/sads_fama_logger.js"
+        ],
+        "level": 1,
+        "sdfObject": "customscript_sads_fama_invoice_ue"
+      },
+      {
+        "path": "/SuiteScripts/Facturama_Integration/fama_payment_complement_ue.js",
+        "bytes": 28324,
+        "apiVersion": "2.1",
+        "scriptType": "UserEventScript",
+        "nativeModules": [
+          "N/query",
+          "N/record"
+        ],
+        "localDeps": [
+          "/SuiteScripts/Facturama_Integration/lib/sads_fama_sat_catalog.js",
+          "/SuiteScripts/Facturama_Integration/lib/sads_fama_logger.js"
+        ],
+        "level": 1,
+        "sdfObject": "customscript_sads_fama_payment_ue"
+      },
+      {
+        "path": "/SuiteScripts/Facturama_Integration/fama_traslado_complement_ue.js",
+        "bytes": 17522,
+        "apiVersion": "2.1",
+        "scriptType": "UserEventScript",
+        "nativeModules": [
+          "N/query",
+          "N/record"
+        ],
+        "localDeps": [
+          "/SuiteScripts/Facturama_Integration/lib/sads_fama_logger.js",
+          "/SuiteScripts/Facturama_Integration/lib/sads_fama_carta_porte_mapper.js",
+          "/SuiteScripts/Facturama_Integration/lib/sads_fama_sat_catalog.js"
+        ],
+        "level": 1,
+        "sdfObject": "customscript_sads_fama_traslado_ue"
+      },
+      {
+        "path": "/SuiteScripts/Facturama_Integration/lib/sads_fama_api.js",
+        "bytes": 5413,
+        "apiVersion": "2.0",
+        "scriptType": null,
+        "nativeModules": [
+          "N/https"
+        ],
+        "localDeps": [
+          "/SuiteScripts/Facturama_Integration/lib/sads_fama_logger.js"
+        ],
+        "level": 1,
+        "sdfObject": null
+      },
+      {
+        "path": "/SuiteScripts/Facturama_Integration/lib/sads_fama_cfdi.js",
+        "bytes": 5710,
+        "apiVersion": "2.0",
+        "scriptType": null,
+        "nativeModules": [
+          "N/encode",
+          "N/xml"
+        ],
+        "localDeps": [
+          "/SuiteScripts/Facturama_Integration/lib/sads_fama_logger.js"
+        ],
+        "level": 1,
+        "sdfObject": null
+      },
+      {
+        "path": "/SuiteScripts/Facturama_Integration/lib/sads_fama_files.js",
+        "bytes": 6660,
+        "apiVersion": "2.0",
+        "scriptType": null,
+        "nativeModules": [
+          "N/encode",
+          "N/file",
+          "N/render"
+        ],
+        "localDeps": [
+          "/SuiteScripts/Facturama_Integration/lib/sads_fama_logger.js"
+        ],
+        "level": 1,
+        "sdfObject": null
+      },
+      {
+        "path": "/SuiteScripts/Facturama_Integration/pi_sads_fama_connector.js",
+        "bytes": 10467,
+        "apiVersion": "2.0",
+        "scriptType": "plugintypeimpl",
+        "nativeModules": [
+          "N/https",
+          "N/record",
+          "N/search"
+        ],
+        "localDeps": [
+          "/SuiteScripts/Facturama_Integration/lib/sads_fama_logger.js",
+          "/SuiteScripts/Facturama_Integration/lib/sads_fama_config.js",
+          "/SuiteScripts/Facturama_Integration/lib/sads_fama_api.js",
+          "/SuiteScripts/Facturama_Integration/lib/sads_fama_files.js",
+          "/SuiteScripts/Facturama_Integration/lib/sads_fama_cfdi.js",
+          "/SuiteScripts/Facturama_Integration/lib/sads_fama_response_handler.js"
+        ],
+        "level": 2,
+        "sdfObject": null
+      },
+      {
+        "path": "/SuiteScripts/Facturama_Integration/sads_fama_mr_global_orchestrator.js",
+        "bytes": 23669,
+        "apiVersion": "2.0",
+        "scriptType": "MapReduceScript",
+        "nativeModules": [
+          "N/email",
+          "N/file",
+          "N/record",
+          "N/runtime",
+          "N/search"
+        ],
+        "localDeps": [
+          "/SuiteScripts/Facturama_Integration/lib/sads_fama_logger.js",
+          "/SuiteScripts/Facturama_Integration/lib/sads_fama_config.js",
+          "/SuiteScripts/Facturama_Integration/lib/sads_fama_global_mapper.js",
+          "/SuiteScripts/Facturama_Integration/lib/sads_fama_api.js",
+          "/SuiteScripts/Facturama_Integration/lib/sads_fama_files.js"
+        ],
+        "level": 2,
+        "sdfObject": "customscript_sads_fama_mr_global_orch"
+      }
+    ],
+    "templates": [
+      {
+        "file": "facturama_cashsale_template.ftl",
+        "bytes": 5448,
+        "nameId": "1",
+        "cfdiType": "I",
+        "stopGuards": 0,
+        "usesDesgloseDetalle": false,
+        "usesCartaPortePayload": false,
+        "ids": 4
+      },
+      {
+        "file": "facturama_creditmemo_template.ftl",
+        "bytes": 7655,
+        "nameId": "2",
+        "cfdiType": "E",
+        "stopGuards": 7,
+        "usesDesgloseDetalle": false,
+        "usesCartaPortePayload": false,
+        "ids": 5
+      },
+      {
+        "file": "facturama_customerpayment_template.ftl",
+        "bytes": 5285,
+        "nameId": "14",
+        "cfdiType": "P",
+        "stopGuards": 10,
+        "usesDesgloseDetalle": false,
+        "usesCartaPortePayload": false,
+        "ids": 9
+      },
+      {
+        "file": "facturama_edocs_template.ftl",
+        "bytes": 6719,
+        "nameId": "1",
+        "cfdiType": "I",
+        "stopGuards": 4,
+        "usesDesgloseDetalle": false,
+        "usesCartaPortePayload": false,
+        "ids": 6
+      },
+      {
+        "file": "facturama_invoice_template.ftl",
+        "bytes": 8778,
+        "nameId": "1",
+        "cfdiType": "I",
+        "stopGuards": 6,
+        "usesDesgloseDetalle": true,
+        "usesCartaPortePayload": true,
+        "ids": 10
+      },
+      {
+        "file": "facturama_traslado_template.ftl",
+        "bytes": 3946,
+        "nameId": "36",
+        "cfdiType": "T",
+        "stopGuards": 2,
+        "usesDesgloseDetalle": false,
+        "usesCartaPortePayload": true,
+        "ids": 5
+      }
+    ],
+    "manifest": {
+      "present": true,
+      "features": [
+        {
+          "name": "SERVERSIDESCRIPTING",
+          "required": true
+        },
+        {
+          "name": "MULTILANGUAGE",
+          "required": false
+        },
+        {
+          "name": "EXPREPORTS",
+          "required": false
+        },
+        {
+          "name": "ADVRECEIVING",
+          "required": false
+        },
+        {
+          "name": "ADVANCEDPRINTING",
+          "required": true
+        },
+        {
+          "name": "MULTILOCINVT",
+          "required": false
+        },
+        {
+          "name": "WORKFLOW",
+          "required": true
+        },
+        {
+          "name": "INVENTORY",
+          "required": false
+        },
+        {
+          "name": "CUSTOMTRANSACTIONS",
+          "required": false
+        },
+        {
+          "name": "EXTREMELIST",
+          "required": false
+        },
+        {
+          "name": "RECEIVABLES",
+          "required": false
+        },
+        {
+          "name": "MAILMERGE",
+          "required": false
+        },
+        {
+          "name": "CUSTOMRECORDS",
+          "required": true
+        },
+        {
+          "name": "SUBSIDIARIES",
+          "required": true
+        },
+        {
+          "name": "PAYABLES",
+          "required": false
+        },
+        {
+          "name": "OPPORTUNITIES",
+          "required": false
+        },
+        {
+          "name": "PAYCHECKJOURNAL",
+          "required": false
+        },
+        {
+          "name": "CUSTOMSEGMENTS",
+          "required": false
+        },
+        {
+          "name": "ACCOUNTING",
+          "required": false
+        },
+        {
+          "name": "WEBSTORE",
+          "required": false
+        },
+        {
+          "name": "CRM",
+          "required": false
+        },
+        {
+          "name": "CREATESUITEBUNDLES",
+          "required": false
+        }
+      ],
+      "objects": [
+        "custbody_psg_ei_trans_edoc_standard",
+        "customrecord_psg_ei_standards",
+        "customrole1021",
+        "customrole1022",
+        "customrole1023",
+        "customrole1024",
+        "customrole1026",
+        "customrole1028",
+        "customrole1029",
+        "customrole1030",
+        "customrole1035",
+        "customrole1071",
+        "customrole1081",
+        "customrolealm_cordinador",
+        "custtab_7_4346104_208",
+        "custtab_mx_cfdi_data",
+        "custtmpl_167_5490848_sb1_764",
+        "custtmpl_cashsale_certified_pdf_template",
+        "custtmpl_creditmemo_certified_pdf_template",
+        "custtmpl_invoice_certified_pdf_template",
+        "custtmpl_itemfulfillment_certified_pdf",
+        "custtmpl_payment_certified_pdf_template"
+      ]
+    }
+  },
+  "deployOrder": {
+    "levels": [
+      [
+        "/SuiteScripts/Facturama_Integration/fama_global_invoice_client.js",
+        "/SuiteScripts/Facturama_Integration/fama_global_invoice_library.js",
+        "/SuiteScripts/Facturama_Integration/lib/sads_fama_carta_porte_mapper.js",
+        "/SuiteScripts/Facturama_Integration/lib/sads_fama_config.js",
+        "/SuiteScripts/Facturama_Integration/lib/sads_fama_global_mapper.js",
+        "/SuiteScripts/Facturama_Integration/lib/sads_fama_logger.js",
+        "/SuiteScripts/Facturama_Integration/lib/sads_fama_response_handler.js",
+        "/SuiteScripts/Facturama_Integration/lib/sads_fama_sat_catalog.js"
+      ],
+      [
+        "/SuiteScripts/Facturama_Integration/fama_backfill_tax_object_mr.js",
+        "/SuiteScripts/Facturama_Integration/fama_factura_cartaporte_complement_ue.js",
+        "/SuiteScripts/Facturama_Integration/fama_global_invoice_suitelet.js",
+        "/SuiteScripts/Facturama_Integration/fama_invoice_tax_object_ue.js",
+        "/SuiteScripts/Facturama_Integration/fama_payment_complement_ue.js",
+        "/SuiteScripts/Facturama_Integration/fama_traslado_complement_ue.js",
+        "/SuiteScripts/Facturama_Integration/lib/sads_fama_api.js",
+        "/SuiteScripts/Facturama_Integration/lib/sads_fama_cfdi.js",
+        "/SuiteScripts/Facturama_Integration/lib/sads_fama_files.js"
+      ],
+      [
+        "/SuiteScripts/Facturama_Integration/pi_sads_fama_connector.js",
+        "/SuiteScripts/Facturama_Integration/sads_fama_mr_global_orchestrator.js"
+      ]
+    ],
+    "cycles": []
+  },
+  "externalDependencies": {
+    "Otros (cuenta)": [
+      {
+        "id": "custbody_alm_date_time",
+        "usedIn": [
+          "template:facturama_edocs_template.ftl",
+          "template:facturama_invoice_template.ftl"
+        ]
+      },
+      {
+        "id": "custbody_edoc_generated_pdf",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/pi_sads_fama_connector.js",
+          "/SuiteScripts/Facturama_Integration/sads_fama_mr_global_orchestrator.js"
+        ]
+      },
+      {
+        "id": "custcol_desglose_detalle",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/fama_factura_cartaporte_complement_ue.js",
+          "template:facturama_invoice_template.ftl"
+        ]
+      },
+      {
+        "id": "customrecord_mcf_sat_months",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/fama_global_invoice_suitelet.js"
+        ]
+      },
+      {
+        "id": "customrecord_mcf_sat_recurrence",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/fama_global_invoice_suitelet.js"
+        ]
+      },
+      {
+        "id": "custrecord_alm_subsidiaria_rfc",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/sads_fama_mr_global_orchestrator.js",
+          "template:facturama_customerpayment_template.ftl"
+        ]
+      }
+    ],
+    "DRT (partner)": [
+      {
+        "id": "custbody_drt_cp_clave_unidadpeso",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/fama_factura_cartaporte_complement_ue.js",
+          "/SuiteScripts/Facturama_Integration/fama_traslado_complement_ue.js",
+          "/SuiteScripts/Facturama_Integration/lib/sads_fama_carta_porte_mapper.js"
+        ]
+      },
+      {
+        "id": "custbody_drt_cp_complemento_cartaporte",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/fama_factura_cartaporte_complement_ue.js",
+          "/SuiteScripts/Facturama_Integration/fama_traslado_complement_ue.js",
+          "template:facturama_invoice_template.ftl"
+        ]
+      },
+      {
+        "id": "custbody_drt_cp_destino",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/fama_factura_cartaporte_complement_ue.js",
+          "/SuiteScripts/Facturama_Integration/fama_traslado_complement_ue.js"
+        ]
+      },
+      {
+        "id": "custbody_drt_cp_fechahora_llegada",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/fama_factura_cartaporte_complement_ue.js",
+          "/SuiteScripts/Facturama_Integration/fama_traslado_complement_ue.js",
+          "/SuiteScripts/Facturama_Integration/lib/sads_fama_carta_porte_mapper.js"
+        ]
+      },
+      {
+        "id": "custbody_drt_cp_fechahora_salida",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/fama_factura_cartaporte_complement_ue.js",
+          "/SuiteScripts/Facturama_Integration/fama_traslado_complement_ue.js",
+          "/SuiteScripts/Facturama_Integration/lib/sads_fama_carta_porte_mapper.js"
+        ]
+      },
+      {
+        "id": "custbody_drt_cp_figura_transporte",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/fama_factura_cartaporte_complement_ue.js",
+          "/SuiteScripts/Facturama_Integration/fama_traslado_complement_ue.js"
+        ]
+      },
+      {
+        "id": "custbody_drt_cp_id_destino",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/fama_factura_cartaporte_complement_ue.js",
+          "/SuiteScripts/Facturama_Integration/fama_traslado_complement_ue.js",
+          "/SuiteScripts/Facturama_Integration/lib/sads_fama_carta_porte_mapper.js"
+        ]
+      },
+      {
+        "id": "custbody_drt_cp_id_origen",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/fama_factura_cartaporte_complement_ue.js",
+          "/SuiteScripts/Facturama_Integration/fama_traslado_complement_ue.js",
+          "/SuiteScripts/Facturama_Integration/lib/sads_fama_carta_porte_mapper.js"
+        ]
+      },
+      {
+        "id": "custbody_drt_cp_logistica_inversa_rede",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/fama_factura_cartaporte_complement_ue.js",
+          "/SuiteScripts/Facturama_Integration/fama_traslado_complement_ue.js"
+        ]
+      },
+      {
+        "id": "custbody_drt_cp_origen",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/fama_factura_cartaporte_complement_ue.js",
+          "/SuiteScripts/Facturama_Integration/fama_traslado_complement_ue.js"
+        ]
+      },
+      {
+        "id": "custbody_drt_cp_peso_bruto_vehicular",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/fama_factura_cartaporte_complement_ue.js",
+          "/SuiteScripts/Facturama_Integration/fama_traslado_complement_ue.js",
+          "/SuiteScripts/Facturama_Integration/lib/sads_fama_carta_porte_mapper.js"
+        ]
+      },
+      {
+        "id": "custbody_drt_cp_registro_istmo",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/fama_factura_cartaporte_complement_ue.js",
+          "/SuiteScripts/Facturama_Integration/fama_traslado_complement_ue.js"
+        ]
+      },
+      {
+        "id": "custbody_drt_cp_tipo_transporte",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/fama_factura_cartaporte_complement_ue.js",
+          "/SuiteScripts/Facturama_Integration/fama_traslado_complement_ue.js",
+          "template:facturama_invoice_template.ftl",
+          "template:facturama_traslado_template.ftl"
+        ]
+      },
+      {
+        "id": "custbody_drt_cp_totaldistrec",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/fama_factura_cartaporte_complement_ue.js",
+          "/SuiteScripts/Facturama_Integration/fama_traslado_complement_ue.js",
+          "/SuiteScripts/Facturama_Integration/lib/sads_fama_carta_porte_mapper.js"
+        ]
+      },
+      {
+        "id": "custbody_drt_cp_transpinternac",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/fama_factura_cartaporte_complement_ue.js",
+          "/SuiteScripts/Facturama_Integration/fama_traslado_complement_ue.js"
+        ]
+      },
+      {
+        "id": "custbody_drt_cp_transporte",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/fama_factura_cartaporte_complement_ue.js",
+          "/SuiteScripts/Facturama_Integration/fama_traslado_complement_ue.js"
+        ]
+      },
+      {
+        "id": "custbody_drt_cp_ubicacion_polo_destino",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/fama_factura_cartaporte_complement_ue.js",
+          "/SuiteScripts/Facturama_Integration/fama_traslado_complement_ue.js",
+          "/SuiteScripts/Facturama_Integration/lib/sads_fama_carta_porte_mapper.js"
+        ]
+      },
+      {
+        "id": "custbody_drt_cp_ubicacion_polo_origen",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/fama_factura_cartaporte_complement_ue.js",
+          "/SuiteScripts/Facturama_Integration/fama_traslado_complement_ue.js",
+          "/SuiteScripts/Facturama_Integration/lib/sads_fama_carta_porte_mapper.js"
+        ]
+      },
+      {
+        "id": "custbody_mcp_idccp",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/fama_factura_cartaporte_complement_ue.js",
+          "/SuiteScripts/Facturama_Integration/fama_traslado_complement_ue.js",
+          "/SuiteScripts/Facturama_Integration/lib/sads_fama_carta_porte_mapper.js"
+        ]
+      },
+      {
+        "id": "custcol_drt_cp_materialpeligroso",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/fama_factura_cartaporte_complement_ue.js",
+          "/SuiteScripts/Facturama_Integration/fama_traslado_complement_ue.js"
+        ]
+      },
+      {
+        "id": "custcol_drt_cp_pesoenkg",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/fama_factura_cartaporte_complement_ue.js",
+          "/SuiteScripts/Facturama_Integration/fama_traslado_complement_ue.js"
+        ]
+      },
+      {
+        "id": "customrecord_drt_cp_figura_transporte",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/fama_factura_cartaporte_complement_ue.js",
+          "/SuiteScripts/Facturama_Integration/fama_traslado_complement_ue.js"
+        ]
+      },
+      {
+        "id": "customrecord_drt_cp_remolque",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/fama_factura_cartaporte_complement_ue.js",
+          "/SuiteScripts/Facturama_Integration/fama_traslado_complement_ue.js"
+        ]
+      },
+      {
+        "id": "customrecord_drt_cp_transporte",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/fama_factura_cartaporte_complement_ue.js",
+          "/SuiteScripts/Facturama_Integration/fama_traslado_complement_ue.js"
+        ]
+      },
+      {
+        "id": "customrecord_drt_cp_ubicacion",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/fama_factura_cartaporte_complement_ue.js",
+          "/SuiteScripts/Facturama_Integration/fama_traslado_complement_ue.js"
+        ]
+      },
+      {
+        "id": "customrecord_drt_reg_facturacion_interco",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/fama_global_invoice_suitelet.js",
+          "/SuiteScripts/Facturama_Integration/sads_fama_mr_global_orchestrator.js"
+        ]
+      },
+      {
+        "id": "custrecord_drt_anio",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/fama_global_invoice_suitelet.js",
+          "/SuiteScripts/Facturama_Integration/sads_fama_mr_global_orchestrator.js"
+        ]
+      },
+      {
+        "id": "custrecord_drt_cfdi_usage",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/fama_global_invoice_suitelet.js"
+        ]
+      },
+      {
+        "id": "custrecord_drt_cod_postal_emisor",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/sads_fama_mr_global_orchestrator.js"
+        ]
+      },
+      {
+        "id": "custrecord_drt_cp_anio",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/fama_factura_cartaporte_complement_ue.js",
+          "/SuiteScripts/Facturama_Integration/fama_traslado_complement_ue.js"
+        ]
+      },
+      {
+        "id": "custrecord_drt_cp_asegurarespcivil",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/fama_factura_cartaporte_complement_ue.js",
+          "/SuiteScripts/Facturama_Integration/fama_traslado_complement_ue.js"
+        ]
+      },
+      {
+        "id": "custrecord_drt_cp_configvehicular",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/fama_factura_cartaporte_complement_ue.js",
+          "/SuiteScripts/Facturama_Integration/fama_traslado_complement_ue.js"
+        ]
+      },
+      {
+        "id": "custrecord_drt_cp_ft_numlicencia",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/fama_factura_cartaporte_complement_ue.js",
+          "/SuiteScripts/Facturama_Integration/fama_traslado_complement_ue.js"
+        ]
+      },
+      {
+        "id": "custrecord_drt_cp_nombrefigura",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/fama_factura_cartaporte_complement_ue.js",
+          "/SuiteScripts/Facturama_Integration/fama_traslado_complement_ue.js"
+        ]
+      },
+      {
+        "id": "custrecord_drt_cp_numpermisosct",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/fama_factura_cartaporte_complement_ue.js",
+          "/SuiteScripts/Facturama_Integration/fama_traslado_complement_ue.js"
+        ]
+      },
+      {
+        "id": "custrecord_drt_cp_permsct",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/fama_factura_cartaporte_complement_ue.js",
+          "/SuiteScripts/Facturama_Integration/fama_traslado_complement_ue.js"
+        ]
+      },
+      {
+        "id": "custrecord_drt_cp_placa",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/fama_factura_cartaporte_complement_ue.js",
+          "/SuiteScripts/Facturama_Integration/fama_traslado_complement_ue.js"
+        ]
+      },
+      {
+        "id": "custrecord_drt_cp_placavm",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/fama_factura_cartaporte_complement_ue.js",
+          "/SuiteScripts/Facturama_Integration/fama_traslado_complement_ue.js"
+        ]
+      },
+      {
+        "id": "custrecord_drt_cp_polizarespcivil",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/fama_factura_cartaporte_complement_ue.js",
+          "/SuiteScripts/Facturama_Integration/fama_traslado_complement_ue.js"
+        ]
+      },
+      {
+        "id": "custrecord_drt_cp_rfcfigura",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/fama_factura_cartaporte_complement_ue.js",
+          "/SuiteScripts/Facturama_Integration/fama_traslado_complement_ue.js"
+        ]
+      },
+      {
+        "id": "custrecord_drt_cp_subtiporem",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/fama_factura_cartaporte_complement_ue.js",
+          "/SuiteScripts/Facturama_Integration/fama_traslado_complement_ue.js"
+        ]
+      },
+      {
+        "id": "custrecord_drt_cp_tipo_transporte",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/fama_factura_cartaporte_complement_ue.js",
+          "/SuiteScripts/Facturama_Integration/fama_traslado_complement_ue.js"
+        ]
+      },
+      {
+        "id": "custrecord_drt_cp_tipofigura",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/fama_factura_cartaporte_complement_ue.js",
+          "/SuiteScripts/Facturama_Integration/fama_traslado_complement_ue.js"
+        ]
+      },
+      {
+        "id": "custrecord_drt_cp_transporte",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/fama_factura_cartaporte_complement_ue.js",
+          "/SuiteScripts/Facturama_Integration/fama_traslado_complement_ue.js"
+        ]
+      },
+      {
+        "id": "custrecord_drt_customer",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/fama_global_invoice_suitelet.js"
+        ]
+      },
+      {
+        "id": "custrecord_drt_documento_xml",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/sads_fama_mr_global_orchestrator.js"
+        ]
+      },
+      {
+        "id": "custrecord_drt_end_date",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/fama_global_invoice_suitelet.js"
+        ]
+      },
+      {
+        "id": "custrecord_drt_facturas",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/fama_global_invoice_suitelet.js",
+          "/SuiteScripts/Facturama_Integration/sads_fama_mr_global_orchestrator.js"
+        ]
+      },
+      {
+        "id": "custrecord_drt_meses",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/fama_global_invoice_suitelet.js",
+          "/SuiteScripts/Facturama_Integration/sads_fama_mr_global_orchestrator.js"
+        ]
+      },
+      {
+        "id": "custrecord_drt_pc_ubi_calle",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/fama_factura_cartaporte_complement_ue.js",
+          "/SuiteScripts/Facturama_Integration/fama_traslado_complement_ue.js"
+        ]
+      },
+      {
+        "id": "custrecord_drt_pc_ubi_codigopostal",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/fama_factura_cartaporte_complement_ue.js",
+          "/SuiteScripts/Facturama_Integration/fama_traslado_complement_ue.js"
+        ]
+      },
+      {
+        "id": "custrecord_drt_pc_ubi_colonia",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/fama_factura_cartaporte_complement_ue.js",
+          "/SuiteScripts/Facturama_Integration/fama_traslado_complement_ue.js"
+        ]
+      },
+      {
+        "id": "custrecord_drt_pc_ubi_estado",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/fama_factura_cartaporte_complement_ue.js",
+          "/SuiteScripts/Facturama_Integration/fama_traslado_complement_ue.js"
+        ]
+      },
+      {
+        "id": "custrecord_drt_pc_ubi_localidad",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/fama_factura_cartaporte_complement_ue.js",
+          "/SuiteScripts/Facturama_Integration/fama_traslado_complement_ue.js"
+        ]
+      },
+      {
+        "id": "custrecord_drt_pc_ubi_municipio",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/fama_factura_cartaporte_complement_ue.js",
+          "/SuiteScripts/Facturama_Integration/fama_traslado_complement_ue.js"
+        ]
+      },
+      {
+        "id": "custrecord_drt_pc_ubi_nombre_rd",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/fama_factura_cartaporte_complement_ue.js",
+          "/SuiteScripts/Facturama_Integration/fama_traslado_complement_ue.js"
+        ]
+      },
+      {
+        "id": "custrecord_drt_pc_ubi_numeroexterior",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/fama_factura_cartaporte_complement_ue.js",
+          "/SuiteScripts/Facturama_Integration/fama_traslado_complement_ue.js"
+        ]
+      },
+      {
+        "id": "custrecord_drt_pc_ubi_numerointerior",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/fama_factura_cartaporte_complement_ue.js",
+          "/SuiteScripts/Facturama_Integration/fama_traslado_complement_ue.js"
+        ]
+      },
+      {
+        "id": "custrecord_drt_pc_ubi_referencia",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/fama_factura_cartaporte_complement_ue.js",
+          "/SuiteScripts/Facturama_Integration/fama_traslado_complement_ue.js"
+        ]
+      },
+      {
+        "id": "custrecord_drt_pc_ubi_residencia_fiscal",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/fama_factura_cartaporte_complement_ue.js",
+          "/SuiteScripts/Facturama_Integration/fama_traslado_complement_ue.js"
+        ]
+      },
+      {
+        "id": "custrecord_drt_pc_ubi_rfc",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/fama_factura_cartaporte_complement_ue.js",
+          "/SuiteScripts/Facturama_Integration/fama_traslado_complement_ue.js"
+        ]
+      },
+      {
+        "id": "custrecord_drt_pdf_generado",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/sads_fama_mr_global_orchestrator.js"
+        ]
+      },
+      {
+        "id": "custrecord_drt_periodicidad",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/fama_global_invoice_suitelet.js",
+          "/SuiteScripts/Facturama_Integration/sads_fama_mr_global_orchestrator.js"
+        ]
+      },
+      {
+        "id": "custrecord_drt_sat_payment_method",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/fama_global_invoice_suitelet.js",
+          "/SuiteScripts/Facturama_Integration/sads_fama_mr_global_orchestrator.js"
+        ]
+      },
+      {
+        "id": "custrecord_drt_sat_payment_term",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/fama_global_invoice_suitelet.js",
+          "/SuiteScripts/Facturama_Integration/sads_fama_mr_global_orchestrator.js"
+        ]
+      },
+      {
+        "id": "custrecord_drt_start_date",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/fama_global_invoice_suitelet.js"
+        ]
+      },
+      {
+        "id": "custrecord_drt_status",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/fama_global_invoice_suitelet.js",
+          "/SuiteScripts/Facturama_Integration/sads_fama_mr_global_orchestrator.js"
+        ]
+      },
+      {
+        "id": "custrecord_drt_subsidiary",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/fama_global_invoice_suitelet.js",
+          "/SuiteScripts/Facturama_Integration/sads_fama_mr_global_orchestrator.js"
+        ]
+      },
+      {
+        "id": "custrecord_drt_uuid",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/sads_fama_mr_global_orchestrator.js"
+        ]
+      },
+      {
+        "id": "custrecord_drt_xml_generado",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/sads_fama_mr_global_orchestrator.js"
+        ]
+      },
+      {
+        "id": "custrecord_drt_xml_issue_date",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/fama_global_invoice_suitelet.js",
+          "/SuiteScripts/Facturama_Integration/sads_fama_mr_global_orchestrator.js"
+        ]
+      },
+      {
+        "id": "custrecord_drt_xml_issue_date_2",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/sads_fama_mr_global_orchestrator.js"
+        ]
+      }
+    ],
+    "Mexico Compliance": [
+      {
+        "id": "custbody_mx_cfdi_cadena_original",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/lib/sads_fama_cfdi.js"
+        ]
+      },
+      {
+        "id": "custbody_mx_cfdi_certify_timestamp",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/lib/sads_fama_cfdi.js",
+          "/SuiteScripts/Facturama_Integration/sads_fama_mr_global_orchestrator.js"
+        ]
+      },
+      {
+        "id": "custbody_mx_cfdi_folio",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/fama_payment_complement_ue.js",
+          "/SuiteScripts/Facturama_Integration/lib/sads_fama_cfdi.js"
+        ]
+      },
+      {
+        "id": "custbody_mx_cfdi_issue_datetime",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/lib/sads_fama_cfdi.js"
+        ]
+      },
+      {
+        "id": "custbody_mx_cfdi_issuer_serial",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/lib/sads_fama_cfdi.js"
+        ]
+      },
+      {
+        "id": "custbody_mx_cfdi_qr_code",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/lib/sads_fama_cfdi.js"
+        ]
+      },
+      {
+        "id": "custbody_mx_cfdi_sat_serial",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/lib/sads_fama_cfdi.js"
+        ]
+      },
+      {
+        "id": "custbody_mx_cfdi_sat_signature",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/lib/sads_fama_cfdi.js"
+        ]
+      },
+      {
+        "id": "custbody_mx_cfdi_serie",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/fama_payment_complement_ue.js",
+          "/SuiteScripts/Facturama_Integration/lib/sads_fama_cfdi.js",
+          "template:facturama_cashsale_template.ftl",
+          "template:facturama_creditmemo_template.ftl",
+          "template:facturama_edocs_template.ftl",
+          "template:facturama_invoice_template.ftl",
+          "template:facturama_traslado_template.ftl"
+        ]
+      },
+      {
+        "id": "custbody_mx_cfdi_signature",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/lib/sads_fama_cfdi.js"
+        ]
+      },
+      {
+        "id": "custbody_mx_cfdi_uuid",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/fama_global_invoice_library.js",
+          "/SuiteScripts/Facturama_Integration/fama_payment_complement_ue.js",
+          "/SuiteScripts/Facturama_Integration/lib/sads_fama_cfdi.js",
+          "/SuiteScripts/Facturama_Integration/sads_fama_mr_global_orchestrator.js"
+        ]
+      },
+      {
+        "id": "custbody_mx_customer_rfc",
+        "usedIn": [
+          "template:facturama_customerpayment_template.ftl"
+        ]
+      },
+      {
+        "id": "custbody_mx_txn_sat_payment_method",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/fama_global_invoice_library.js",
+          "template:facturama_customerpayment_template.ftl"
+        ]
+      },
+      {
+        "id": "custbody_mx_txn_sat_payment_term",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/fama_payment_complement_ue.js",
+          "/SuiteScripts/Facturama_Integration/lib/sads_fama_sat_catalog.js"
+        ]
+      },
+      {
+        "id": "custcol_mx_txn_line_sat_item_code",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/fama_factura_cartaporte_complement_ue.js",
+          "/SuiteScripts/Facturama_Integration/fama_traslado_complement_ue.js",
+          "/SuiteScripts/Facturama_Integration/sads_fama_mr_global_orchestrator.js"
+        ]
+      },
+      {
+        "id": "custcol_mx_txn_line_sat_tax_object",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/lib/sads_fama_sat_catalog.js",
+          "/SuiteScripts/Facturama_Integration/sads_fama_mr_global_orchestrator.js"
+        ]
+      },
+      {
+        "id": "custentity_mx_rfc",
+        "usedIn": [
+          "template:facturama_cashsale_template.ftl",
+          "template:facturama_creditmemo_template.ftl",
+          "template:facturama_edocs_template.ftl",
+          "template:facturama_invoice_template.ftl"
+        ]
+      },
+      {
+        "id": "custentity_mx_sat_industry_type",
+        "usedIn": [
+          "template:facturama_customerpayment_template.ftl"
+        ]
+      },
+      {
+        "id": "custentity_mx_sat_registered_name",
+        "usedIn": [
+          "template:facturama_cashsale_template.ftl",
+          "template:facturama_creditmemo_template.ftl",
+          "template:facturama_customerpayment_template.ftl",
+          "template:facturama_edocs_template.ftl",
+          "template:facturama_invoice_template.ftl"
+        ]
+      },
+      {
+        "id": "customrecord_mx_mapper_values",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/fama_global_invoice_suitelet.js"
+        ]
+      },
+      {
+        "id": "customrecord_mx_sat_cfdi_usage",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/fama_global_invoice_suitelet.js"
+        ]
+      },
+      {
+        "id": "customrecord_mx_sat_payment_term",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/fama_global_invoice_suitelet.js"
+        ]
+      },
+      {
+        "id": "customrecord_mx_sat_tax_object",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/lib/sads_fama_sat_catalog.js"
+        ]
+      },
+      {
+        "id": "customsearch_mx_mapping_search",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/lib/sads_fama_sat_catalog.js"
+        ]
+      },
+      {
+        "id": "custrecord_mx_mapper_keyvalue_category",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/lib/sads_fama_sat_catalog.js"
+        ]
+      },
+      {
+        "id": "custrecord_mx_mapper_keyvalue_rectype",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/lib/sads_fama_sat_catalog.js"
+        ]
+      },
+      {
+        "id": "custrecord_mx_mapper_keyvalue_subkey",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/lib/sads_fama_sat_catalog.js"
+        ]
+      },
+      {
+        "id": "custrecord_mx_mapper_keyvalue_subrectype",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/lib/sads_fama_sat_catalog.js"
+        ]
+      },
+      {
+        "id": "custrecord_mx_mapper_keyvalue_value",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/lib/sads_fama_sat_catalog.js"
+        ]
+      },
+      {
+        "id": "custrecord_mx_mapper_value_inreport",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/lib/sads_fama_sat_catalog.js"
+        ]
+      },
+      {
+        "id": "custrecord_mx_rcs_uuid",
+        "usedIn": [
+          "template:facturama_creditmemo_template.ftl",
+          "template:facturama_edocs_template.ftl",
+          "template:facturama_invoice_template.ftl"
+        ]
+      },
+      {
+        "id": "custrecord_mx_sat_industry_type",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/sads_fama_mr_global_orchestrator.js",
+          "template:facturama_customerpayment_template.ftl"
+        ]
+      },
+      {
+        "id": "custrecord_mx_sat_registered_name",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/sads_fama_mr_global_orchestrator.js",
+          "template:facturama_cashsale_template.ftl",
+          "template:facturama_creditmemo_template.ftl",
+          "template:facturama_customerpayment_template.ftl",
+          "template:facturama_edocs_template.ftl",
+          "template:facturama_invoice_template.ftl",
+          "template:facturama_traslado_template.ftl"
+        ]
+      },
+      {
+        "id": "custrecord_mx_sat_to_code",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/lib/sads_fama_sat_catalog.js",
+          "/SuiteScripts/Facturama_Integration/sads_fama_mr_global_orchestrator.js"
+        ]
+      }
+    ],
+    "NetSuite PSG / E-Document": [
+      {
+        "id": "custbody_psg_ei_certified_edoc",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/lib/sads_fama_cfdi.js",
+          "/SuiteScripts/Facturama_Integration/sads_fama_mr_global_orchestrator.js"
+        ]
+      },
+      {
+        "id": "custbody_psg_ei_status",
+        "usedIn": [
+          "/SuiteScripts/Facturama_Integration/sads_fama_mr_global_orchestrator.js"
+        ]
+      }
+    ],
+    "Propio (sads)": [
+      {
+        "id": "custrecord_sads_fama",
+        "usedIn": [
+          "template:facturama_customerpayment_template.ftl"
+        ]
+      }
+    ]
+  },
+  "notVerifiableLocally": [
+    {
+      "id": "P-05",
+      "tarea": "Existencia en producción de bundles, registros y campos externos (ver dependencias externas)"
+    },
+    {
+      "id": "P-06",
+      "tarea": "Equivalencia en producción de los IDs hardcodeados (ver hallazgos HARDCODE)"
+    },
+    {
+      "id": "P-07",
+      "tarea": "project:validate --server contra la cuenta de producción"
+    },
+    {
+      "id": "P-08",
+      "tarea": "Timbrado aceptado por el PAC en sandbox con el código a desplegar"
+    },
+    {
+      "id": "P-09",
+      "tarea": "Respaldo del estado actual de producción"
+    },
+    {
+      "id": "P-10",
+      "tarea": "Ventana de cambio y comunicación a usuarios"
+    },
+    {
+      "id": "P-11",
+      "tarea": "Volumen para el backfill de Tax Object"
+    },
+    {
+      "id": "D-03",
+      "tarea": "Instancia de configuración de producción (manual)"
+    },
+    {
+      "id": "D-07",
+      "tarea": "Plugin implementation y Sending Method (manual)"
+    },
+    {
+      "id": "D-08",
+      "tarea": "Carga de plantillas .ftl en Electronic Documents (manual)"
+    },
+    {
+      "id": "V-01..V-12",
+      "tarea": "Pruebas de humo y monitoreo post-despliegue"
+    },
+    {
+      "id": "R-01..R-07",
+      "tarea": "Plan de rollback"
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 /**
  * Copyright (c) 2019, Oracle and/or its affiliates. All rights reserved.
  *
- * @NApiVersion 2.1
+ * @NApiVersion 2.0
  * @NScriptType plugintypeimpl
  * @NModuleScope Public
  */
@@ -33,7 +33,7 @@ define([
 	'./../../common/localeCurrencyMap',
 	'./../../common/logger',
 	'./../eiLogger',
-	'./../../common/constants'
+	'./../../common/constants',
 
 ], function (
 	config,
@@ -63,15 +63,15 @@ define([
 	localeCurrencyMap,
 	logger,
 	eiLogger,
-	constants
+	constants,
 ) {
-	function inject (obj) {
+	function inject(obj) {
 		var alias = 'custom';
 		var cdsToBeInjected = {};
 
 		logger.logLargeText('Entry Point for EI Custom Data Source - Plugin Implementation BEGIN', JSON.stringify(obj), false);
 
-		if(obj.transactionRecord != null && obj.transactionRecord.type == constants.CUSTOMTRANSACTION.MCF_EDOC_CANCEL){
+		if (obj.transactionRecord != null && obj.transactionRecord.type == constants.CUSTOMTRANSACTION.MCF_EDOC_CANCEL) {
 			cdsToBeInjected = createDataSourceForCancellation(obj);
 			alias = 'eDocCDS';
 		} else {
@@ -121,6 +121,7 @@ define([
 		}
 		cdsToBeInjected.localeCurrencyMap = localeCurrencyMap;
 		satMappingLookup.clearInstance(); // for Integration Tests
+		famaLogger.write('mx_pl_generation_hook.return.data', cdsToBeInjected);
 		return {
 			customDataSources: [
 				{
@@ -137,11 +138,11 @@ define([
 
 		var formattedCds = lecApi.getEDocumentModel({
 			subsidiaryId: cdsBeforeFormatting.subsidiary.id,
-            categoryId: "",
-            categoryExternalId: constants.LEC_TYPES.CATEGORY.GOODS,
-            operationTypeId: "",
-            operationTypeExternalId: constants.LEC_TYPES.OPERATION_TYPE.CANCEL,
-            eDocumentModel: cdsBeforeFormatting
+			categoryId: "",
+			categoryExternalId: constants.LEC_TYPES.CATEGORY.GOODS,
+			operationTypeId: "",
+			operationTypeExternalId: constants.LEC_TYPES.OPERATION_TYPE.CANCEL,
+			eDocumentModel: cdsBeforeFormatting
 		});
 
 		if (!formattedCds.success) {
@@ -151,7 +152,7 @@ define([
 		return formattedCds.eDocumentModel;
 	}
 
-	function _logInfoToKibana (obj) {
+	function _logInfoToKibana(obj) {
 		var txnRecord = obj.transactionRecord;
 		eiLogger.logInfoToKibana(
 			'Generation',
@@ -164,7 +165,7 @@ define([
 		);
 	}
 
-	function _getRecordType (txnRecord, isPdf) {
+	function _getRecordType(txnRecord, isPdf) {
 		var recordObj;
 		if (isPdf) {
 			recordObj = txnRecord;

@@ -156,19 +156,25 @@ disperso: tantas posiciones como el `line` más alto más 1, con `null` en los h
 solo en la posición que coincide con su propio valor de `line` (ver `models/traslado_1520482.json`
 para un ejemplo con 61 posiciones y solo 13 pobladas).
 
-## `(expr)!"" ?has_content` con espacio no hace lo que parece
+## `(expr)!"" <lo que sea>` con espacio no hace lo que parece — no es solo `?has_content`
 
-Encontrado en la misma plantilla de Traslado. `<#if (ubicacion.campo)!"" ?has_content>` — con un
-espacio antes de `?has_content` — NO aplica el builtin sobre `(ubicacion.campo)!""` como parece a
-simple vista. FreeMarker lo parsea como `(ubicacion.campo) ! ("" ?has_content)`, es decir,
-`?has_content` se pega al literal `""` del lado derecho del operador de valor por defecto (`!`), no
-a la expresión completa. Si `ubicacion.campo` sí tiene valor, el `<#if>` termina evaluando ese
-STRING directamente (no el booleano esperado), y revienta con "Expected a boolean, but this has
-evaluated to a string".
+Encontrado en la misma plantilla de Traslado, primero con `?has_content` y luego otra vez con `==`.
+`<#if (ubicacion.campo)!"" ?has_content>` — con un espacio antes de `?has_content` — NO aplica el
+builtin sobre `(ubicacion.campo)!""` como parece a simple vista. FreeMarker lo parsea como
+`(ubicacion.campo) ! ("" ?has_content)`, es decir, lo que sigue al espacio se pega al literal `""`
+del lado derecho del operador de valor por defecto (`!`), no a la expresión completa. Si
+`ubicacion.campo` sí tiene valor, el `<#if>` termina evaluando ESE valor directamente (no el
+booleano esperado), y revienta con "Expected a boolean, but this has evaluated to a string" — pasó
+igual con `(ubicacion.tipoUbicacion)!"" == "Origen"` (parsea como `!("" == "Origen")`).
 
-Corrección: envolver toda la expresión con el `!` en un paréntesis adicional antes de encadenar el
-builtin: `((ubicacion.campo)!"")?has_content`. Sin espacio entre `!""` y `?has_content` también
-evita el problema, pero el paréntesis extra es más legible y más difícil de repetir por error.
+La regla es general: cualquier builtin u operador que venga después de un `!"valor_de_respaldo"` con
+espacio de por medio se pega al valor de respaldo, no a la expresión completa — no importa si es
+`?has_content`, `==`, `?json_string` o cualquier otro.
+
+Corrección: envolver toda la expresión con el `!` en un paréntesis adicional antes de encadenar
+cualquier cosa: `((ubicacion.campo)!"")?has_content`, `((ubicacion.campo)!"") == "Origen"`. Sin
+espacio entre `!""` y lo que sigue también evita el problema, pero el paréntesis extra es más
+legible y más difícil de repetir por error.
 
 ## Flujo de trabajo para una plantilla nueva (ej. Notas de Crédito)
 

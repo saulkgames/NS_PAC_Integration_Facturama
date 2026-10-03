@@ -1,0 +1,78 @@
+{
+  "transaction": {
+    "tranid": "155670",
+    "transactionnumber": "155670",
+    "trandate": { "__date__": "2026-09-30" },
+    "currencysymbol": "MXN",
+    "exchangerate": 1,
+    "custbody_alm_date_time": { "__date__": "2026-09-30 10:00:00" },
+    "custbody_mx_cfdi_serie": "",
+    "terms": "2",
+    "item": [
+      {
+        "quantity": "34.59",
+        "units": "SERV",
+        "item": "Flete Yeiko",
+        "description": "Servicio de flete",
+        "custcol_pfp_codigoarticulo_": "Flete",
+        "custcol_mx_txn_line_sat_item_code": "3990",
+        "custcol_mx_txn_line_sat_tax_object": "2",
+        "custcol_desglose_detalle": "Desglose factura"
+      }
+    ],
+    "recmachcustrecord_mx_rcs_orig_trans": [],
+    "subsidiary": {
+      "zip": "81460",
+      "custrecord_mx_sat_registered_name": "PROVEEDORA DE FIERRO Y PERFILES",
+      "custrecord_alm_subsidiaria_rfc": "PFP810520JX0"
+    }
+  },
+  "customer": {
+    "isperson": "F",
+    "custentity_mx_rfc": "PSR920309CS2",
+    "custentity_mx_sat_registered_name": "PAPAS SELECTAS RIO FUERTE",
+    "billcountry": "MX",
+    "defaulttaxreg": ""
+  },
+  "companyinformation": {},
+  "custom": {
+    "multiCurrencyFeature": "true",
+    "oneWorldFeature": "true",
+    "loggedUserName": "Cinthia Campos V",
+    "companyInfo": { "rfc": "PFP810520JX0" },
+    "billaddr": { "customerdefaultzipcode": "81255", "countrycode": "MX" },
+    "satcodes": {
+      "paymentMethod": "99",
+      "paymentTerm": "PPD",
+      "proofType": "I",
+      "industryType": "601",
+      "customerIndustryType": "601",
+      "cfdiUsage": "S01",
+      "exportType": "01",
+      "items": [
+        { "itemCode": "78101800", "taxObject": "02" }
+      ]
+    },
+    "relatedCfdis": {
+      "types": [],
+      "cfdis": {}
+    },
+    "items": [
+      {
+        "line": "0",
+        "type": "NonInvtPart",
+        "satUnitCode": "E48",
+        "amount": "726.39",
+        "rate": "21.00",
+        "discount": "0",
+        "parts": [],
+        "taxes": {
+          "taxItems": [
+            { "taxBaseAmount": "726.39", "taxAmount": "116.22", "satTaxCode": "002", "taxRate": "0.16", "taxFactorType": "Tasa" }
+          ],
+          "whTaxItems": []
+        }
+      }
+    ]
+  }
+}

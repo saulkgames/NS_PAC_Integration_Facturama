@@ -1,0 +1,109 @@
+{
+  "transaction": {
+    "tranid": "155670",
+    "transactionnumber": "155670",
+    "trandate": { "__date__": "2026-09-30" },
+    "currencysymbol": "MXN",
+    "exchangerate": 1,
+    "custbody_alm_date_time": { "__date__": "2026-09-30 10:00:00" },
+    "custbody_mx_cfdi_serie": "",
+    "terms": "2",
+    "custbody_drt_cp_complemento_cartaporte": "T",
+    "custbody_drt_cp_tipo_transporte": "Autotransporte Federal",
+    "custbody_sads_fama_cartaporte_payload": "{\"CartaPorte31\":{\"IdCCP\":\"CCC12345-6789-4abc-9def-0123456789ab\",\"TranspInternac\":\"No\",\"TotalDistRec\":\"110.00\",\"Ubicaciones\":[{\"TipoUbicacion\":\"Origen\",\"IDUbicacion\":\"OR000001\",\"RFCRemitenteDestinatario\":\"PFP810520JX0\",\"NombreRemitenteDestinatario\":\"PROVEEDORA DE FIERRO Y PERFILES\",\"FechaHoraSalidaLlegada\":\"2026-09-30T08:00:00\",\"Domicilio\":{\"Calle\":\"E. ZAPATA Y MORELOS\",\"NumeroExterior\":\"S/N\",\"NumeroInterior\":\"ubicacion_domicilionumint_vacia\",\"Colonia\":\"0833\",\"Localidad\":\"ubicacion_domiciliolocalidad_vacia\",\"Referencia\":\"ubicacion_domicilioreferencia_vacia\",\"Municipio\":\"015\",\"Estado\":\"SIN\",\"Pais\":\"MEX\",\"CodigoPostal\":\"81460\"}},{\"TipoUbicacion\":\"Destino\",\"IDUbicacion\":\"DE000316\",\"RFCRemitenteDestinatario\":\"NCI141128DP9\",\"NombreRemitenteDestinatario\":\"NEPTUNO CINCO SA DE CV\",\"FechaHoraSalidaLlegada\":\"2026-10-01T12:00:00\",\"DistanciaRecorrida\":\"110.00\",\"Domicilio\":{\"Calle\":\"AGRICULTURA\",\"NumeroExterior\":\"1144\",\"NumeroInterior\":\"ubicacion_domicilionumint_vacia\",\"Colonia\":\"0726\",\"Localidad\":\"ubicacion_domiciliolocalidad_vacia\",\"Referencia\":\"ubicacion_domicilioreferencia_vacia\",\"Municipio\":\"001\",\"Estado\":\"SIN\",\"Pais\":\"MEX\",\"CodigoPostal\":\"81255\"}}],\"Mercancias\":{\"PesoBrutoTotal\":\"34.590\",\"UnidadPeso\":\"KGM\",\"PesoNetoTotal\":\"34.590\",\"NumTotalMercancias\":\"1\",\"Mercancia\":[{\"BienesTransp\":\"50405700\",\"Descripcion\":\"Papas\",\"Cantidad\":\"34.590000\",\"ClaveUnidad\":\"KGM\",\"PesoEnKg\":\"34.590\",\"CantidadTransporta\":[{\"Cantidad\":\"34.590000\",\"IDOrigen\":\"OR000001\",\"IDDestino\":\"DE000316\"}]}],\"Autotransporte\":{\"PermSCT\":\"TPAF01\",\"NumPermisoSCT\":\"2547NIVY24052012021001018\",\"IdentificacionVehicular\":{\"ConfigVehicular\":\"C2\",\"PesoBrutoVehicular\":\"19\",\"PlacaVM\":\"52AL5F\",\"AnioModeloVM\":\"2019\"},\"Seguros\":{\"AseguraRespCivil\":\"HDI SEGUROS\",\"PolizaRespCivil\":\"571578765\"}}},\"FiguraTransporte\":[{\"TipoFigura\":\"01\",\"RFCFigura\":\"SOPA8802229R8\",\"NumLicencia\":\"LFD00060681\",\"NombreFigura\":\"ALFREDO SOTELO PARRA\"}]}}",
+    "item": [
+      {
+        "quantity": "34.59",
+        "units": "SERV",
+        "item": "Flete Yeiko",
+        "description": "Servicio de flete",
+        "custcol_pfp_codigoarticulo_": "Flete",
+        "custcol_mx_txn_line_sat_item_code": "3990",
+        "custcol_mx_txn_line_sat_tax_object": "2",
+        "custcol_desglose_detalle": "Desglose factura"
+      },
+      {
+        "quantity": "34.59",
+        "units": "Kg",
+        "item": "Papas",
+        "description": "Papas",
+        "custcol_pfp_codigoarticulo_": "Papas",
+        "custcol_mx_txn_line_sat_item_code": "3999",
+        "custcol_mx_txn_line_sat_tax_object": "1",
+        "custcol_desglose_detalle": "Desglose carta porte",
+        "custcol_drt_cp_pesoenkg": "34.59",
+        "custcol_drt_cp_materialpeligroso": false
+      }
+    ],
+    "recmachcustrecord_mx_rcs_orig_trans": [],
+    "subsidiary": {
+      "zip": "81460",
+      "custrecord_mx_sat_registered_name": "PROVEEDORA DE FIERRO Y PERFILES",
+      "custrecord_alm_subsidiaria_rfc": "PFP810520JX0"
+    }
+  },
+  "customer": {
+    "isperson": "F",
+    "custentity_mx_rfc": "PSR920309CS2",
+    "custentity_mx_sat_registered_name": "PAPAS SELECTAS RIO FUERTE",
+    "billcountry": "MX",
+    "defaulttaxreg": ""
+  },
+  "companyinformation": {},
+  "custom": {
+    "multiCurrencyFeature": "true",
+    "oneWorldFeature": "true",
+    "loggedUserName": "Cinthia Campos V",
+    "companyInfo": { "rfc": "PFP810520JX0" },
+    "billaddr": { "customerdefaultzipcode": "81255", "countrycode": "MX" },
+    "satcodes": {
+      "paymentMethod": "99",
+      "paymentTerm": "PPD",
+      "proofType": "I",
+      "industryType": "601",
+      "customerIndustryType": "601",
+      "cfdiUsage": "S01",
+      "exportType": "01",
+      "items": [
+        { "itemCode": "78101800", "taxObject": "02" },
+        { "itemCode": "50405700", "taxObject": "01" }
+      ]
+    },
+    "relatedCfdis": {
+      "types": [],
+      "cfdis": {}
+    },
+    "items": [
+      {
+        "line": "0",
+        "type": "NonInvtPart",
+        "satUnitCode": "E48",
+        "amount": "726.39",
+        "rate": "21.00",
+        "discount": "0",
+        "parts": [],
+        "taxes": {
+          "taxItems": [
+            { "taxBaseAmount": "726.39", "taxAmount": "116.22", "satTaxCode": "002", "taxRate": "0.16", "taxFactorType": "Tasa" }
+          ],
+          "whTaxItems": [
+            { "taxBaseAmount": "726.39", "taxAmount": "29.06", "satTaxCode": "002", "taxRate": "0.04", "taxFactorType": "Tasa" }
+          ]
+        }
+      },
+      {
+        "line": "1",
+        "type": "NonInvtPart",
+        "satUnitCode": "KGM",
+        "amount": "0",
+        "rate": "0",
+        "discount": "0",
+        "parts": [],
+        "taxes": {
+          "taxItems": [],
+          "whTaxItems": []
+        }
+      }
+    ]
+  }
+}

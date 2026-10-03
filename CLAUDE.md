@@ -45,6 +45,22 @@ Este proyecto distingue deliberadamente entre dos posturas ante un error, según
   bloquear la operación principal en NetSuite (ej. un error de cálculo del Complemento de Pago no
   debe impedir que el Customer Payment se guarde).
 
+## Comentarios en el código
+
+- El código lleva documentación de las funciones (qué hace, parámetros, retorno) y comentarios
+  breves solo donde una línea sea genuinamente compleja o no obvia.
+- El código NO lleva el porqué de una decisión, su contexto, fechas ni referencias a
+  conversaciones o confirmaciones del usuario — eso va en `docs/development-log.md` o en el
+  mensaje de commit.
+
+## Referencias normativas
+
+- XSD oficial del SAT para Carta Porte: `https://www.sat.gob.mx/sitio_internet/cfd/CartaPorte/CartaPorte<version>.xsd`
+  (ej. `CartaPorte31.xsd`, la versión que usa este proyecto — Facturama la llama "V31"). Define
+  sintaxis, cardinalidad y enumeraciones, pero NO las reglas de negocio cruzadas contra catálogos
+  SAT (ej. Material Peligroso vs. `c_ClaveProdServCP`) — esas solo se confirman contra la
+  respuesta real del PAC o la matriz de validación del SAT.
+
 ## Verificación antes de dar por bueno un cambio
 
 - Los scripts de este proyecto son SuiteScript (no ejecutables directamente fuera de NetSuite).

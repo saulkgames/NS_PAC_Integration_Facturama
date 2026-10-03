@@ -1,0 +1,18 @@
+<usereventscript scriptid="customscript_sads_fama_factura_cp_ue">
+  <description>Calcula el objeto Complemento.CartaPorte31 (Factura con Complemento Carta Porte) de una Factura con Carta Porte marcado, a partir de las líneas con custcol_desglose_detalle = "Desglose carta porte"/"Ambos", y lo persiste en custbody_sads_fama_cartaporte_payload.</description>
+  <isinactive>F</isinactive>
+  <name>Facturama - Payload Carta Porte Factura</name>
+  <notifyadmins>F</notifyadmins>
+  <notifyemails></notifyemails>
+  <notifyowner>T</notifyowner>
+  <scriptfile>[/SuiteScripts/Facturama_Integration/fama_factura_cartaporte_complement_ue.js]</scriptfile>
+  <scriptdeployments>
+    <scriptdeployment scriptid="customdeploy_sads_fama_factura_cp_ue">
+      <allroles>T</allroles>
+      <isdeployed>T</isdeployed>
+      <loglevel>DEBUG</loglevel>
+      <recordtype>INVOICE</recordtype>
+      <status>RELEASED</status>
+    </scriptdeployment>
+  </scriptdeployments>
+</usereventscript>
