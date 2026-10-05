@@ -56,20 +56,6 @@
 <#stop "ERROR DE INTEGRIDAD: Si el Método de Pago es PPD, la Forma de Pago debe ser '99' en el registro. Corrija NetSuite para evitar discrepancias contables con el SAT.">
 </#if>
 
-<#-- COMPLEMENTO CARTA PORTE (adaptador puro, ver CLAUDE.md y
-Diseno_Orquestacion_Factura_CartaPorte.md): el objeto Complemento.CartaPorte31 lo arma
-fama_factura_cartaporte_complement_ue.js al guardar la Factura, a partir de las líneas con
-custcol_desglose_detalle = "2", y lo persiste en custbody_sads_fama_cartaporte_payload — esta
-plantilla solo lo transporta. Las líneas custcol_desglose_detalle = "1" siguen su camino normal
-más abajo, sin ningún cambio a su cálculo de impuestos. -->
-<#if transaction.custbody_drt_cp_complemento_cartaporte?has_content>
-<#if transaction.custbody_drt_cp_tipo_transporte?has_content && transaction.custbody_drt_cp_tipo_transporte != "Autotransporte Federal">
-<#stop "ERROR FATAL: El Complemento Carta Porte de esta plantilla solo soporta Autotransporte Federal. Tipo de transporte recibido: '${transaction.custbody_drt_cp_tipo_transporte}' no está implementado todavía.">
-</#if>
-<#if !transaction.custbody_sads_fama_cartaporte_payload?has_content>
-<#stop "ERROR FATAL: custbody_sads_fama_cartaporte_payload está vacío. fama_factura_cartaporte_complement_ue.js todavía no corrió sobre este registro — guárdalo de nuevo.">
-</#if>
-</#if>
 
 <#-- 2. CONSTRUCCIÓN DEL JSON -->
 {
@@ -125,7 +111,6 @@ más abajo, sin ningún cambio a su cálculo de impuestos. -->
 "FiscalRegime": "${satCodes.customerIndustryType}",
 "CfdiUse": "${satCodes.cfdiUsage}"
 },"Items": [
-<#assign isFirstItem = true>
 <#list custom.items as customItem>
 <#assign "item" = transaction.item[customItem.line?trim?number]>
 <#assign "taxes" = customItem.taxes>
@@ -137,14 +122,6 @@ más abajo, sin ningún cambio a su cálculo de impuestos. -->
 <#assign "itemSatUnitCode" = (customItem.satUnitCode)!"">
 <#assign "itemUnits" = item.units>
 </#if>
-<#-- RN: solo las líneas "Desglose factura" son Conceptos facturables. Las líneas "Desglose
-carta porte" las procesa fama_factura_cartaporte_complement_ue.js por separado — aquí ni
-siquiera se calculan sus impuestos.
-NOTA: transaction.item[].custcol_desglose_detalle expone el TEXTO de la lista aquí (confirmado
-contra un render real: comparar contra el id crudo "1" no hizo match en ningún caso y dejó
-Items[] vacío) — no el id interno. El User Event sí lee el id crudo vía getSublistValue, por
-eso su comparación contra "2" es correcta y no necesita cambiar. -->
-<#if item.custcol_desglose_detalle == "Desglose factura">
 <#assign subTotal = customItem.amount?number>
 <#assign Descuento = customItem.discount?number?abs>
 <#assign Impuestos_Trasladados = 0>
@@ -166,8 +143,6 @@ eso su comparación contra "2" es correcta y no necesita cambiar. -->
 </#list>
 </#if>
 </#if>
-<#if !isFirstItem>,</#if>
-<#assign isFirstItem = false>
 {
 "ProductCode": "${itemSatCodes.itemCode}",
 "IdentificationNumber": "${item.custcol_pfp_codigoarticulo_?json_string}",
@@ -178,7 +153,9 @@ eso su comparación contra "2" es correcta y no necesita cambiar. -->
 <#if itemSatUnitCode?has_content>
 "UnitCode": "${itemSatUnitCode}",
 </#if>
-"UnitPrice": ${customItem.rate?number?c},
+<#assign rateSeguro = (customItem.rate!"0")?number>
+<#assign UnitPriceTrunk = ((rateSeguro * 1000000)?floor / 1000000)>
+"UnitPrice": ${UnitPriceTrunk?c},
 "Quantity": ${item.quantity?number?c},
 "Subtotal": ${subTotal},
 "Discount": ${Descuento},
@@ -218,11 +195,7 @@ eso su comparación contra "2" es correcta y no necesita cambiar. -->
 </#list>
 </#if>
 ]
-}
-</#if>
+}<#if customItem_has_next>,</#if>
 </#list>
 ]
-<#if transaction.custbody_drt_cp_complemento_cartaporte?has_content>
-,"Complemento": ${transaction.custbody_sads_fama_cartaporte_payload}
-</#if>
 }

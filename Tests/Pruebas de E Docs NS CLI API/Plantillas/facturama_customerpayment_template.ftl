@@ -15,10 +15,10 @@
 <#assign domicilioFiscalReceptor = custom.billaddr.customerdefaultzipcode!"">
 
 <#-- Fuentes de campo confirmadas por prueba directa en sandbox el 2026-09-24 (ver
-     docs/development-log.md): satCodes.paymentMethod y satCodes.customerIndustryType NO los
-     llena el hook nativo de Customer Payment (solo el de Invoice). Se leen directo de
-     transaction/customer, igual que la plantilla MySuite de Complemento de Pago que sí funciona
-     en esta cuenta. -->
+docs/development-log.md): satCodes.paymentMethod y satCodes.customerIndustryType NO los
+llena el hook nativo de Customer Payment (solo el de Invoice). Se leen directo de
+transaction/customer, igual que la plantilla MySuite de Complemento de Pago que sí funciona
+en esta cuenta. -->
 <#assign receiverRfc = transaction.custbody_mx_customer_rfc!"">
 <#assign receiverName = customer.custentity_mx_sat_registered_name!"">
 <#assign rawReceiverFiscalRegime = customer.custentity_mx_sat_industry_type!"">
@@ -75,12 +75,12 @@
 </#if>
 
 <#-- El arreglo RelatedDocuments (TaxObject, PartialityNumber, PreviousBalanceAmount, Taxes y,
-     cuando aplica, EquivalenceDocRel) NO se construye en esta plantilla. Esta plantilla es un
-     adaptador puro de salida: toma el JSON ya calculado por la capa de dominio
-     (fama_payment_complement_ue.js, User Event de Customer Payment) desde
-     custbody_sads_fama_cpago_payload y lo inserta TAL CUAL (ya es un arreglo completo — no
-     envolverlo en otro [ ] o queda doblemente anidado). Cualquier cambio a cómo se calculan esos
-     valores va en fama_payment_complement_ue.js, nunca aquí. -->
+cuando aplica, EquivalenceDocRel) NO se construye en esta plantilla. Esta plantilla es un
+adaptador puro de salida: toma el JSON ya calculado por la capa de dominio
+(fama_payment_complement_ue.js, User Event de Customer Payment) desde
+custbody_sads_fama_cpago_payload y lo inserta TAL CUAL (ya es un arreglo completo — no
+envolverlo en otro [ ] o queda doblemente anidado). Cualquier cambio a cómo se calculan esos
+valores va en fama_payment_complement_ue.js, nunca aquí. -->
 
 <#-- 3. CONSTRUCCIÓN DEL JSON -->
 {

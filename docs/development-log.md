@@ -435,3 +435,14 @@ Registro cronológico de avances técnicos del proyecto **NS PAC Integration Fac
 - **Verificación aplicada:** `node --check` en los 2 archivos. `npm test` — 2 suites, 10 tests, en verde.
 - **Pendientes:** el usuario debe llenar `custcol_drt_cp_pesoenkg` en la línea de mercancía y `custrecord_drt_pc_ubi_localidad` en ambos registros de Ubicacion, y confirmar si el CodigoPostal declarado corresponde realmente a Estado/Municipio/Localidad según el catálogo SAT antes de reintentar. Reintentar el timbrado real con el fix de Remolques ya aplicado.
 
+
+### 2026-10-03 — Script de auditoría local de pre-despliegue (tools/preflight-audit)
+
+- **Estado:** implementado y probado; fase local únicamente. La verificación contra la cuenta de producción queda como segunda fase.
+- **Motivo:** convertir el checklist de paso a producción en un informe repetible (JSON + MD desde los mismos datos) en vez de revisión manual.
+- **Qué hace:** análisis estático de `pac_facturama_integration` (objetos SDF, `.js`, manifest, `deploy.xml`, git) y de las plantillas `facturama_*.ftl`. No lee valores de instancias de datos de objetos SDF; solo nombres de campo.
+- **Primera corrida (veredicto NO LISTO, 2 bloqueantes / 7 altas):** confirmó los hallazgos revisados a mano (instancias de `customrecord_sads_fama_config` con campos de credenciales y referencias de sandbox, `custtmpl_167_5490848_sb1_764` en el manifest, plugin sin objeto SDF, `Diccionario_pac_facturama_integration.txt` dentro de File Cabinet, 7 archivos sin commit y sin tag) y encontró dos IDs hardcodeados que el checklist manual no había listado: `CONST_SUBSIDIARY = 9` (`fama_global_invoice_library.js`) y `TARGET_FOLDER_ID = 412704` (`lib/sads_fama_files.js`).
+- **Ajustes durante las pruebas del propio script:** menciones abreviadas de un id en texto (ej. `custrecord_sads_fama config` en un mensaje de error) ya no cuentan como id sin definir; el sufijo `_vacia` de los marcadores de diagnóstico se normaliza al campo base; el primer renglón de `git status` ya no se trunca.
+- **Archivos o componentes:** `tools/preflight-audit/audit.js`, `tools/preflight-audit/README.md`.
+- **Verificación aplicada:** `node --check`; dos corridas consecutivas producen el mismo contenido salvo `meta.generatedAt`; el JSON de salida no contiene valores de las instancias de configuración.
+- **Pendientes:** fase 2 (consulta a la cuenta de producción: existencia de bundles/registros externos, IDs de lista, `customsearch_mx_mapping_search`), una vez confirmado qué datos expone la CLI en esta cuenta. Resolver los bloqueantes y altas que reporta antes del go-live.

@@ -49,29 +49,27 @@
 <#stop "ERROR DE INTEGRIDAD: Si el Método de Pago es PPD, la Forma de Pago debe ser '99' en el registro. Corrija NetSuite para evitar discrepancias contables con el SAT.">
 </#if>
 
-<#-- NOTA DE CRÉDITO (CfdiType E): en teoría siempre debe declarar al menos un CFDI relacionado —
-pero esta plantilla YA NO detiene la generación por eso (ver docs/development-log.md, entrada del
-error PAC "Unexpected character... <, position 0"): facturama_edocs_template.ftl (Factura) omite
-el nodo cuando no hay datos, en vez de usar <#stop>, y es la única plantilla de esta familia
-probada con éxito contra un CFDI real con Relations. Esta ahora replica exactamente ese patrón
-opcional/blindado. La regla de negocio "una Nota de Crédito debe tener Relations" queda pendiente
-de mover a un User Event (capa de dominio, ver CLAUDE.md) — un <#stop> aquí no es el lugar correcto
-para validarla mientras no se confirme por qué el <#stop> anterior producía ese error. -->
-<#assign cfdiRelType = "">
-<#assign cfdisArray = "">
-<#if custom.relatedCfdis?has_content && custom.relatedCfdis.types?has_content>
+<#-- NOTA DE CRÉDITO (CfdiType E): a diferencia de Factura, SIEMPRE debe declarar al menos un
+CFDI relacionado (CfdiRelacionados) — sin esto el comprobante es fiscalmente inválido. Aquí SÍ
+se detiene la generación (Fail-Fast) en vez de omitir el nodo como hace la plantilla de Factura. -->
+<#if !custom.relatedCfdis?? || !custom.relatedCfdis.types?has_content>
+<#stop "ERROR FATAL: Esta Nota de Crédito no tiene ningún CFDI relacionado (custom.relatedCfdis vacío). Un Comprobante de Egreso no puede timbrarse sin Relations.">
+</#if>
 <#if custom.relatedCfdis.types?size gt 1>
 <#stop "ERROR FATAL: El proveedor PAC (Facturama) no soporta múltiples Tipos de Relación en un mismo comprobante. La transacción tiene ${custom.relatedCfdis.types?size} tipos distintos. Unifique el Tipo de Relación en NetSuite.">
 </#if>
 <#assign cfdiRelType = custom.relatedCfdis.types[0]>
 <#assign cfdisArray = custom.relatedCfdis.cfdis["k0"]!"">
+<#if !cfdisArray?has_content>
+<#stop "ERROR FATAL: El Tipo de Relación '${cfdiRelType}' no tiene ningún CFDI (UUID) asociado en custom.relatedCfdis.cfdis.">
+</#if>
+
 <#-- Regla SAT: si la Nota de Crédito "paga" un anticipo (Tipo de Relación 07), el Método de Pago
 del propio comprobante debe forzarse a PUE, sin importar el método habitual del cliente. Regla de
 catálogo SAT fija (no es una decisión de negocio de la empresa) — ver mysuite_credit_memo_template.ftl,
 que ya aplica esta misma regla en producción. -->
 <#if cfdiRelType == "07">
 <#assign satMetodoPago = "PUE">
-</#if>
 </#if>
 
 <#-- 3. CONSTRUCCIÓN DEL JSON -->
@@ -95,7 +93,6 @@ que ya aplica esta misma regla en producción. -->
 "Currency": "${currencyCode}",
 "ExpeditionPlace": "${customCompanyInfo.zip}",
 "Exportation": "${satCodes.exportType}",
-<#if custom.relatedCfdis?has_content && custom.relatedCfdis.types?has_content && cfdisArray?has_content>
 "Relations": {
 "Type": "${cfdiRelType}",
 "Cfdis": [
@@ -106,7 +103,6 @@ que ya aplica esta misma regla en producción. -->
 </#list>
 ]
 },
-</#if>
 "Issuer": {
 "FiscalRegime": "${satCodes.industryType}",
 "Rfc": "${companyTaxRegNumber}",

@@ -12,7 +12,7 @@
       <isdeployed>T</isdeployed>
       <loglevel>DEBUG</loglevel>
       <recordtype>CUSTOMERPAYMENT</recordtype>
-      <status>RELEASED</status>
+      <status>TESTING</status>
     </scriptdeployment>
   </scriptdeployments>
 </usereventscript>

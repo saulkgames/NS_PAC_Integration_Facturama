@@ -8,7 +8,4 @@
     <objects>
         <path>~/Objects/*</path>
     </objects>
-    <translationimports>
-        <path>~/Translations/*</path>
-    </translationimports>
 </deploy>

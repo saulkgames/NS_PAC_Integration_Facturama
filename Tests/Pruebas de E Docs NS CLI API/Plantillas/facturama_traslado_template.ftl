@@ -1,15 +1,5 @@
 <#setting locale = "en_US">
 
-<#-- ADAPTADOR PURO (ver CLAUDE.md): el objeto Complemento.CartaPorte31 completo (Ubicaciones,
-Mercancias, Autotransporte, FiguraTransporte) lo arma fama_traslado_complement_ue.js al guardar la
-Ejecución de Orden de Venta y lo persiste en custbody_sads_fama_cartaporte_payload — esta plantilla
-solo lo transporta, igual que facturama_customerpayment_template.ftl con
-custbody_sads_fama_cpago_payload. Modo diagnóstico (decisión del usuario, 2026-09-26): ese payload
-puede traer valores "{campo}_vacia" donde falte un dato — revisar antes de timbrar.
-
-Único caso que sigue deteniendo la generación aquí (no es un dato faltante, es una modalidad que
-el User Event no sabe construir todavía): Transporte Aéreo/Marítimo/Ferroviario. -->
-
 <#if custom.oneWorldFeature == "true">
 <#assign customCompanyInfo = transaction.subsidiary>
 <#else>
@@ -18,12 +8,6 @@ el User Event no sabe construir todavía): Transporte Aéreo/Marítimo/Ferroviar
 
 <#assign "satCodes" = custom.satcodes>
 <#assign "companyTaxRegNumber" = custom.companyInfo.rfc>
-
-<#-- COMPROBANTE DE TRASLADO (CfdiType T): el Receptor es el propio emisor — no hay venta, solo
-se acredita el movimiento legal de mercancía propia entre ubicaciones. Confirmado por evidencia
-directa: la plantilla MySuite ya probada en esta cuenta usa custom.companyInfo.rfc /
-customCompanyInfo.custrecord_mx_sat_registered_name para Receptor (nunca customer.*), y el XML
-certificado real (transacción 1520482) trae RFCReceptor = RFCEmisor. -->
 
 <#if transaction.custbody_drt_cp_tipo_transporte?has_content && transaction.custbody_drt_cp_tipo_transporte != "Autotransporte Federal">
 <#stop "ERROR FATAL: Esta plantilla solo soporta Autotransporte Federal. Tipo de transporte recibido: '${transaction.custbody_drt_cp_tipo_transporte}' no está implementado todavía.">
@@ -52,8 +36,6 @@ certificado real (transacción 1520482) trae RFCReceptor = RFCEmisor. -->
 "Serie": "${transaction.custbody_mx_cfdi_serie?json_string}",
 </#if>
 "Date": "${transaction.trandate?string.iso}T00:00:00",
-"Currency": "MXN",
-"CurrencyExchangeRate": 1,
 "ExpeditionPlace": "${strOrVacio(customCompanyInfo.zip!"", "customcompanyinfo_zip")?json_string}",
 "Exportation": "01",
 "Issuer": {
